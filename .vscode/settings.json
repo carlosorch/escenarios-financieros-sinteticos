@@ -34,11 +34,51 @@
   "latex-workshop.synctex.afterBuild.enabled": true,
   "latex-workshop.view.pdf.viewer": "tab",
   "latex-workshop.latex.clean.subfolder.enabled": true,
-  "latex-workshop.latex.autoBuild.run": "onSave",
+  "latex-workshop.latex.autoBuild.run": "never",
   "latex-workshop.latex.recipe.default": "first",
   "latex-workshop.latex.tools": [
     {
-      "name": "latexmk",
+      "name": "docker_latexmk",
+      "command": "docker",
+      "args": [
+        "run",
+        "--rm",
+        "-v",
+        "%DIR%:/work",
+        "-w",
+        "/work",
+        "sanjibsen/weblatex:latest",
+        "latexmk",
+        "-synctex=1",
+        "-interaction=nonstopmode",
+        "-file-line-error",
+        "-pdf",
+        "-outdir=PDF",
+        "%DOCFILE%"
+      ]
+    },
+    {
+      "name": "docker_latexmk_xelatex",
+      "command": "docker",
+      "args": [
+        "run",
+        "--rm",
+        "-v",
+        "%DIR%:/work",
+        "-w",
+        "/work",
+        "sanjibsen/weblatex:latest",
+        "latexmk",
+        "-synctex=1",
+        "-interaction=nonstopmode",
+        "-file-line-error",
+        "-xelatex",
+        "-outdir=PDF",
+        "%DOCFILE%"
+      ]
+    },
+    {
+      "name": "latexmk_local",
       "command": "latexmk",
       "args": [
         "-synctex=1",
@@ -50,7 +90,7 @@
       ]
     },
     {
-      "name": "latexmk_xelatex",
+      "name": "latexmk_local_xelatex",
       "command": "latexmk",
       "args": [
         "-synctex=1",
@@ -64,15 +104,27 @@
   ],
   "latex-workshop.latex.recipes": [
     {
-      "name": "latexmk",
+      "name": "docker_latexmk (recommended)",
       "tools": [
-        "latexmk"
+        "docker_latexmk"
       ]
     },
     {
-      "name": "latexmk_xelatex",
+      "name": "docker_latexmk_xelatex",
       "tools": [
-        "latexmk_xelatex"
+        "docker_latexmk_xelatex"
+      ]
+    },
+    {
+      "name": "latexmk_local",
+      "tools": [
+        "latexmk_local"
+      ]
+    },
+    {
+      "name": "latexmk_local_xelatex",
+      "tools": [
+        "latexmk_local_xelatex"
       ]
     }
   ],

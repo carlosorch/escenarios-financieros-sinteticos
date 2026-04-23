@@ -1,6 +1,7 @@
 {
   "recommendations": [
     "James-Yu.latex-workshop",
+    "ms-azuretools.vscode-docker",
     "GitHub.copilot",
     "ms-vsliveshare.vsliveshare",
     "znck.grammarly"

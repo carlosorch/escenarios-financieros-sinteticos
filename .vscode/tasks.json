@@ -2,6 +2,17 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "Setup local thesis environment (Docker)",
+      "type": "shell",
+      "command": "./scripts/setup-local.sh",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
       "label": "Compile thesis PDF (Docker)",
       "type": "shell",
       "command": "docker run --rm -v \"${workspaceFolder}\":/work -w /work sanjibsen/weblatex:latest latexmk -pdf -interaction=nonstopmode -file-line-error -outdir=PDF plantilla.tex",

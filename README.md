@@ -5,12 +5,23 @@ Este repositorio esta preparado para trabajar la tesis en local con VS Code, Doc
 ## Que queda configurado
 
 - WebLaTex mediante `sanjibsen/weblatex:latest` en `.devcontainer/devcontainer.json`.
-- Compilacion automatica al guardar (`latex-workshop`) y salida en `PDF/`.
-- Tarea de VS Code para compilar con Docker sin instalar LaTeX localmente.
+- Pipeline local en VS Code con Docker (sin instalar LaTeX en el sistema).
+- Tarea de setup para dejar todo listo con un click y tarea de compilacion a PDF.
 - Extensions para colaboracion y redaccion: LaTeX Workshop, Live Share, Copilot y Grammarly.
 - Configuracion local equivalente en `.vscode/settings.json` para quien trabaje sin Codespaces.
 - Ignorado de artefactos de compilacion en `.gitignore`.
 - Workflow manual de GitHub Actions para generar el PDF solo cuando se necesite.
+
+## Inicio rapido (2 clicks)
+
+1. Abrir el repo en VS Code.
+2. Ejecutar `Terminal` -> `Run Task` -> `Setup local thesis environment (Docker)`.
+3. Cuando termine, ejecutar `Terminal` -> `Run Task` -> `Compile thesis PDF (Docker)`.
+4. Abrir `PDF/plantilla.pdf`.
+
+Con esto no hace falta tener `latexmk` instalado localmente.
+
+Nota: en Windows/macOS hay que abrir Docker Desktop antes del primer setup.
 
 ## Guia paso a paso para trabajar en local
 
@@ -204,7 +215,8 @@ Opcion recomendada si no quereis instalar LaTeX completo en cada ordenador.
 En VS Code:
 
 1. Ir a `Terminal` -> `Run Task`
-2. Elegir `Compile thesis PDF (Docker)`
+2. Elegir `Setup local thesis environment (Docker)` la primera vez
+3. Elegir `Compile thesis PDF (Docker)` para compilar
 
 O por terminal manual:
 
@@ -219,7 +231,8 @@ Salida esperada:
 
 ### 7. Compilar al guardar con LaTeX Workshop
 
-Esto solo aplica si esa persona tiene LaTeX instalado localmente, por ejemplo `latexmk`.
+En esta configuracion, la receta recomendada de `LaTeX Workshop` usa Docker.
+Si alguien quiere usar compilacion local sin Docker, entonces si necesita `latexmk` instalado en su equipo.
 
 Comprobacion:
 
@@ -227,13 +240,13 @@ Comprobacion:
 latexmk -v
 ```
 
-Si existe `latexmk`, entonces:
+Si existe `latexmk`, tambien se puede usar receta local:
 
 - abrir `plantilla.tex`
 - guardar con `Ctrl+S`
 - `LaTeX Workshop` recompilara automaticamente
 
-Si `latexmk` no esta instalado, usar Docker como en el paso anterior.
+Si `latexmk` no esta instalado, seguir con Docker (recomendado para el equipo).
 
 ### 8. Ver el PDF
 
@@ -310,19 +323,11 @@ docker run --rm -v "$PWD":/work -w /work sanjibsen/weblatex:latest \
 
 ## Compilacion local con VS Code
 
-- Si tienes TeX Live/MiKTeX + `latexmk` en tu equipo, `LaTeX Workshop` recompila al guardar.
-- Si no quieres instalar LaTeX, usa Docker con la tarea incluida de VS Code.
+- Receta recomendada de `LaTeX Workshop`: `docker_latexmk (recommended)`.
+- Sin `latexmk` local: usar `Run Task` -> `Compile thesis PDF (Docker)`.
+- Con `latexmk` local: se puede cambiar a receta `latexmk_local`.
 
-Este workflow no se ejecuta automaticamente en cada `push` o `pull request`.
-
-## Compilacion local con Docker
-
-```bash
-docker run --rm -v "$PWD":/work -w /work sanjibsen/weblatex:latest \
-  latexmk -pdf -interaction=nonstopmode -file-line-error -outdir=PDF plantilla.tex
-```
-
-El PDF queda en `PDF/plantilla.pdf`.
+Este workflow de repositorio no se ejecuta automaticamente en cada `push` o `pull request`.
 
 ## Codespaces
 
