@@ -23,6 +23,109 @@ Cada persona del equipo debe tener instalado:
 - `Docker Desktop` o `Docker Engine`
 - Cuenta de GitHub con acceso al repo `carlosorch/tfm`
 
+### Instalacion en Linux, macOS y Windows
+
+#### Linux (Ubuntu/Debian)
+
+Git:
+
+```bash
+sudo apt update
+sudo apt install -y git
+```
+
+VS Code:
+
+```bash
+sudo snap install code --classic
+```
+
+Docker:
+
+```bash
+curl -fsSL https://get.docker.com | sh
+sudo usermod -aG docker $USER
+newgrp docker
+```
+
+#### macOS
+
+Si tienes `Homebrew` instalado:
+
+Git:
+
+```bash
+brew install git
+```
+
+VS Code:
+
+```bash
+brew install --cask visual-studio-code
+```
+
+Docker Desktop:
+
+```bash
+brew install --cask docker
+```
+
+Despues de instalar Docker Desktop en macOS:
+
+1. Abrir la app `Docker`
+2. Esperar a que termine de arrancar
+3. Comprobarlo con:
+
+```bash
+docker --version
+docker ps
+```
+
+Si no tienes `Homebrew`, puedes instalarlo con:
+
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+#### Windows
+
+Opcion recomendada: usar `winget` en PowerShell.
+
+Git:
+
+```powershell
+winget install --id Git.Git -e
+```
+
+VS Code:
+
+```powershell
+winget install --id Microsoft.VisualStudioCode -e
+```
+
+Docker Desktop:
+
+```powershell
+winget install --id Docker.DockerDesktop -e
+```
+
+Despues de instalar Docker Desktop en Windows:
+
+1. Abrir `Docker Desktop`
+2. Esperar a que termine de arrancar
+3. Comprobarlo en PowerShell:
+
+```powershell
+docker --version
+docker ps
+```
+
+Si `winget` no esta disponible, usar los instaladores oficiales:
+
+- Git: `https://git-scm.com/downloads`
+- VS Code: `https://code.visualstudio.com/Download`
+- Docker Desktop: `https://www.docker.com/products/docker-desktop/`
+
 Comprobacion rapida en terminal:
 
 ```bash
