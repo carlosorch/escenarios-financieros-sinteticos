@@ -1,274 +1,182 @@
-# TFM - Flujo local con VS Code y WebLaTex
+# TFM - Flujo local con VS Code y LaTeX
 
-Este repositorio esta preparado para trabajar la tesis en local con VS Code, Docker y GitHub como base de control de versiones.
+Este repositorio esta preparado para trabajar la tesis en local con VS Code, LaTeX instalado en el ordenador y GitHub como control de versiones.
 
 ## Que queda configurado
 
-- WebLaTex mediante `sanjibsen/weblatex:latest` en `.devcontainer/devcontainer.json`.
-- Pipeline local en VS Code con Docker (sin instalar LaTeX en el sistema).
-- Tarea de setup para dejar todo listo con un click y tarea de compilacion a PDF.
-- Extensions para colaboracion y redaccion: LaTeX Workshop, Live Share, Copilot y Grammarly.
-- Configuracion local equivalente en `.vscode/settings.json` para quien trabaje sin Codespaces.
-- Ignorado de artefactos de compilacion en `.gitignore`.
-- Workflow manual de GitHub Actions para generar el PDF solo cuando se necesite.
+- Compilacion local con `latexmk`, `pdflatex` y `bibtex`.
+- Setup automatico desde VS Code para instalar/verificar dependencias LaTeX.
+- Tarea de compilacion local a PDF.
+- LaTeX Workshop configurado para usar `latexmk_local` como receta recomendada.
+- Docker queda solo como fallback opcional, no como flujo principal.
+- Workflow manual de GitHub Actions para generar el PDF cuando se necesite.
 
-## Inicio rapido (2 clicks)
+## Inicio rapido
 
 1. Abrir el repo en VS Code.
-2. Ejecutar `Terminal` -> `Run Task` -> `Setup local thesis environment (Docker)`.
-3. Cuando termine, ejecutar `Terminal` -> `Run Task` -> `Compile thesis PDF (Docker)`.
+2. Ejecutar `Terminal` -> `Run Task` -> `Setup local thesis environment`.
+3. Cuando termine, ejecutar `Terminal` -> `Run Task` -> `Compile thesis PDF`.
 4. Abrir `PDF/plantilla.pdf`.
 
-Con esto no hace falta tener `latexmk` instalado localmente.
+En Windows, el setup instala MiKTeX y Strawberry Perl con `winget` si no estan instalados. Puede pedir permisos de administrador.
 
-Nota: en Windows/macOS hay que abrir Docker Desktop antes del primer setup.
+## Requisitos base
 
-## Guia paso a paso para trabajar en local
-
-### 1. Instalar lo minimo necesario
-
-Cada persona del equipo debe tener instalado:
+Cada persona del equipo debe tener:
 
 - `Git`
 - `VS Code`
-- `Docker Desktop` o `Docker Engine`
-- Cuenta de GitHub con acceso al repo `carlosorch/tfm`
+- Cuenta de GitHub con acceso al repo
 
-### Instalacion en Linux, macOS y Windows
+El setup del proyecto se encarga de LaTeX:
 
-#### Linux (Ubuntu/Debian)
+- Windows: instala/verifica MiKTeX y Strawberry Perl, necesario para ejecutar `latexmk`.
+- Linux: instala paquetes TeX Live usando `apt`, `dnf` o `pacman` si estan disponibles.
+- macOS: instala `mactex-no-gui` usando Homebrew si esta disponible.
 
-Git:
+## Instalacion base por sistema
 
-```bash
-sudo apt update
-sudo apt install -y git
-```
-
-VS Code:
-
-```bash
-sudo snap install code --classic
-```
-
-Docker:
-
-```bash
-curl -fsSL https://get.docker.com | sh
-sudo usermod -aG docker $USER
-newgrp docker
-```
-
-#### macOS
-
-Si tienes `Homebrew` instalado:
-
-Git:
-
-```bash
-brew install git
-```
-
-VS Code:
-
-```bash
-brew install --cask visual-studio-code
-```
-
-Docker Desktop:
-
-```bash
-brew install --cask docker
-```
-
-Despues de instalar Docker Desktop en macOS:
-
-1. Abrir la app `Docker`
-2. Esperar a que termine de arrancar
-3. Comprobarlo con:
-
-```bash
-docker --version
-docker ps
-```
-
-Si no tienes `Homebrew`, puedes instalarlo con:
-
-```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-```
-
-#### Windows
+### Windows
 
 Opcion recomendada: usar `winget` en PowerShell.
 
-Git:
-
 ```powershell
 winget install --id Git.Git -e
-```
-
-VS Code:
-
-```powershell
 winget install --id Microsoft.VisualStudioCode -e
-```
-
-Docker Desktop:
-
-```powershell
-winget install --id Docker.DockerDesktop -e
-```
-
-Despues de instalar Docker Desktop en Windows:
-
-1. Abrir `Docker Desktop`
-2. Esperar a que termine de arrancar
-3. Comprobarlo en PowerShell:
-
-```powershell
-docker --version
-docker ps
 ```
 
 Si `winget` no esta disponible, usar los instaladores oficiales:
 
 - Git: `https://git-scm.com/downloads`
 - VS Code: `https://code.visualstudio.com/Download`
-- Docker Desktop: `https://www.docker.com/products/docker-desktop/`
 
-Comprobacion rapida en terminal:
+No hace falta instalar Docker para trabajar en local.
+
+### Linux Ubuntu/Debian
 
 ```bash
-git --version
-docker --version
-code --version
+sudo apt update
+sudo apt install -y git
+sudo snap install code --classic
 ```
 
-### 2. Clonar el repositorio
+### macOS
 
-En una terminal, ejecutar:
+Con Homebrew:
+
+```bash
+brew install git
+brew install --cask visual-studio-code
+```
+
+Si no tienes Homebrew:
+
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+## Clonar y abrir el repositorio
 
 ```bash
 git clone git@github.com:carlosorch/tfm.git
 cd tfm
+code .
 ```
 
-Si alguien no tiene SSH configurado en GitHub, puede usar HTTPS:
+Si alguien no tiene SSH configurado en GitHub:
 
 ```bash
 git clone https://github.com/carlosorch/tfm.git
 cd tfm
-```
-
-### 3. Abrir el proyecto en VS Code
-
-Desde la carpeta del repo:
-
-```bash
 code .
 ```
 
-Al abrirlo, VS Code deberia sugerir instalar extensiones recomendadas.
-Instalar como minimo:
+Al abrir el repo, VS Code deberia sugerir instalar extensiones recomendadas. Instalar como minimo:
 
 - `LaTeX Workshop`
 - `Live Share` si vais a compartir una sesion
 - `Grammarly` solo si a esa persona le resulta util
 
-### 4. Arrancar Docker
-
-Antes de compilar con el flujo recomendado, Docker tiene que estar encendido.
-
-Comprobarlo con:
-
-```bash
-docker ps
-```
-
-Si ese comando responde sin error, Docker esta listo.
-
-### 5. Editar la tesis
-
-El archivo principal es:
-
-```text
-plantilla.tex
-```
-
-La bibliografia esta en:
-
-```text
-bibliografia.bib
-```
-
-Las imagenes estan en:
-
-```text
-media/
-```
-
-### 6. Compilar el PDF en local con Docker
-
-Opcion recomendada si no quereis instalar LaTeX completo en cada ordenador.
+## Setup local de LaTeX
 
 En VS Code:
 
-1. Ir a `Terminal` -> `Run Task`
-2. Elegir `Setup local thesis environment (Docker)` la primera vez
-3. Elegir `Compile thesis PDF (Docker)` para compilar
+1. Ir a `Terminal` -> `Run Task`.
+2. Elegir `Setup local thesis environment`.
+3. Esperar a que instale/verifique LaTeX.
+4. Confirmar que se genera `PDF/plantilla.pdf`.
 
-O por terminal manual:
+Por terminal:
 
 ```bash
-docker run --rm -v "$PWD":/work -w /work sanjibsen/weblatex:latest \
-  latexmk -pdf -interaction=nonstopmode -file-line-error -outdir=PDF plantilla.tex
+./scripts/setup-local.sh
+```
+
+En Windows tambien se puede ejecutar:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\setup-local-windows.ps1
+```
+
+## Compilar el PDF
+
+En VS Code:
+
+1. Ir a `Terminal` -> `Run Task`.
+2. Elegir `Compile thesis PDF`.
+
+Por terminal:
+
+```bash
+./scripts/compile-local.sh
+```
+
+En Windows:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\compile-local-windows.ps1
 ```
 
 Salida esperada:
 
-- El PDF se genera en `PDF/plantilla.pdf`
+- `PDF/plantilla.pdf`
 
-### 7. Compilar al guardar con LaTeX Workshop
+## Compilar con LaTeX Workshop
 
-En esta configuracion, la receta recomendada de `LaTeX Workshop` usa Docker.
-Si alguien quiere usar compilacion local sin Docker, entonces si necesita `latexmk` instalado en su equipo.
+La receta recomendada es:
 
-Comprobacion:
-
-```bash
-latexmk -v
+```text
+latexmk_local (recommended)
 ```
 
-Si existe `latexmk`, tambien se puede usar receta local:
+Para compilar desde LaTeX Workshop:
 
 - abrir `plantilla.tex`
-- guardar con `Ctrl+S`
-- `LaTeX Workshop` recompilara automaticamente
+- ejecutar `LaTeX Workshop: Build LaTeX project`
+- o usar el boton de build de la extension
 
-Si `latexmk` no esta instalado, seguir con Docker (recomendado para el equipo).
+La autocompilacion al guardar esta desactivada en `.vscode/settings.json` para evitar builds constantes. Si el equipo la quiere activar, cambiar:
 
-### 8. Ver el PDF
+```json
+"latex-workshop.latex.autoBuild.run": "onSave"
+```
 
-Las dos opciones mas comodas son:
+## Archivos principales
 
-- abrir `PDF/plantilla.pdf` con el visor de VS Code
-- abrir `PDF/plantilla.pdf` con el visor PDF del sistema operativo
+- Documento principal: `plantilla.tex`
+- Bibliografia: `bibliografia.bib`
+- Imagenes: `media/`
+- PDF generado: `PDF/plantilla.pdf`
 
-Si el visor integrado va lento, usar el visor local del sistema suele ir mejor.
+## Flujo diario recomendado
 
-### 9. Flujo diario recomendado
-
-Cada vez que alguien vaya a trabajar:
+Antes de empezar:
 
 ```bash
-cd tfm
 git pull
 ```
 
-Editar los archivos necesarios y compilar.
-
-Cuando termine sus cambios:
+Despues de editar y compilar:
 
 ```bash
 git status
@@ -277,70 +185,78 @@ git commit -m "Describe brevemente el cambio"
 git push
 ```
 
-### 10. Si dos personas editan a la vez
-
-Flujo simple recomendado:
+Si dos personas editan a la vez:
 
 - antes de empezar: `git pull`
 - al terminar: `git add`, `git commit`, `git push`
 - si Git avisa de conflicto: hacer otro `git pull` y resolverlo antes de seguir
 
-### 11. Compilacion remota manual en GitHub
+## Compilacion remota manual en GitHub
 
 Usar esto solo si quereis generar un PDF desde GitHub sin depender del ordenador local.
 
 Pasos:
 
-1. Entrar en el repo en GitHub
-2. Abrir la pestaña `Actions`
-3. Entrar en `Build Thesis PDF`
-4. Pulsar `Run workflow`
-5. Esperar a que termine
-6. Descargar el artefacto `tesis-pdf`
+1. Entrar en el repo en GitHub.
+2. Abrir la pestana `Actions`.
+3. Entrar en `Build Thesis PDF`.
+4. Pulsar `Run workflow`.
+5. Esperar a que termine.
+6. Descargar el artefacto `tesis-pdf`.
 
-### 12. Problemas tipicos
+## Docker como fallback
 
-Si falla Docker:
-
-```bash
-docker ps
-```
-
-Si falla Git porque faltan cambios remotos:
+Docker ya no es el flujo principal. Si alguien lo tiene instalado y quiere usarlo, sigue disponible:
 
 ```bash
-git pull
-```
-
-Si quereis recompilar limpio:
-
-```bash
-rm -rf PDF
-mkdir PDF
 docker run --rm -v "$PWD":/work -w /work sanjibsen/weblatex:latest \
   latexmk -pdf -interaction=nonstopmode -file-line-error -outdir=PDF plantilla.tex
 ```
 
-## Compilacion local con VS Code
+En VS Code tambien existe la task:
 
-- Receta recomendada de `LaTeX Workshop`: `docker_latexmk (recommended)`.
-- Sin `latexmk` local: usar `Run Task` -> `Compile thesis PDF (Docker)`.
-- Con `latexmk` local: se puede cambiar a receta `latexmk_local`.
+```text
+Compile thesis PDF (Docker fallback)
+```
 
-Este workflow de repositorio no se ejecuta automaticamente en cada `push` o `pull request`.
+## Problemas tipicos
+
+Si VS Code no encuentra `latexmk` justo despues de instalar MiKTeX:
+
+- cerrar VS Code
+- abrir VS Code otra vez
+- ejecutar `Setup local thesis environment`
+
+Si `latexmk` dice que falta `perl`:
+
+- ejecutar `Setup local thesis environment`
+- aceptar la instalacion de Strawberry Perl si Windows pide permisos
+- cerrar y abrir VS Code si la terminal antigua no detecta el nuevo `PATH`
+
+Si MiKTeX avisa `So far, you have not checked for MiKTeX updates`, el PDF puede estar compilando correctamente; para quitar el aviso, abrir `MiKTeX Console` y pulsar `Check for updates`.
+
+Si quieres recompilar limpio:
+
+```bash
+rm -rf PDF
+mkdir PDF
+./scripts/compile-local.sh
+```
+
+En Windows:
+
+```powershell
+Remove-Item -Recurse -Force .\PDF
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\compile-local-windows.ps1
+```
 
 ## Codespaces
 
-Codespaces queda disponible como opcion secundaria, pero el flujo recomendado para este proyecto es trabajar en local por rendimiento y mejor compatibilidad con el visor PDF y las extensiones.
+Codespaces queda disponible como opcion secundaria. El flujo recomendado para este proyecto es trabajar en local con LaTeX instalado en el ordenador.
 
 ## Colaboracion entre miembros del TFM
 
-- Cambios pequenos: commit directo a `main` (si el equipo lo acuerda).
-- Cambios grandes: rama + pull request + revision/comentarios.
-- Historial completo y reversible con Git (equivalente al historial de Overleaf, pero mas potente).
-- GitHub Actions consume cuota de la cuenta propietaria del repositorio (`carlosorch/tfm`).
-
-## Notas actuales del proyecto
-
-- La compilacion funciona correctamente en este entorno.
-- La bibliografia actual ya resuelve las referencias que faltaban en el documento.
+- Cambios pequenos: commit directo a `main` si el equipo lo acuerda.
+- Cambios grandes: rama + pull request + revision.
+- Historial completo y reversible con Git.
+- GitHub Actions consume cuota de la cuenta propietaria del repositorio.

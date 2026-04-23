@@ -38,6 +38,30 @@
   "latex-workshop.latex.recipe.default": "first",
   "latex-workshop.latex.tools": [
     {
+      "name": "latexmk_local",
+      "command": "latexmk",
+      "args": [
+        "-synctex=1",
+        "-interaction=nonstopmode",
+        "-file-line-error",
+        "-pdf",
+        "-outdir=PDF",
+        "%DOC%"
+      ]
+    },
+    {
+      "name": "latexmk_local_xelatex",
+      "command": "latexmk",
+      "args": [
+        "-synctex=1",
+        "-interaction=nonstopmode",
+        "-file-line-error",
+        "-xelatex",
+        "-outdir=PDF",
+        "%DOC%"
+      ]
+    },
+    {
       "name": "docker_latexmk",
       "command": "docker",
       "args": [
@@ -76,47 +100,11 @@
         "-outdir=PDF",
         "%DOCFILE%"
       ]
-    },
-    {
-      "name": "latexmk_local",
-      "command": "latexmk",
-      "args": [
-        "-synctex=1",
-        "-interaction=nonstopmode",
-        "-file-line-error",
-        "-pdf",
-        "-outdir=PDF",
-        "%DOC%"
-      ]
-    },
-    {
-      "name": "latexmk_local_xelatex",
-      "command": "latexmk",
-      "args": [
-        "-synctex=1",
-        "-interaction=nonstopmode",
-        "-file-line-error",
-        "-xelatex",
-        "-outdir=PDF",
-        "%DOC%"
-      ]
     }
   ],
   "latex-workshop.latex.recipes": [
     {
-      "name": "docker_latexmk (recommended)",
-      "tools": [
-        "docker_latexmk"
-      ]
-    },
-    {
-      "name": "docker_latexmk_xelatex",
-      "tools": [
-        "docker_latexmk_xelatex"
-      ]
-    },
-    {
-      "name": "latexmk_local",
+      "name": "latexmk_local (recommended)",
       "tools": [
         "latexmk_local"
       ]
@@ -126,11 +114,20 @@
       "tools": [
         "latexmk_local_xelatex"
       ]
+    },
+    {
+      "name": "docker_latexmk (fallback)",
+      "tools": [
+        "docker_latexmk"
+      ]
+    },
+    {
+      "name": "docker_latexmk_xelatex",
+      "tools": [
+        "docker_latexmk_xelatex"
+      ]
     }
   ],
-  "latex-workshop.view.pdf.color.dark.pageColorsBackground": "#171717",
-  "latex-workshop.view.pdf.color.dark.pageColorsForeground": "#FFFFFF",
-  "latex-workshop.view.pdf.color.dark.backgroundColor": "#171717",
   "editor.formatOnSave": true,
   "latex-workshop.latex.pdfWatch.delay": 500,
   "files.autoSave": "afterDelay",
