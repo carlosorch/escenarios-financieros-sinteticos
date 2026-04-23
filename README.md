@@ -12,27 +12,205 @@ Este repositorio esta preparado para trabajar la tesis en local con VS Code, Doc
 - Ignorado de artefactos de compilacion en `.gitignore`.
 - Workflow manual de GitHub Actions para generar el PDF solo cuando se necesite.
 
-## Flujo recomendado en local
+## Guia paso a paso para trabajar en local
 
-1. Clonar el repo y abrirlo en VS Code.
-2. Tener Docker arrancado.
-3. Editar `plantilla.tex` y guardar (`Ctrl+S`) si tienes `latexmk` instalado localmente.
-4. Si no tienes LaTeX instalado, ejecutar la tarea `Compile thesis PDF (Docker)` desde `Terminal` -> `Run Task`.
-5. Revisar `PDF/plantilla.pdf` con un visor PDF local o en la pestaña de LaTeX Workshop.
+### 1. Instalar lo minimo necesario
+
+Cada persona del equipo debe tener instalado:
+
+- `Git`
+- `VS Code`
+- `Docker Desktop` o `Docker Engine`
+- Cuenta de GitHub con acceso al repo `carlosorch/tfm`
+
+Comprobacion rapida en terminal:
+
+```bash
+git --version
+docker --version
+code --version
+```
+
+### 2. Clonar el repositorio
+
+En una terminal, ejecutar:
+
+```bash
+git clone git@github.com:carlosorch/tfm.git
+cd tfm
+```
+
+Si alguien no tiene SSH configurado en GitHub, puede usar HTTPS:
+
+```bash
+git clone https://github.com/carlosorch/tfm.git
+cd tfm
+```
+
+### 3. Abrir el proyecto en VS Code
+
+Desde la carpeta del repo:
+
+```bash
+code .
+```
+
+Al abrirlo, VS Code deberia sugerir instalar extensiones recomendadas.
+Instalar como minimo:
+
+- `LaTeX Workshop`
+- `Live Share` si vais a compartir una sesion
+- `Grammarly` solo si a esa persona le resulta util
+
+### 4. Arrancar Docker
+
+Antes de compilar con el flujo recomendado, Docker tiene que estar encendido.
+
+Comprobarlo con:
+
+```bash
+docker ps
+```
+
+Si ese comando responde sin error, Docker esta listo.
+
+### 5. Editar la tesis
+
+El archivo principal es:
+
+```text
+plantilla.tex
+```
+
+La bibliografia esta en:
+
+```text
+bibliografia.bib
+```
+
+Las imagenes estan en:
+
+```text
+media/
+```
+
+### 6. Compilar el PDF en local con Docker
+
+Opcion recomendada si no quereis instalar LaTeX completo en cada ordenador.
+
+En VS Code:
+
+1. Ir a `Terminal` -> `Run Task`
+2. Elegir `Compile thesis PDF (Docker)`
+
+O por terminal manual:
+
+```bash
+docker run --rm -v "$PWD":/work -w /work sanjibsen/weblatex:latest \
+  latexmk -pdf -interaction=nonstopmode -file-line-error -outdir=PDF plantilla.tex
+```
+
+Salida esperada:
+
+- El PDF se genera en `PDF/plantilla.pdf`
+
+### 7. Compilar al guardar con LaTeX Workshop
+
+Esto solo aplica si esa persona tiene LaTeX instalado localmente, por ejemplo `latexmk`.
+
+Comprobacion:
+
+```bash
+latexmk -v
+```
+
+Si existe `latexmk`, entonces:
+
+- abrir `plantilla.tex`
+- guardar con `Ctrl+S`
+- `LaTeX Workshop` recompilara automaticamente
+
+Si `latexmk` no esta instalado, usar Docker como en el paso anterior.
+
+### 8. Ver el PDF
+
+Las dos opciones mas comodas son:
+
+- abrir `PDF/plantilla.pdf` con el visor de VS Code
+- abrir `PDF/plantilla.pdf` con el visor PDF del sistema operativo
+
+Si el visor integrado va lento, usar el visor local del sistema suele ir mejor.
+
+### 9. Flujo diario recomendado
+
+Cada vez que alguien vaya a trabajar:
+
+```bash
+cd tfm
+git pull
+```
+
+Editar los archivos necesarios y compilar.
+
+Cuando termine sus cambios:
+
+```bash
+git status
+git add .
+git commit -m "Describe brevemente el cambio"
+git push
+```
+
+### 10. Si dos personas editan a la vez
+
+Flujo simple recomendado:
+
+- antes de empezar: `git pull`
+- al terminar: `git add`, `git commit`, `git push`
+- si Git avisa de conflicto: hacer otro `git pull` y resolverlo antes de seguir
+
+### 11. Compilacion remota manual en GitHub
+
+Usar esto solo si quereis generar un PDF desde GitHub sin depender del ordenador local.
+
+Pasos:
+
+1. Entrar en el repo en GitHub
+2. Abrir la pestaña `Actions`
+3. Entrar en `Build Thesis PDF`
+4. Pulsar `Run workflow`
+5. Esperar a que termine
+6. Descargar el artefacto `tesis-pdf`
+
+### 12. Problemas tipicos
+
+Si falla Docker:
+
+```bash
+docker ps
+```
+
+Si falla Git porque faltan cambios remotos:
+
+```bash
+git pull
+```
+
+Si quereis recompilar limpio:
+
+```bash
+rm -rf PDF
+mkdir PDF
+docker run --rm -v "$PWD":/work -w /work sanjibsen/weblatex:latest \
+  latexmk -pdf -interaction=nonstopmode -file-line-error -outdir=PDF plantilla.tex
+```
 
 ## Compilacion local con VS Code
 
 - Si tienes TeX Live/MiKTeX + `latexmk` en tu equipo, `LaTeX Workshop` recompila al guardar.
 - Si no quieres instalar LaTeX, usa Docker con la tarea incluida de VS Code.
 
-## Compilacion manual en GitHub
-
-1. Ir a `Actions` en el repositorio.
-2. Abrir `Build Thesis PDF`.
-3. Pulsar `Run workflow`.
-4. Descargar el artefacto `tesis-pdf` cuando termine.
-
-Este workflow ya no se ejecuta automaticamente en cada `push` o `pull request`.
+Este workflow no se ejecuta automaticamente en cada `push` o `pull request`.
 
 ## Compilacion local con Docker
 
