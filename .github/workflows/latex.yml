@@ -1,0 +1,27 @@
+name: Build Thesis PDF
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build-pdf:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build PDF with WebLaTex image
+        run: |
+          mkdir -p PDF
+          docker run --rm -v "$PWD":/work -w /work sanjibsen/weblatex:latest \
+            latexmk -pdf -interaction=nonstopmode -file-line-error -outdir=PDF plantilla.tex
+
+      - name: Upload PDF artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tesis-pdf
+          path: PDF/plantilla.pdf
