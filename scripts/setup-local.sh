@@ -20,6 +20,7 @@ install_with_apt() {
     texlive-latex-recommended \
     texlive-latex-extra \
     texlive-fonts-recommended \
+    texlive-fonts-extra \
     texlive-lang-spanish \
     texlive-bibtex-extra
 }
@@ -29,6 +30,7 @@ install_with_dnf() {
     latexmk \
     texlive-scheme-medium \
     texlive-collection-latexextra \
+    texlive-collection-fontsextra \
     texlive-collection-langspanish \
     texlive-apacite
 }
@@ -38,6 +40,7 @@ install_with_pacman() {
     texlive-bin \
     texlive-core \
     texlive-latexextra \
+    texlive-fontsextra \
     texlive-bibtexextra \
     texlive-langspanish
 }

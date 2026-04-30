@@ -204,6 +204,45 @@ Pasos:
 5. Esperar a que termine.
 6. Descargar el artefacto `tesis-pdf`.
 
+## Prueba de instalacion desde cero
+
+El repositorio incluye una prueba aislada para comprobar si una persona con un equipo limpio podria instalar las dependencias y compilar el PDF.
+
+La prueba se ejecuta en GitHub Actions sobre maquinas nuevas de:
+
+- Linux: `ubuntu-latest`
+- macOS: `macos-latest`
+- Windows: `windows-latest`
+
+Workflow:
+
+```text
+Fresh Install Test
+```
+
+Que valida:
+
+- instalacion/verificacion de LaTeX en Linux y macOS usando `scripts/setup-local.sh`
+- instalacion/verificacion de LaTeX en Windows usando `scripts/setup-ci-windows.ps1`
+- disponibilidad de `latexmk`, `pdflatex` y `bibtex`
+- disponibilidad de `perl` en Windows, necesario para `latexmk`
+- generacion correcta de `PDF/plantilla.pdf`
+
+En Windows, la prueba de GitHub Actions usa un script separado porque el setup normal para usuarios puede requerir permisos de administrador mediante `winget`. El flujo para usuarios sigue siendo:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\setup-local-windows.ps1
+```
+
+Para ejecutar la prueba desde GitHub:
+
+1. Entrar en el repo en GitHub.
+2. Abrir la pestana `Actions`.
+3. Entrar en `Fresh Install Test`.
+4. Pulsar `Run workflow`.
+5. Revisar los tres jobs: Linux, macOS y Windows.
+6. Descargar el artefacto `thesis-pdf-*` si se quiere revisar el PDF generado por cada sistema.
+
 ## Docker como fallback
 
 Docker ya no es el flujo principal. Si alguien lo tiene instalado y quiere usarlo, sigue disponible:
