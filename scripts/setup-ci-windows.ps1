@@ -3,6 +3,17 @@ $ErrorActionPreference = "Stop"
 $repoRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
 Set-Location $repoRoot
 
+function Get-ToolPaths {
+  return @(
+    "$env:LOCALAPPDATA\Programs\MiKTeX\miktex\bin\x64",
+    "$env:ProgramFiles\MiKTeX\miktex\bin\x64",
+    "${env:ProgramFiles(x86)}\MiKTeX\miktex\bin",
+    "C:\Strawberry\perl\bin",
+    "$env:ProgramFiles\Strawberry\perl\bin",
+    "${env:ProgramFiles(x86)}\Strawberry\perl\bin"
+  )
+}
+
 function Add-ExistingPath {
   param([string[]] $Paths)
 
@@ -14,14 +25,19 @@ function Add-ExistingPath {
 }
 
 function Refresh-ToolPaths {
-  Add-ExistingPath @(
-    "$env:LOCALAPPDATA\Programs\MiKTeX\miktex\bin\x64",
-    "$env:ProgramFiles\MiKTeX\miktex\bin\x64",
-    "${env:ProgramFiles(x86)}\MiKTeX\miktex\bin",
-    "C:\Strawberry\perl\bin",
-    "$env:ProgramFiles\Strawberry\perl\bin",
-    "${env:ProgramFiles(x86)}\Strawberry\perl\bin"
-  )
+  Add-ExistingPath (Get-ToolPaths)
+}
+
+function Persist-ToolPathsForGitHubActions {
+  if (-not $env:GITHUB_PATH) {
+    return
+  }
+
+  foreach ($path in (Get-ToolPaths)) {
+    if ($path -and (Test-Path $path)) {
+      Add-Content -Path $env:GITHUB_PATH -Value $path
+    }
+  }
 }
 
 function Test-Command {
@@ -89,5 +105,7 @@ latexmk -pdf -interaction=nonstopmode -file-line-error -outdir=PDF plantilla.tex
 if ($LASTEXITCODE -ne 0 -or -not (Test-Path "PDF\plantilla.pdf")) {
   Write-Error "[setup-ci][error] PDF\plantilla.pdf was not generated."
 }
+
+Persist-ToolPathsForGitHubActions
 
 Write-Host "[setup-ci] Windows CI LaTeX environment is ready."

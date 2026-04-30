@@ -53,6 +53,21 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
+          $toolPaths = @(
+            "$env:LOCALAPPDATA\Programs\MiKTeX\miktex\bin\x64",
+            "$env:ProgramFiles\MiKTeX\miktex\bin\x64",
+            "${env:ProgramFiles(x86)}\MiKTeX\miktex\bin",
+            "C:\Strawberry\perl\bin",
+            "$env:ProgramFiles\Strawberry\perl\bin",
+            "${env:ProgramFiles(x86)}\Strawberry\perl\bin"
+          )
+
+          foreach ($path in $toolPaths) {
+            if ($path -and (Test-Path $path) -and $env:Path -notlike "*$path*") {
+              $env:Path = "$path;$env:Path"
+            }
+          }
+
           latexmk -version
           pdflatex --version
           bibtex --version
