@@ -65,19 +65,19 @@
 \listoftables
 
 \chapter{Resumen}
-Este estudio tiene como finalidad examinar la posibilidad de mejorar la optimización de carteras utilizando modelos generativos y métricas fundamentadas en la teoría de la información. Para esto, se propone un método que une Autoencoders Variacionales y Redes Generativas Adversarias junto con medidas como la divergencia de Kullback-Leibler, lo que permite aprender distribuciones complejas de retornos financieros y crear escenarios probabilísticos. A partir de estos escenarios, se analiza la calidad de las distribuciones obtenidas y su aplicabilidad en la creación de carteras, comparando los resultados con técnicas tradicionales como el modelo media-varianza. Se espera que los resultados ofrezcan una mejor representación del riesgo y las relaciones entre activos, lo que podría llevar a carteras más sólidas. 
+Este trabajo desarrolla y evalúa un prototipo reproducible de inteligencia artificial generativa aplicado a la generación de escenarios financieros sintéticos y a su uso en la optimización de carteras. La propuesta se plantea como un pipeline experimental que parte de la obtención de datos financieros reales, transforma los precios ajustados en retornos logarítmicos y construye ventanas temporales multiactivo. Sobre estas ventanas se entrenan modelos generativos basados en Autoencoders Variacionales (VAE) y TimeGAN. A partir de estos modelos se generan escenarios sintéticos de mercado, que son evaluados mediante métricas estadísticas, temporales e informacionales, incluyendo divergencias de Kullback-Leibler y Jensen-Shannon.
 
-En resumen, el estudio sugiere una alternativa metodológica que combina aprendizaje automático y teoría de la información para optimizar el proceso de toma de decisiones financieras.
+La aportación principal del trabajo no consiste en proponer una nueva teoría financiera ni un algoritmo completamente nuevo, sino en diseñar un flujo técnico reproducible para estudiar si los escenarios financieros sintéticos preservan información relevante de los retornos reales. Asimismo, se analiza si dichos escenarios pueden contribuir al estudio de carteras más robustas frente a enfoques clásicos. Para ello, los escenarios generados se integran en modelos de optimización de cartera y se comparan con baselines como la cartera equiponderada, la cartera de mínima varianza y el modelo de Markowitz. La evaluación financiera se realiza sobre datos reales fuera de muestra, con el fin de separar la fidelidad distribucional de los escenarios sintéticos de su utilidad práctica en la asignación de activos.
 
 
-{\bf Palabras Clave:} optimización de carteras, modelos generativos, teoría de la información, riesgo financiero, aprendizaje automático
+{\bf Palabras Clave:} optimización de carteras, IA generativa, TimeGAN, VAE, escenarios financieros sintéticos, teoría de la información, divergencia de Jensen-Shannon, divergencia de Kullback-Leibler
 
 \chapter{Abstract}
-This study aims to analyze the potential of improving portfolio optimization through the use of generative models and information-theoretic metrics. The proposed methodology combines Variational Autoencoders and Generative Adversarial Networks with measures such as Kullback-Leibler divergence to learn complex return distributions and generate probabilistic market scenarios. These scenarios are used to evaluate the quality of the generated distributions and their applicability in portfolio construction, comparing the results with traditional approaches such as mean-variance optimization. The expected findings suggest an improved representation of risk and asset dependencies, potentially leading to more robust portfolios.
+This work develops and evaluates a reproducible generative AI pipeline for synthetic financial scenario generation, distributional validation, and portfolio optimization. The proposed experimental workflow starts from real financial data, transforms adjusted prices into logarithmic returns, and builds multivariate temporal windows. These windows are used to train generative models based on a Variational Autoencoder (VAE) and TimeGAN. The resulting synthetic market scenarios are assessed through statistical, temporal, and information-theoretic metrics, including Kullback-Leibler divergence and Jensen-Shannon divergence.
 
-In conclusion, this work proposes a methodological framework that integrates machine learning and information theory to enhance financial decision-making.
+The main contribution is not a new financial theory or a completely new algorithm, but a reproducible experimental pipeline designed to analyze whether synthetic financial scenarios preserve relevant information from real returns. The work also studies whether these scenarios can support the analysis of more robust portfolio construction when compared with classical approaches. The generated scenarios are integrated into portfolio optimization models and compared against baselines such as the equally weighted portfolio, minimum-variance portfolio, and Markowitz mean-variance optimization. Financial performance is evaluated on real out-of-sample data, separating the distributional fidelity of the generated scenarios from their practical usefulness in asset allocation.
 
-{\bf Keywords:} portfolio optimization, generative models, information theory, financial risk, machine learning
+{\bf Keywords:} portfolio optimization, generative AI, TimeGAN, Variational Autoencoder, synthetic financial scenarios, information theory, Kullback-Leibler divergence, Jensen-Shannon divergence
 
 
 \mainmatter
@@ -89,7 +89,7 @@ En particular, mediante el enfoque media-varianza, Markowitz estableció que el 
 
 No obstante, a pesar de su relevancia teórica, la aplicación de estos enfoques a datos financieros reales presenta limitaciones importantes. En la práctica, los retornos de los activos no suelen ajustarse a distribuciones normales, sino que muestran asimetrías, colas pesadas y episodios de volatilidad agrupada. Asimismo, las relaciones entre activos pueden ser no lineales y variar a lo largo del tiempo, especialmente en contextos de inestabilidad o crisis financieras. Estas características dificultan la estimación precisa de los parámetros necesarios para el modelo y pueden dar lugar a soluciones inestables o poco robustas, evidenciando la necesidad de desarrollar metodologías más flexibles capaces de capturar la complejidad inherente a los mercados financieros.
 
-En este contexto, el presente trabajo se sitúa en la intersección entre finanzas cuantitativas, inteligencia artificial y teoría de la información. En concreto, se propone estudiar si el uso de modelos generativos, como las Redes Generativas Adversarias y los Autoencoders Variacionales, junto con medidas informacionales como la divergencia de Kullback-Leibler \cite{Kullback1951}, puede contribuir a construir carteras más robustas y con una mejor representación del riesgo. De este modo, el trabajo pretende explorar una alternativa metodológica a los enfoques clásicos, incorporando herramientas capaces de modelar distribuciones complejas de retornos y dependencias más realistas entre activos.
+En este contexto, el presente trabajo se sitúa en la intersección entre finanzas cuantitativas, inteligencia artificial y teoría de la información. En concreto, se propone estudiar si el uso de modelos generativos, como TimeGAN y los Autoencoders Variacionales, junto con medidas informacionales como la divergencia de Kullback-Leibler \cite{Kullback1951}, puede contribuir a construir carteras más robustas y con una mejor representación del riesgo. De este modo, el trabajo pretende explorar una alternativa metodológica a los enfoques clásicos, incorporando herramientas capaces de modelar distribuciones complejas de retornos y dependencias más realistas entre activos.
 
 La relevancia de este problema no es únicamente teórica. En la práctica, una cartera se construye a partir de estimaciones sobre el comportamiento futuro de los activos, por lo que cualquier error en la representación de sus retornos puede trasladarse directamente a la asignación de pesos. Si dichas estimaciones simplifican en exceso la realidad del mercado, por ejemplo asumiendo normalidad o relaciones de dependencia estables, el resultado puede ser una cartera aparentemente eficiente en términos históricos pero vulnerable cuando cambia el entorno financiero. En consecuencia, mejorar la forma en que se representan los retornos no es una cuestión secundaria, sino un elemento central para reforzar la calidad del proceso de decisión.
 
@@ -119,7 +119,7 @@ No obstante, su aplicación práctica presenta dificultades cuando se trabaja co
 
 Uno de los principales problemas de los enfoques tradicionales es que dependen mucho de estimaciones históricas que pueden ser inestables. Pequeños cambios en los retornos esperados, en la volatilidad o en la dependencia entre activos pueden dar lugar a carteras muy distintas, y en muchos casos poco robustas fuera de la muestra. Esta limitación se vuelve especialmente importante cuando se quiere trabajar en contextos de incertidumbre elevada, donde los eventos extremos y la complejidad del mercado hacen más difícil representar adecuadamente el riesgo. En esta línea, algunos trabajos recientes han mostrado que el uso de modelos generativos y técnicas de aumento de datos puede resultar útil para representar mejor la dinámica de las series financieras y enriquecer el análisis del riesgo y de la construcción de carteras \cite{Huang2024,Kalina2024,FTSDiffusion2024}.
 
-En este contexto, los modelos generativos aparecen como una alternativa especialmente interesante. Tanto las Redes Generativas Adversarias (GAN) como los Autoencoders Variacionales (VAE) permiten aprender distribuciones complejas a partir de datos históricos y generar muestras sintéticas que conservan patrones relevantes de los datos originales \cite{Goodfellow2014,Kingma2013}. Aplicado al ámbito financiero, esto resulta atractivo porque ofrece la posibilidad de modelar mejor fenómenos como las colas pesadas, las asimetrías o las dependencias no lineales entre activos, aspectos que suelen quedar insuficientemente reflejados cuando solo se trabaja con estadísticos clásicos.
+En este contexto, los modelos generativos aparecen como una alternativa especialmente interesante. Tanto TimeGAN como los Autoencoders Variacionales (VAE) permiten aprender distribuciones complejas a partir de datos históricos y generar muestras sintéticas que conservan patrones relevantes de los datos originales \cite{Yoon2019,Kingma2013}. Aplicado al ámbito financiero, esto resulta atractivo porque ofrece la posibilidad de modelar mejor fenómenos como las colas pesadas, las asimetrías o las dependencias no lineales entre activos, aspectos que suelen quedar insuficientemente reflejados cuando solo se trabaja con estadísticos clásicos.
 
 Junto a ello, la teoría de la información aporta herramientas muy útiles para evaluar la calidad de esas representaciones. En particular, la divergencia de Kullback-Leibler \cite{Kullback1951} permite medir la diferencia entre la distribución real de los retornos y la distribución generada por el modelo, lo que proporciona una forma rigurosa de comprobar hasta qué punto la información contenida en los datos originales se conserva en los datos sintéticos \cite{Cover2006}. Esta idea resulta especialmente relevante en este trabajo, ya que no solo interesa generar datos plausibles, sino también utilizarlos de forma útil dentro del proceso de optimización de carteras.
 
@@ -218,7 +218,7 @@ Con el objetivo de mejorar la estabilidad de las soluciones y reducir la sensibi
 
 En paralelo, el aumento en la disponibilidad de datos financieros y el desarrollo de nuevas capacidades computacionales favorecieron la incorporación de técnicas de aprendizaje automático en el análisis financiero. Estos enfoques permiten modelar relaciones complejas sin necesidad de imponer hipótesis paramétricas estrictas, lo que los hace especialmente adecuados para tratar con datos de alta dimensionalidad y estructuras no lineales. En el ámbito de la optimización de carteras, esto ha dado lugar a propuestas como la Deep Portfolio Theory, que utiliza redes neuronales profundas para aprender representaciones latentes de los activos y construir carteras a partir de dichas representaciones \cite{Heaton2016}. Este tipo de enfoques refleja un cambio en la forma de abordar el problema, pasando de modelos basados en supuestos teóricos a modelos orientados a datos.
 
-Más recientemente, los modelos generativos han adquirido una relevancia creciente en el ámbito del aprendizaje automático y han comenzado a aplicarse en finanzas. A diferencia de los modelos predictivos tradicionales, que se centran en estimar valores esperados, los modelos generativos buscan aprender la distribución completa de los datos, lo que permite generar nuevas muestras coherentes con el comportamiento observado. Entre estos modelos destacan los autoencoders variacionales (VAE), que permiten aprender representaciones probabilísticas en espacios latentes \cite{Kingma2013}, y las redes generativas adversarias (GAN), que utilizan un enfoque competitivo entre dos redes para generar datos sintéticos con alto grado de realismo \cite{Goodfellow2014}.
+Más recientemente, los modelos generativos han adquirido una relevancia creciente en el ámbito del aprendizaje automático y han comenzado a aplicarse en finanzas. A diferencia de los modelos predictivos tradicionales, que se centran en estimar valores esperados, los modelos generativos buscan aprender la distribución completa de los datos, lo que permite generar nuevas muestras coherentes con el comportamiento observado. Entre estos modelos destacan los autoencoders variacionales (VAE), que permiten aprender representaciones probabilísticas en espacios latentes \cite{Kingma2013}, y TimeGAN, que adapta el aprendizaje adversarial a la generación de series temporales mediante componentes de embedding, recuperación y supervisión temporal \cite{Yoon2019}.
 
 
 En el contexto financiero, estos modelos ofrecen la posibilidad de generar escenarios sintéticos del comportamiento del mercado, lo que resulta especialmente útil para el análisis de riesgo y la evaluación de estrategias de inversión. En lugar de depender únicamente de datos históricos, es posible generar múltiples trayectorias plausibles de los retornos, proporcionando una visión más completa de la incertidumbre. En esta línea, trabajos como el de Mariani, \cite{Mariani2019} han explorado el uso de modelos generativos en el análisis de carteras, mostrando su potencial para mejorar la representación del riesgo y la toma de decisiones.
@@ -429,7 +429,7 @@ Junto a estas librerías generales, existen herramientas más específicas para 
 
 Desde un punto de vista metodológico, este primer grupo de herramientas cumple una función crítica: garantizar que el conjunto de datos sobre el que se entrenarán los modelos sea consistente y comparable entre activos. En un problema de cartera, pequeñas diferencias en la alineación temporal de las series, en el tratamiento de días sin cotización o en la gestión de valores faltantes pueden alterar de forma apreciable las estimaciones posteriores. Por ello, el papel de estas librerías no debe entenderse solo como una ayuda técnica para manipular datos, sino como una base necesaria para asegurar la calidad de los análisis y la fiabilidad de los resultados.
 
-En segundo lugar, para el desarrollo de modelos generativos destacan frameworks de aprendizaje profundo como \emph{TensorFlow} y \emph{PyTorch}, que tampoco son específicos de finanzas, sino herramientas generales de deep learning muy extendidas en múltiples áreas \cite{Abadi2016,Paszke2019}. Su interés en este proyecto radica en que ofrecen la flexibilidad necesaria para implementar arquitecturas como las Redes Generativas Adversarias (GAN) y los Autoencoders Variacionales (VAE), adaptando el entrenamiento a la estructura de los datos financieros. Aun así, requieren un diseño adicional para representar correctamente aspectos como la dependencia entre activos, la volatilidad o el comportamiento extremo de los retornos.
+En segundo lugar, para el desarrollo de modelos generativos destacan frameworks de aprendizaje profundo como \emph{TensorFlow} y \emph{PyTorch}, que tampoco son específicos de finanzas, sino herramientas generales de deep learning muy extendidas en múltiples áreas \cite{Abadi2016,Paszke2019}. Su interés en este proyecto radica en que ofrecen la flexibilidad necesaria para implementar arquitecturas como TimeGAN y los Autoencoders Variacionales (VAE), adaptando el entrenamiento a la estructura de los datos financieros. Aun así, requieren un diseño adicional para representar correctamente aspectos como la dependencia entre activos, la volatilidad o el comportamiento extremo de los retornos.
 
 Esta flexibilidad constituye una ventaja importante, pero también introduce una exigencia metodológica adicional. A diferencia de las herramientas de optimización financiera más tradicionales, estos frameworks no proporcionan por sí mismos una solución cerrada para el problema de cartera. Es necesario definir la arquitectura, seleccionar el esquema de entrenamiento, establecer la representación de entrada y decidir cómo interpretar la salida generada por el modelo. En consecuencia, su utilidad para este trabajo reside precisamente en permitir una implementación adaptable, aunque dicha adaptabilidad implique asumir decisiones de diseño que deben ser justificadas y evaluadas con cuidado.
 
@@ -443,7 +443,7 @@ Además, estas bibliotecas resultan particularmente valiosas para este proyecto 
 
 No obstante, la principal limitación del ecosistema actual no reside en la ausencia de herramientas aisladas, sino en la dificultad de integrarlas en un procedimiento único. Obtener datos, limpiarlos, entrenar un modelo generativo, medir la fidelidad de las distribuciones producidas y trasladar esos resultados a una decisión de cartera son tareas que suelen resolverse con bibliotecas distintas y con supuestos metodológicos no siempre homogéneos. Precisamente por ello, una de las aportaciones prácticas de este trabajo consiste en articular un flujo coherente en el que cada herramienta cumpla una función concreta dentro de una estrategia común de análisis, generación, evaluación y optimización.
 
-La revisión de herramientas existentes muestra que hay soluciones maduras para cada etapa por separado: tratamiento de datos, modelado profundo y optimización de carteras. Sin embargo, no es tan habitual encontrar una herramienta integrada que combine de forma directa modelado generativo, teoría de la información y selección de carteras dentro de un mismo procedimiento. Esta situación refuerza el interés del presente trabajo, ya que pone de manifiesto la necesidad de articular un enfoque que conecte esas tres dimensiones y permita estudiar si la información generada por modelos como GAN y VAE puede traducirse en decisiones de inversión más robustas.
+La revisión de herramientas existentes muestra que hay soluciones maduras para cada etapa por separado: tratamiento de datos, modelado profundo y optimización de carteras. Sin embargo, no es tan habitual encontrar una herramienta integrada que combine de forma directa modelado generativo, teoría de la información y selección de carteras dentro de un mismo procedimiento. Esta situación refuerza el interés del presente trabajo, ya que pone de manifiesto la necesidad de articular un enfoque que conecte esas tres dimensiones y permita estudiar si la información generada por modelos como TimeGAN y VAE puede traducirse en decisiones de inversión más robustas.
 
 
 \section{Conclusiones}
@@ -466,10 +466,10 @@ A partir de estas consideraciones, se identifica una oportunidad clara de invest
 
 En consecuencia, el trabajo se orienta hacia el desarrollo de un enfoque que combine ambas perspectivas, con el objetivo de mejorar la representación de la incertidumbre y la modelización de las dependencias entre activos en el proceso de optimización de carteras. Este planteamiento permitirá avanzar hacia modelos más flexibles y realistas, contribuyendo al análisis y la toma de decisiones en entornos financieros complejos.
 
-\chapter{Objetivos concretos y metodología de trabajo}
+\chapter{Objetivos concretos}
 \section{Objetivo general}
 
-El objetivo general de este proyecto es desarrollar y evaluar un modelo de optimización de carteras basado en técnicas de modelado generativo y métricas basadas en la teoría de la información, con el fin de obtener una representación más precisa de las distribuciones de retorno de los activos, generando escenarios probabilísticos del mercado y comparando su rendimiento frente a enfoques tradicionales.
+El objetivo general de este proyecto es desarrollar y evaluar un pipeline experimental reproducible basado en técnicas de modelado generativo y métricas de teoría de la información, con el fin de generar escenarios sintéticos de retornos financieros, validar su fidelidad estadística e informacional y analizar su utilidad en procesos de optimización de carteras frente a enfoques tradicionales.
 
 \section{Objetivos específicos}
 
@@ -481,16 +481,48 @@ A continuación, se presentan los objetivos específicos que guiarán el desarro
 
 \begin{itemize}
 \item O1: Realizar un {\bf análisis completo} del problema de optimización de carteras y del contexto de aplicación, incluyendo el estudio de los enfoques tradicionales y de los más actuales, identificando sus principales limitaciones y estableciendo los elementos diferenciadores de la propuesta planteada en este trabajo.
-\item O2: {\bf Explorar el uso de modelos generativos}, en específico de Redes Generativas Adversarias (GAN) y los Autoencoders Variacionales (VAE), para el aprendizaje de distribuciones de retorno a partir de datos financieros reales y como estas mejoran la posibilidad de retorno de activos.
+\item O2: {\bf Explorar el uso de modelos generativos}, en específico de TimeGAN y Autoencoders Variacionales (VAE), para el aprendizaje de distribuciones y secuencias de retornos a partir de datos financieros reales.
 \item O3: {\bf Obtener y preparar} los datos financieros necesarios para el desarrollo del modelo, incluyendo un proceso preciso de transformación y limpieza de aquellos valores que puedan afectar a su calidad y adecuación. Para ello se aplicarán técnicas de análisis exploratorio de datos (EDA) y herramientas estadísticas que permitan comprender la estructura de la información, identificar patrones relevantes y verificar la adecuación de los datos.
-\item O4: {\bf Desarrollar e implementar} un modelo basado en Redes Generativas Adversarias y/o Autoencoders Variacionales para el aprendizaje de las distribuciones de retorno de los activos e integrar métricas basadas en teoría de la información para evaluar la calidad de las distribuciones generadas y verificar su adecuación para su aplicación en la optimización de carteras.
-\item O5: {\bf Evaluar y comparar} el rendimiento del modelo propuesto frente a métodos tradicionales de optimización de carteras, analizando su capacidad para representar la incertidumbre y las dependencias entre activos.
+\item O4: {\bf Desarrollar e implementar} modelos basados en VAE y TimeGAN para generar escenarios sintéticos de retornos e integrar métricas basadas en teoría de la información para evaluar la calidad de las distribuciones generadas y verificar su adecuación para su aplicación en la optimización de carteras.
+\item O5: {\bf Evaluar y comparar} el comportamiento del pipeline propuesto frente a métodos tradicionales de optimización de carteras, analizando su capacidad para representar la incertidumbre, preservar dependencias entre activos y apoyar la construcción de carteras evaluadas fuera de muestra.
 \end{itemize}
 
-\section{Metodología del trabajo}
-La metodología propuesta para este trabajo la planteamos con un enfoque aplicado, experimental y comparativo, ya que el objetivo del estudio no es únicamente revisar el problema de la optimización de carteras desde una perspectiva teórica, sino diseñar y evaluar una propuesta concreta basada en modelos generativos y métricas de teoría de la información. Para ello, el trabajo se estructurará en una serie de fases sucesivas que permitirán abordar el problema de forma ordenada, justificar cada decisión metodológica y analizar los resultados de manera rigurosa.
+\chapter{Metodología}
 
-De manera más concreta, el diseño metodológico seguirá una lógica de pipeline en la que cada etapa alimenta a la siguiente. En primer lugar, se construirá un conjunto de datos financieros adecuado para el problema de estudio; en segundo lugar, se entrenarán modelos generativos capaces de aprender la distribución de los retornos; posteriormente, se evaluará la fidelidad de las distribuciones sintéticas obtenidas; y, por último, se analizará cómo dicha información puede incorporarse al proceso de optimización de carteras. Esta estructura pretende separar con claridad dos niveles de evaluación distintos: por una parte, la calidad estadística e informacional del modelo generativo y, por otra, la calidad financiera de las carteras construidas a partir de la información que dicho modelo proporciona.
+\section{Enfoque metodológico}
+
+La metodología del trabajo se plantea con un enfoque aplicado, experimental y comparativo. El objetivo no es formular una nueva teoría financiera ni proponer un algoritmo completamente nuevo, sino desarrollar un prototipo técnico reproducible de inteligencia artificial generativa aplicado a la generación de escenarios financieros sintéticos y a su evaluación en un problema real de optimización de carteras.
+
+El proyecto se concibe como un pipeline experimental en el que cada etapa produce una salida verificable que alimenta a la siguiente: obtención de datos reales, transformación de precios en retornos, construcción de ventanas temporales multiactivo, entrenamiento de modelos VAE y TimeGAN, generación de escenarios sintéticos, validación estadística e informacional de dichos escenarios, optimización de carteras y evaluación fuera de muestra frente a baselines clásicos.
+
+La pregunta metodológica central puede formularse del siguiente modo: ¿hasta qué punto los escenarios de retornos financieros generados mediante VAE y TimeGAN preservan la información estadística, temporal e informacional de los datos reales y pueden contribuir al análisis de carteras más robustas frente a enfoques clásicos?
+
+\section{Adaptación de CRISP-DM al proyecto}
+
+Como marco general se adopta CRISP-DM, por su adecuación a proyectos de ciencia de datos e inteligencia artificial basados en datos reales, preparación, modelado, evaluación y análisis de resultados. En este TFM, sus fases se adaptan al contexto financiero y experimental de la siguiente forma:
+
+\begin{longtable}{|p{0.28\textwidth}|p{0.62\textwidth}|}
+\caption{Adaptación de CRISP-DM al proyecto}\label{tab:crispdm-adaptacion}\\
+\hline
+\textbf{Fase CRISP-DM} & \textbf{Adaptación al TFM} \\
+\hline
+Comprensión del negocio & Análisis del problema de optimización de carteras y de las limitaciones de los enfoques clásicos basados en estimaciones puntuales. \\
+\hline
+Comprensión de los datos & Estudio de precios, retornos, volatilidad, correlaciones y estructura temporal de los activos seleccionados. \\
+\hline
+Preparación de datos & Limpieza, alineación temporal, cálculo de retornos logarítmicos, normalización y construcción de ventanas temporales. \\
+\hline
+Modelado & Entrenamiento y comparación de VAE y TimeGAN como modelos generativos para retornos financieros. \\
+\hline
+Evaluación & Evaluación estadística, temporal, informacional y financiera de los escenarios y carteras resultantes. \\
+\hline
+Despliegue & Construcción de un prototipo experimental reproducible para análisis académico, sin implicar una puesta en producción financiera. \\
+\hline
+\end{longtable}
+
+\section{Diseño técnico de la solución propuesta}
+
+La solución se diseña como un pipeline modular compuesto por etapas diferenciadas de adquisición de datos, preprocesamiento, análisis exploratorio y construcción de ventanas temporales. Sobre esta base se incorporan los módulos de modelado generativo con VAE y TimeGAN, generación de escenarios sintéticos, evaluación estadística, temporal e informacional, optimización de carteras y comparación final de resultados.
 
 Este flujo general se resume en la Figura~\ref{fig:pipeline-metodologico}, que organiza de manera visual las etapas del trabajo desde la obtención de datos hasta la comparación final con métodos base.
 \begin{figure}[htbp]
@@ -501,43 +533,111 @@ Este flujo general se resume en la Figura~\ref{fig:pipeline-metodologico}, que o
     \label{fig:pipeline-metodologico}
 \end{figure}
 
-En primer lugar, se llevará a cabo la selección y delimitación del universo de estudio. Se prevé trabajar con un conjunto de entre 20 y 30 activos financieros líquidos, preferentemente pertenecientes a un índice bursátil de referencia como el S\&P 500 o el NASDAQ-100. La elección de este tipo de activos responde a la necesidad de disponer de series temporales amplias, consistentes y representativas, así como de un contexto realista en el que analizar tanto el comportamiento individual de los retornos como las dependencias existentes entre ellos. Asimismo, se contempla emplear datos históricos diarios correspondientes a un horizonte aproximado de entre ocho y diez años, con el fin de contar con suficiente información para entrenar los modelos y evaluar su comportamiento en diferentes condiciones de mercado.
+\section{Comprensión del problema}
 
-La selección de activos no se realizará únicamente con un criterio de disponibilidad de datos, sino también con una lógica financiera y experimental. Trabajar con activos líquidos y suficientemente seguidos por el mercado facilita disponer de precios continuos, reduce el impacto de problemas derivados de la iliquidez y permite construir un entorno de análisis comparable con estudios previos de la literatura. Además, escoger un universo acotado pero diversificado hará posible observar si los modelos son capaces de aprender no solo el comportamiento de cada serie de forma aislada, sino también las relaciones cruzadas que condicionan la diversificación efectiva de una cartera.
+El problema se formula desde una perspectiva técnica: no se pretende predecir precios exactos ni anticipar el mercado, sino aprender distribuciones y secuencias de retornos financieros que permitan generar escenarios alternativos plausibles. Los enfoques clásicos de optimización dependen de estimaciones puntuales de media y covarianza, mientras que los modelos generativos permiten trabajar con conjuntos de escenarios que representan distintas configuraciones posibles del mercado.
 
-En segundo lugar, se procederá a la obtención y preparación de los datos financieros. Para ello, se recurrirá a fuentes de información accesibles y ampliamente utilizadas en el ámbito académico y experimental, como Yahoo Finance. En esta etapa se descargarán las series históricas de precios de los activos seleccionados y se transformarán en retornos financieros, ya que esta magnitud permite analizar con mayor precisión la evolución relativa de los activos y resulta más adecuada para el modelado posterior. Además, se revisarán posibles valores faltantes, inconsistencias temporales y anomalías en los datos, aplicando procesos de limpieza y homogeneización que permitan construir un conjunto de datos fiable. El propósito de esta fase es garantizar que la información utilizada en el estudio sea coherente y de calidad, ya que cualquier deficiencia en los datos podría afectar directamente al entrenamiento de los modelos y a la validez de las conclusiones.
+La teoría de la información se utiliza como mecanismo de validación intermedio para evaluar si las distribuciones generadas preservan información relevante de los datos reales antes de emplearlas en la construcción de carteras.
 
-Dentro de esta fase será especialmente importante definir de forma explícita el procedimiento de construcción del conjunto final de trabajo. Para ello, se considerará la frecuencia temporal utilizada, el método de cálculo de retornos, la forma de tratar ausencias de cotización y el posible escalado o normalización de las variables antes del entrenamiento. Estas decisiones no son puramente técnicas, ya que condicionan la distribución observada por los modelos y, por tanto, la calidad de las muestras generadas. En consecuencia, la preparación del dataset se planteará como una etapa metodológica central y no solo como un paso previo al entrenamiento.
+\section{Comprensión de los datos}
 
-Una vez depurados los datos, se desarrollará una fase de análisis exploratorio. En ella se examinarán las características estadísticas principales de los retornos, incluyendo su tendencia, dispersión, volatilidad, presencia de valores extremos, asimetrías y posibles comportamientos no normales. También se estudiarán las relaciones de correlación y dependencia entre activos, dado que estas desempeñan un papel central en el problema de optimización de carteras. Esta fase permitirá comprender mejor la estructura de la información disponible y, al mismo tiempo, justificar la necesidad de emplear modelos generativos capaces de representar distribuciones complejas y relaciones no lineales entre variables. Desde el punto de vista instrumental, esta fase podrá apoyarse en Python y en bibliotecas orientadas al tratamiento, análisis y visualización de datos.
+Se prevé trabajar con datos diarios procedentes de Yahoo Finance mediante la biblioteca \texttt{yfinance}. El universo inicial estará formado por activos líquidos pertenecientes al S\&P 500 o al NASDAQ-100, con un número aproximado de entre 20 y 30 activos y un horizonte histórico de entre ocho y diez años. La variable inicial será el precio ajustado de cierre y la variable modelada serán los retornos logarítmicos.
 
-Este análisis exploratorio tendrá además una función de diagnóstico metodológico. A partir de él se podrán identificar características del conjunto de datos que deban ser tenidas en cuenta al diseñar los modelos, como la presencia de colas pronunciadas, cambios de volatilidad, distinta escala entre activos o patrones de dependencia que no queden bien descritos por la correlación lineal. Asimismo, esta etapa permitirá justificar con mayor fundamento por qué un enfoque puramente basado en media y covarianza puede resultar insuficiente para el problema planteado, reforzando así la conexión entre la descripción de los datos y la elección del método propuesto.
+El análisis exploratorio incluirá media, volatilidad, asimetría, curtosis, percentiles, valores extremos, distribuciones empíricas, matriz de correlaciones, autocorrelación de retornos y autocorrelación de retornos absolutos. Esta fase permitirá justificar la necesidad de modelos capaces de representar colas pesadas, cambios de volatilidad y relaciones de dependencia entre activos.
 
-A continuación, se abordará el diseño e implementación de la propuesta basada en modelos generativos. En concreto, se trabajará con dos enfoques principales: Autoencoders Variacionales (VAE) y Redes Generativas Adversarias (GAN). La elección de estos modelos se fundamenta en su capacidad para aprender distribuciones complejas a partir de datos reales y generar nuevas muestras sintéticas que reproduzcan patrones estadísticos relevantes. En este contexto, el interés del trabajo no radica únicamente en generar datos artificiales, sino en comprobar si dichas distribuciones sintéticas representan de forma más adecuada los retornos de los activos y sus dependencias, de modo que puedan emplearse posteriormente en la optimización de carteras. Si el desarrollo del proyecto lo permite, se valorará además la inclusión de una variante adicional o una mejora sencilla sobre alguno de los modelos base, con el fin de enriquecer el análisis comparativo.
+\section{Preparación de los datos}
 
-La comparación entre VAE y GAN se planteará de forma equilibrada, procurando que ambos enfoques se entrenen sobre el mismo conjunto de datos y bajo criterios homogéneos de validación. En términos generales, los VAE resultan especialmente interesantes por su capacidad para aprender una representación latente estructurada de los datos, mientras que las GAN destacan por su potencial para generar muestras realistas a partir de un proceso adversarial. Analizar ambos enfoques permitirá contrastar dos formas distintas de aproximarse al aprendizaje de distribuciones financieras y valorar cuál de ellas se adapta mejor a los objetivos del trabajo.
+La preparación de datos seguirá una secuencia fija: descarga de precios ajustados, alineación temporal de activos, tratamiento de valores faltantes, cálculo de retornos logarítmicos, división temporal de los datos, normalización con estadísticos calculados exclusivamente sobre el conjunto de entrenamiento y construcción de ventanas temporales multiactivo.
 
-Posteriormente, se llevará a cabo la fase de entrenamiento, ajuste y validación de los modelos. Para ello, los datos se dividirán en subconjuntos de entrenamiento, validación y prueba, respetando el orden temporal de las observaciones. Esta decisión metodológica es especialmente importante en problemas financieros, ya que evita introducir sesgos derivados del uso de información futura y permite aproximar de forma más realista el comportamiento de los modelos en un entorno de aplicación real. Durante esta fase se realizará el ajuste de hiperparámetros, el seguimiento del proceso de convergencia y la evaluación de la estabilidad de cada arquitectura, con el objetivo de identificar configuraciones que generen distribuciones plausibles y coherentes con el comportamiento observado en los datos históricos.
+Los retornos se calcularán como:
 
-En este sentido, la validación temporal se entenderá como un criterio esencial de realismo experimental. El objetivo será que las decisiones de ajuste y selección del modelo se apoyen únicamente en información disponible hasta cada momento del proceso, evitando cualquier contaminación del conjunto de prueba. Si el tiempo y los recursos del proyecto lo permiten, también se contemplará la posibilidad de incorporar un esquema de evaluación secuencial o por ventanas temporales, con el fin de observar si la capacidad de generalización del modelo se mantiene en contextos de mercado diferentes. Con ello se pretende aproximar el análisis a una situación más cercana a la toma de decisiones real.
+\begin{equation}
+r_t = \ln \left(\frac{P_t}{P_{t-1}}\right)
+\end{equation}
 
-Una vez entrenados los modelos, se procederá a evaluar la calidad de las distribuciones generadas. Este paso resulta esencial, puesto que el valor de la propuesta depende de que los modelos no solo generen muestras sintéticas, sino que reproduzcan adecuadamente la estructura estadística de los retornos reales. Para ello se emplearán métricas de carácter estadístico e informacional, tales como la comparación de momentos, estructuras de correlación y medidas de divergencia entre distribuciones, como la divergencia de Kullback-Leibler o la divergencia de Jensen-Shannon. Estas métricas permitirán analizar en qué medida las distribuciones sintéticas conservan propiedades relevantes de los datos originales y cuál de los modelos generativos ofrece un mejor ajuste al problema planteado.
+La partición de los datos será temporal y no aleatoria, con una distribución orientativa del 70\% para entrenamiento, 15\% para validación y 15\% para prueba. Las ventanas temporales tendrán una longitud inicial de 30 días por el número de activos seleccionados, por ejemplo, 30 días por 20 activos.
 
-Conviene subrayar que esta fase de evaluación no se confundirá con la evaluación final de las carteras. Un modelo puede generar datos visualmente plausibles y, sin embargo, no preservar adecuadamente relaciones relevantes para la diversificación o para la estimación del riesgo. Por ello, la metodología distinguirá con claridad entre la fidelidad distribucional de las muestras sintéticas y la utilidad práctica de dichas muestras en el problema de optimización. Esta separación permitirá interpretar con mayor precisión los resultados y evitar conclusiones simplificadas sobre el rendimiento de cada enfoque.
+\section{Modelado generativo}
 
-En una fase posterior, las distribuciones aprendidas se integrarán en el proceso de optimización de carteras. El objetivo será analizar si una modelización más rica y flexible de los retornos puede traducirse en mejores decisiones de asignación de activos. Para ello, los resultados obtenidos con los modelos generativos se compararán con diversos enfoques tradicionales que actuarán como línea base, entre ellos una cartera equiponderada, el modelo clásico de Markowitz media-varianza y una estrategia de mínima varianza. La inclusión de estos métodos de referencia permitirá valorar de forma objetiva el aporte de la propuesta planteada y determinar si el uso de modelos generativos ofrece ventajas respecto a técnicas más consolidadas en la literatura financiera.
+El núcleo técnico del trabajo será la comparación entre VAE y TimeGAN. Ambos modelos se entrenarán sobre las mismas ventanas temporales y se evaluarán con un protocolo común, de forma que la comparación no dependa de diferencias en la preparación de datos o en el conjunto de evaluación.
 
-La integración entre generación y optimización podrá materializarse de distintas maneras, siempre manteniendo coherencia con los objetivos del estudio. Entre las posibilidades metodológicas se encuentra utilizar las muestras generadas para estimar distribuciones de retornos futuras, derivar a partir de ellas matrices de riesgo o dependencia, o construir escenarios sobre los que comparar estrategias de asignación. Lo relevante, en cualquier caso, será que el procedimiento seleccionado permita enlazar de forma explícita la calidad de la representación probabilística con la decisión final de cartera, en lugar de tratar ambas etapas como problemas completamente independientes.
+El VAE se utilizará como modelo generativo probabilístico basado en espacio latente. Su arquitectura incluirá un encoder, una representación latente, el mecanismo de reparametrización y un decoder. La función de pérdida combinará un término de reconstrucción y un término de regularización KL. En el estudio, el VAE actuará como baseline generativo estable para contrastar un modelo latente probabilístico frente a un modelo adversarial temporal. Su principal limitación esperada es que, si las ventanas se tratan de forma agregada, puede capturar peor ciertas dependencias temporales que un modelo diseñado específicamente para series.
 
-Asimismo, la elección de baselines responderá a un criterio de interpretabilidad y comparabilidad. Una cartera equiponderada ofrece una referencia sencilla pero útil para valorar si la complejidad adicional del modelo propuesto se traduce en alguna mejora apreciable. Por su parte, los enfoques media-varianza y de mínima varianza representan soluciones ampliamente utilizadas en la práctica y en la literatura, por lo que constituyen puntos de comparación adecuados para situar el rendimiento de la propuesta dentro de un marco financiero reconocible.
+TimeGAN se utilizará como modelo principal para la generación de series temporales multivariantes, precisamente porque su diseño está orientado a preservar dinámica temporal además de estructura distribucional. Su arquitectura incorporará red de embedding, red de recuperación, generador, supervisor y discriminador, combinando entrenamiento adversarial y supervisado. Su papel en el estudio será generar secuencias sintéticas de retornos capaces de preservar dependencias temporales y relaciones multivariantes entre activos.
 
-Finalmente, el análisis de resultados se realizará a partir de indicadores financieros que permitan valorar de forma conjunta rentabilidad, riesgo y estabilidad. Entre las métricas previstas se encuentran la rentabilidad acumulada, la volatilidad, el ratio de Sharpe \cite{Sharpe1964}, el máximo drawdown y medidas asociadas al grado de diversificación de la cartera. La interpretación de estos resultados no se limitará a identificar qué enfoque obtiene mejores valores numéricos, sino que buscará relacionar el comportamiento de las carteras con la calidad de las distribuciones generadas, de manera que pueda evaluarse si una mejor representación probabilística de los retornos se traduce realmente en una mejora en el proceso de optimización.
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{media/timegan_yoon2019_fig1.png}
+    \caption{Esquema conceptual de TimeGAN como modelo generativo temporal: diagrama de bloques funcionales y esquema de entrenamiento.}
+    \textbf{Fuente:} tomado de la Figura 1 de Yoon et al. \cite{Yoon2019}.
+    \label{fig:timegan-externo}
+\end{figure}
 
-Además de estas métricas agregadas, se prestará atención a la estabilidad de los pesos y a la consistencia del comportamiento fuera de muestra. En problemas de optimización de carteras, una estrategia puede mostrar buenos resultados medios y, sin embargo, apoyarse en asignaciones muy inestables o excesivamente sensibles a pequeñas variaciones en las entradas. Por ello, la metodología buscará valorar no solo el rendimiento financiero final, sino también el grado en que la propuesta conduce a soluciones más equilibradas, diversificadas y metodológicamente robustas.
+\section{Generación de escenarios sintéticos}
 
-De forma complementaria, todo el proceso metodológico se documentará siguiendo criterios de trazabilidad y reproducibilidad. Esto implicará registrar las decisiones tomadas en la selección de activos, el tratamiento de los datos, la configuración general de los modelos y los criterios de evaluación utilizados. De este modo, el trabajo no solo presentará una propuesta metodológica coherente con los objetivos planteados, sino también un procedimiento suficientemente claro y replicable desde el punto de vista académico.
+Los modelos no generarán precios directamente, sino retornos sintéticos. La salida esperada tendrá la forma de \texttt{N escenarios x T días x M activos}; por ejemplo, 1000 escenarios de 30 días para 20 activos. Estos escenarios se utilizarán para comparar distribuciones reales y sintéticas, estimar parámetros de retorno y riesgo, construir carteras mediante modelos de optimización y analizar la robustez de las asignaciones obtenidas mediante estabilidad de pesos, concentración, entropía y comportamiento fuera de muestra.
 
-En conjunto, esta metodología pretende ofrecer un marco ordenado para responder a la pregunta central del trabajo: si una representación generativa e informacionalmente evaluada de los retornos puede aportar una base más sólida para la optimización de carteras que la proporcionada por enfoques tradicionales. La intención no es únicamente comparar modelos, sino analizar de forma encadenada cómo se relacionan la calidad de los datos, el aprendizaje distribucional, la validación estadística y la decisión financiera dentro de un mismo proceso experimental.
+\section{Evaluación de las distribuciones generadas}
+
+La evaluación se organizará en tres niveles. La evaluación estadística comparará media, volatilidad, asimetría, curtosis, percentiles, colas de la distribución y, si el alcance lo permite, VaR o CVaR. La evaluación temporal y de dependencia analizará matrices de correlación, error entre matrices, autocorrelación, autocorrelación de retornos absolutos e información mutua entre activos si se implementa. La evaluación informacional se basará en divergencia de Kullback-Leibler, divergencia de Jensen-Shannon y entropía, pudiendo añadirse la distancia de Wasserstein como métrica complementaria.
+
+La divergencia KL puede ser inestable cuando existen intervalos con probabilidad cero, por lo que se aplicará suavizado o se complementará con Jensen-Shannon, que es simétrica y acotada. Esta evaluación no se confundirá con la evaluación financiera final: un modelo puede generar datos plausibles y, sin embargo, no preservar relaciones relevantes para la diversificación o para la estimación del riesgo.
+
+\section{Optimización y evaluación de carteras}
+
+Los baselines financieros serán la cartera equiponderada, Markowitz media-varianza con datos históricos reales, la cartera de mínima varianza, la cartera optimizada usando escenarios VAE y la cartera optimizada usando escenarios TimeGAN. Los escenarios sintéticos se emplearán para estimar medias, covarianzas o distribuciones de retornos y construir carteras long-only, pero la comparación de rendimiento se realizará siempre sobre retornos reales del conjunto de prueba.
+
+Las carteras generadas a partir de escenarios sintéticos se evaluarán sobre datos reales del periodo de prueba, evitando que la evaluación financiera dependa de los mismos datos artificiales utilizados para optimizar. Las métricas previstas incluyen rentabilidad acumulada, rentabilidad anualizada, volatilidad anualizada, ratio de Sharpe \cite{Sharpe1964}, máximo drawdown, entropía de pesos, concentración de pesos y estabilidad de pesos.
+
+\section{Herramientas y entorno de desarrollo}
+
+El desarrollo se apoyará en Python y bibliotecas de uso habitual en ciencia de datos e inteligencia artificial, como \texttt{pandas}, \texttt{NumPy}, \texttt{yfinance}, \texttt{scikit-learn}, \texttt{PyTorch}, \texttt{SciPy}, \texttt{matplotlib} y \texttt{seaborn}. Para la optimización de carteras se valorará el uso de \texttt{PyPortfolioOpt} o \texttt{CVXPY}. La implementación de VAE y TimeGAN se realizará preferentemente en PyTorch, ya que permite controlar la arquitectura de los modelos y explicar con claridad el desarrollo técnico.
+
+\section{Protocolo experimental y reproducibilidad}
+
+La reproducibilidad se garantizará mediante el uso de semillas aleatorias, una división temporal fija, configuración explícita de hiperparámetros, registro de resultados, misma evaluación para todos los modelos, separación clara entre entrenamiento, validación y prueba, exportación de métricas y gráficas, y organización del código por módulos o notebooks reproducibles.
+
+\begin{longtable}{|p{0.35\textwidth}|p{0.55\textwidth}|}
+\caption{Decisiones metodológicas previstas}\label{tab:decisiones-metodologicas}\\
+\hline
+\textbf{Elemento} & \textbf{Decisión metodológica} \\
+\hline
+Fuente de datos & Yahoo Finance \\
+\hline
+Frecuencia & Diaria \\
+\hline
+Variable modelada & Retornos logarítmicos \\
+\hline
+Modelos generativos & VAE y TimeGAN \\
+\hline
+Baselines financieros & Equiponderada, Markowitz y mínima varianza \\
+\hline
+Evaluación distribucional & Momentos, correlaciones y autocorrelación \\
+\hline
+Evaluación informacional & KL, Jensen-Shannon y entropía \\
+\hline
+Evaluación financiera & Sharpe, drawdown, volatilidad y rentabilidad \\
+\hline
+Validación & División temporal entrenamiento/validación/prueba \\
+\hline
+\end{longtable}
+
+\begin{longtable}{|p{0.16\textwidth}|p{0.18\textwidth}|p{0.2\textwidth}|p{0.18\textwidth}|p{0.16\textwidth}|}
+\caption{Modelos comparados}\label{tab:modelos-comparados}\\
+\hline
+\textbf{Modelo} & \textbf{Tipo} & \textbf{Entrada} & \textbf{Salida} & \textbf{Papel} \\
+\hline
+VAE & Generativo probabilístico & Ventanas de retornos & Retornos sintéticos & Baseline generativo \\
+\hline
+TimeGAN & Generativo adversarial temporal & Secuencias multivariantes & Escenarios sintéticos & Modelo principal \\
+\hline
+Markowitz & Optimización clásica & Media y covarianza & Pesos de cartera & Baseline financiero \\
+\hline
+Mínima varianza & Optimización clásica & Covarianza & Pesos de cartera & Baseline de riesgo \\
+\hline
+Equiponderada & Heurístico simple & Número de activos & Pesos iguales & Referencia simple \\
+\hline
+\end{longtable}
 
 %\begin{thebibliography}{a}
 %\bibitem{etiqueta} \textsc{Autores},
@@ -549,13 +649,6 @@ En conjunto, esta metodología pretende ofrecer un marco ordenado para responder
 
 
 \end{document}
-
-
-
-
-
-
-
 
 
 
