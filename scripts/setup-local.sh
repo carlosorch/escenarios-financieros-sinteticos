@@ -68,6 +68,19 @@ if ! command -v latexmk >/dev/null 2>&1 || ! command -v pdflatex >/dev/null 2>&1
   fi
 fi
 
+for command in latexmk pdflatex bibtex; do
+  if ! command -v "$command" >/dev/null 2>&1; then
+    echo "[setup][error] No se encontro $command tras instalar dependencias."
+    echo "[setup] Cierra y abre la terminal o VS Code, y vuelve a ejecutar este script."
+    exit 1
+  fi
+done
+
+echo "[setup] Herramientas LaTeX detectadas:"
+latexmk -version | head -n 1
+pdflatex --version | head -n 1
+bibtex --version | head -n 1
+
 mkdir -p PDF
 
 echo "[setup] Compilando prueba inicial..."

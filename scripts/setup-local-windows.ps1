@@ -146,7 +146,7 @@ function Invoke-IfAvailable {
 function Configure-MiKTeX {
   Write-Host "[setup] Configurando MiKTeX para instalar paquetes faltantes automaticamente..."
 
-  Invoke-IfAvailable "initexmf" @("--set-config-value=[MPM]AutoInstall=yes")
+  Invoke-IfAvailable "initexmf" @("--set-config-value=[MPM]AutoInstall=1")
   Invoke-IfAvailable "initexmf" @("--update-fndb")
 
   if (-not (Test-LaTeXCommand "latexmk")) {
@@ -187,6 +187,12 @@ Refresh-PerlPaths
 if (-not (Test-LaTeXCommand "latexmk")) {
   Write-Error "[setup][error] No se encontro latexmk tras instalar MiKTeX. Abre MiKTeX Console, actualiza paquetes y vuelve a ejecutar la task."
 }
+
+Write-Host "[setup] Herramientas LaTeX detectadas:"
+& latexmk -version | Select-Object -First 1 | Out-Host
+& pdflatex --version | Select-Object -First 1 | Out-Host
+& bibtex --version | Select-Object -First 1 | Out-Host
+& perl --version | Select-Object -First 2 | Out-Host
 
 New-Item -ItemType Directory -Force -Path "PDF" | Out-Null
 

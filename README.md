@@ -220,6 +220,25 @@ Workflow:
 Fresh Install Test
 ```
 
+Esta prueba no se ejecuta cuando solo cambian archivos del documento, bibliografia o imagenes. Por ejemplo, cambios en `plantilla.tex`, `bibliografia.bib`, `media/` o `logo_unir.pdf` no lanzan esta prueba porque no modifican la instalacion del entorno.
+
+Se ejecuta automaticamente solo cuando cambian archivos de configuracion del entorno:
+
+- `.github/workflows/fresh-install-test.yml`
+- `.vscode/extensions.json`
+- `.vscode/settings.json`
+- `.vscode/tasks.json`
+- `scripts/**`
+
+Ademas, cada sistema operativo se prueba solo cuando el cambio le afecta:
+
+- cambios en `scripts/setup-local.sh` o `scripts/compile-local.sh`: prueban Linux y macOS
+- cambios en scripts Windows `.ps1`: prueban Windows
+- cambios en la configuracion compartida de VS Code o en el propio workflow: prueban Linux, macOS y Windows
+- ejecucion manual con `Run workflow`: prueba Linux, macOS y Windows
+
+Los archivos personales de VS Code no deberian subirse. El repositorio solo conserva la configuracion compartida necesaria para que todos tengan las mismas tareas, recetas de LaTeX Workshop y extensiones recomendadas.
+
 Que valida:
 
 - instalacion/verificacion de LaTeX en Linux y macOS usando `scripts/setup-local.sh`
@@ -233,6 +252,13 @@ En Windows, la prueba de GitHub Actions usa un script separado porque el setup n
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\setup-local-windows.ps1
 ```
+
+Interpretacion del resultado:
+
+- si Linux y macOS pasan, el script normal de usuario ha funcionado en una maquina limpia
+- si Windows pasa, el proyecto compila en Windows con MiKTeX, Strawberry Perl y los mismos comandos LaTeX
+- en Windows, un usuario real todavia debe aceptar permisos de administrador si `winget` instala MiKTeX o Strawberry Perl
+- al terminar el setup local, los scripts muestran las versiones detectadas de `latexmk`, `pdflatex`, `bibtex` y, en Windows, `perl`
 
 Para ejecutar la prueba desde GitHub:
 

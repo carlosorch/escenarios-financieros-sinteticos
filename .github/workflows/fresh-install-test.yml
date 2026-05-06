@@ -3,54 +3,165 @@ name: Fresh Install Test
 on:
   workflow_dispatch:
   pull_request:
+    paths:
+      - ".github/workflows/fresh-install-test.yml"
+      - ".vscode/extensions.json"
+      - ".vscode/settings.json"
+      - ".vscode/tasks.json"
+      - "scripts/**"
   push:
     branches:
       - main
+    paths:
+      - ".github/workflows/fresh-install-test.yml"
+      - ".vscode/extensions.json"
+      - ".vscode/settings.json"
+      - ".vscode/tasks.json"
+      - "scripts/**"
 
 jobs:
-  fresh-install:
-    name: ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 60
+  detect-changes:
+    name: Detect changed setup paths
+    runs-on: ubuntu-latest
+    outputs:
+      linux: ${{ steps.detect.outputs.linux }}
+      macos: ${{ steps.detect.outputs.macos }}
+      windows: ${{ steps.detect.outputs.windows }}
 
-    strategy:
-      fail-fast: false
-      matrix:
-        os:
-          - ubuntu-latest
-          - macos-latest
-          - windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect changed paths
+        id: detect
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "linux=true" >> "$GITHUB_OUTPUT"
+            echo "macos=true" >> "$GITHUB_OUTPUT"
+            echo "windows=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            base="${{ github.event.pull_request.base.sha }}"
+            head="${{ github.event.pull_request.head.sha }}"
+          else
+            base="${{ github.event.before }}"
+            head="${{ github.sha }}"
+          fi
+
+          if [[ "$base" =~ ^0+$ ]]; then
+            echo "linux=true" >> "$GITHUB_OUTPUT"
+            echo "macos=true" >> "$GITHUB_OUTPUT"
+            echo "windows=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          changed_files="$(git diff --name-only "$base" "$head")"
+
+          if grep -Eq '^(\.github/workflows/fresh-install-test\.yml|\.vscode/(extensions|settings|tasks)\.json)$' <<< "$changed_files"; then
+            echo "linux=true" >> "$GITHUB_OUTPUT"
+            echo "macos=true" >> "$GITHUB_OUTPUT"
+            echo "windows=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if grep -Eq '^scripts/(setup-local|compile-local)\.sh$' <<< "$changed_files"; then
+            echo "linux=true" >> "$GITHUB_OUTPUT"
+            echo "macos=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "linux=false" >> "$GITHUB_OUTPUT"
+            echo "macos=false" >> "$GITHUB_OUTPUT"
+          fi
+
+          if grep -Eq '^scripts/(setup-local-windows|setup-ci-windows|compile-local-windows)\.ps1$' <<< "$changed_files"; then
+            echo "windows=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "windows=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  fresh-install-linux:
+    name: ubuntu-latest
+    needs: detect-changes
+    if: needs.detect-changes.outputs.linux == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup LaTeX on Linux and macOS
-        if: runner.os != 'Windows'
+      - name: Setup LaTeX on Linux
         shell: bash
         run: |
           chmod +x scripts/setup-local.sh scripts/compile-local.sh
           ./scripts/setup-local.sh
 
-      - name: Setup LaTeX on Windows
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: .\scripts\setup-ci-windows.ps1
-
-      - name: Verify LaTeX commands on Linux and macOS
-        if: runner.os != 'Windows'
+      - name: Verify LaTeX commands on Linux
         shell: bash
         run: |
-          if [[ "$RUNNER_OS" == "macOS" ]]; then
-            export PATH="/Library/TeX/texbin:$PATH"
-          fi
           latexmk -version
           pdflatex --version
           bibtex --version
           test -f PDF/plantilla.pdf
 
+      - name: Upload generated PDF
+        uses: actions/upload-artifact@v4
+        with:
+          name: thesis-pdf-ubuntu-latest
+          path: PDF/plantilla.pdf
+
+  fresh-install-macos:
+    name: macos-latest
+    needs: detect-changes
+    if: needs.detect-changes.outputs.macos == 'true'
+    runs-on: macos-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup LaTeX on macOS
+        shell: bash
+        run: |
+          chmod +x scripts/setup-local.sh scripts/compile-local.sh
+          ./scripts/setup-local.sh
+
+      - name: Verify LaTeX commands on macOS
+        shell: bash
+        run: |
+          export PATH="/Library/TeX/texbin:$PATH"
+          latexmk -version
+          pdflatex --version
+          bibtex --version
+          test -f PDF/plantilla.pdf
+
+      - name: Upload generated PDF
+        uses: actions/upload-artifact@v4
+        with:
+          name: thesis-pdf-macos-latest
+          path: PDF/plantilla.pdf
+
+  fresh-install-windows:
+    name: windows-latest
+    needs: detect-changes
+    if: needs.detect-changes.outputs.windows == 'true'
+    runs-on: windows-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup LaTeX on Windows
+        shell: pwsh
+        run: .\scripts\setup-ci-windows.ps1
+
       - name: Verify LaTeX commands on Windows
-        if: runner.os == 'Windows'
         shell: pwsh
         run: |
           $toolPaths = @(
@@ -79,5 +190,5 @@ jobs:
       - name: Upload generated PDF
         uses: actions/upload-artifact@v4
         with:
-          name: thesis-pdf-${{ matrix.os }}
+          name: thesis-pdf-windows-latest
           path: PDF/plantilla.pdf
