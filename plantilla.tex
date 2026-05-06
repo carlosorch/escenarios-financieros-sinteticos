@@ -583,6 +583,29 @@ La evaluación se organizará en tres niveles. La evaluación estadística compa
 
 La divergencia KL puede ser inestable cuando existen intervalos con probabilidad cero, por lo que se aplicará suavizado o se complementará con Jensen-Shannon, que es simétrica y acotada. Esta evaluación no se confundirá con la evaluación financiera final: un modelo puede generar datos plausibles y, sin embargo, no preservar relaciones relevantes para la diversificación o para la estimación del riesgo.
 
+\begin{longtable}{|p{0.22\textwidth}|p{0.18\textwidth}|p{0.28\textwidth}|p{0.22\textwidth}|}
+\caption{Métricas previstas para evaluar los escenarios sintéticos}\label{tab:metricas-escenarios}\\
+\hline
+\textbf{Nivel de evaluación} & \textbf{Métrica} & \textbf{Qué compara} & \textbf{Finalidad} \\
+\hline
+Estadístico & Media y volatilidad & Momentos básicos de retornos reales y sintéticos & Comprobar si los escenarios reproducen nivel medio y dispersión. \\
+\hline
+Estadístico & Asimetría, curtosis y percentiles & Forma de la distribución y comportamiento de colas & Evaluar si se preservan colas pesadas, asimetrías y eventos extremos. \\
+\hline
+Temporal y dependencia & Correlaciones & Matriz de correlación real frente a matriz sintética & Analizar si se mantienen relaciones multiactivo relevantes para diversificación. \\
+\hline
+Temporal y dependencia & Autocorrelación & Dependencia temporal de retornos y retornos absolutos & Comprobar si los escenarios capturan estructura temporal y agrupación de volatilidad. \\
+\hline
+Informacional & Divergencia KL & Diferencia entre distribución real y distribución generada & Medir pérdida de información al aproximar los retornos reales mediante escenarios sintéticos. \\
+\hline
+Informacional & Divergencia Jensen-Shannon & Distancia simétrica y acotada entre distribuciones real y sintética & Complementar KL con una medida más estable e interpretable. \\
+\hline
+Informacional & Entropía & Grado de dispersión o incertidumbre de las distribuciones & Valorar si los escenarios reducen o amplifican artificialmente la variabilidad observada. \\
+\hline
+Complementario & Wasserstein & Distancia entre distribuciones considerando su geometría & Evaluar diferencias globales de forma y desplazamiento entre distribuciones. \\
+\hline
+\end{longtable}
+
 \section{Optimización y evaluación de carteras}
 
 Los baselines financieros serán la cartera equiponderada, Markowitz media-varianza con datos históricos reales, la cartera de mínima varianza, la cartera optimizada usando escenarios VAE y la cartera optimizada usando escenarios TimeGAN. Los escenarios sintéticos se emplearán para estimar medias, covarianzas o distribuciones de retornos y construir carteras long-only, pero la comparación de rendimiento se realizará siempre sobre retornos reales del conjunto de prueba.
@@ -649,8 +672,6 @@ Equiponderada & Heurístico simple & Número de activos & Pesos iguales & Refere
 
 
 \end{document}
-
-
 
 
 
