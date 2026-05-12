@@ -45,5 +45,6 @@ class ExperimentConfig:
     timegan_gamma: float = 1.0
     timegan_supervised_weight: float = 100.0
     timegan_reconstruction_weight: float = 10.0
+    timegan_seeds: tuple[int, ...] = (42, 43, 44, 45, 46)
     synthetic_scenarios: int = 1000
     mean_shrinkage_alpha: float = 0.25

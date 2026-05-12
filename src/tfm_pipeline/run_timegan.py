@@ -18,6 +18,7 @@ from .data import (
 )
 from .models.timegan import fit_timegan, sample_timegan
 from .synthetic_evaluation import (
+    diagnostic_summary,
     evaluate_portfolios,
     evaluate_synthetic_returns,
     write_portfolio_weights,
@@ -81,12 +82,19 @@ def run(output_dir: Path = Path("results/timegan")) -> tuple[pd.DataFrame, pd.Da
 
     distribution_reports = []
     summary_reports = []
+    validation_distribution_reports = []
+    validation_summary_reports = []
     portfolio_reports = []
     for variant, variant_returns in {
         "timegan_raw": synthetic_returns,
-        "timegan_vol_calibrated": calibrated_returns,
+        "timegan_mean_vol_calibrated": calibrated_returns,
     }.items():
         distribution_report, summary_report = evaluate_synthetic_returns(splits.train, variant_returns, variant)
+        validation_distribution_report, validation_summary_report = evaluate_synthetic_returns(
+            splits.validation,
+            variant_returns,
+            variant,
+        )
         portfolio_report, portfolio_weights = evaluate_portfolios(
             train_returns=splits.train,
             synthetic_returns=variant_returns,
@@ -96,23 +104,30 @@ def run(output_dir: Path = Path("results/timegan")) -> tuple[pd.DataFrame, pd.Da
         )
         distribution_reports.append(distribution_report)
         summary_reports.append(summary_report)
+        validation_distribution_reports.append(validation_distribution_report)
+        validation_summary_reports.append(validation_summary_report)
         portfolio_reports.append(portfolio_report)
         write_portfolio_weights(output_dir, portfolio_weights, config.assets)
 
     distribution_report = pd.concat(distribution_reports, ignore_index=True)
     summary_report = pd.concat(summary_reports, ignore_index=True)
+    validation_distribution_report = pd.concat(validation_distribution_reports, ignore_index=True)
+    validation_summary_report = pd.concat(validation_summary_reports, ignore_index=True)
     portfolio_report = pd.concat(portfolio_reports, ignore_index=True)
+    diagnostics = diagnostic_summary(distribution_report, summary_report)
+    validation_diagnostics = diagnostic_summary(validation_distribution_report, validation_summary_report)
 
     distribution_report.to_csv(output_dir / "distribution_metrics.csv", index=False)
     summary_report.to_csv(output_dir / "distribution_summary.csv", index=False)
+    validation_distribution_report.to_csv(output_dir / "validation_distribution_metrics.csv", index=False)
+    validation_summary_report.to_csv(output_dir / "validation_distribution_summary.csv", index=False)
+    diagnostics.to_csv(output_dir / "diagnostic_summary.csv", index=False)
+    validation_diagnostics.to_csv(output_dir / "validation_diagnostic_summary.csv", index=False)
     portfolio_report.to_csv(output_dir / "portfolio_metrics.csv", index=False)
 
     return distribution_report, portfolio_report
 
 
 if __name__ == "__main__":
-    distribution, portfolio = run()
-    print("Distribution metrics")
-    print(distribution.to_string(index=False))
-    print("\nPortfolio metrics")
-    print(portfolio.to_string(index=False))
+    run()
+    print("TimeGAN outputs written to results/timegan")

@@ -35,9 +35,9 @@ Los modelos de difusión se mantienen como contexto del estado del arte y posibl
 | Variante | Propósito |
 |---|---|
 | Escenarios sin calibrar | Evaluar directamente la salida del modelo generativo |
-| Escenarios calibrados a volatilidad | Diagnosticar si el error principal del modelo está en la escala de los retornos |
+| Escenarios calibrados a media y volatilidad | Diagnosticar si el error principal del modelo está en la localización y escala de los retornos |
 
-La calibración de volatilidad se tratará como una variante diagnóstica, no como sustituto del modelo generativo principal.
+La calibración de media y volatilidad se tratará como una variante diagnóstica, no como sustituto del modelo generativo principal. Sus métricas de media y volatilidad no deben interpretarse como aprendizaje directo del modelo, ya que se imponen mediante post-procesado con estadísticos de entrenamiento.
 
 ## Métricas distribucionales
 
@@ -80,6 +80,8 @@ Estas métricas comparan distribuciones empíricas reales y sintéticas. Se calc
 
 La evaluación financiera se realizará siempre sobre retornos reales del conjunto de prueba. Los retornos sintéticos se usan para estimar parámetros o distribuciones de optimización, no para medir el rendimiento final.
 
+Como la variable modelada son retornos logarítmicos, la rentabilidad acumulada se calcula como `exp(sum(r_t)) - 1` y la rentabilidad anualizada como `exp(mean(r_t) * 252) - 1`. La volatilidad anualizada se calcula como la desviación típica de retornos logarítmicos multiplicada por `sqrt(252)`.
+
 | Métrica | Qué evalúa | Uso previsto |
 |---|---|---|
 | Rentabilidad acumulada | Resultado total del periodo de prueba | Comparar comportamiento final |
@@ -100,3 +102,9 @@ Un modelo generativo no se considerará mejor únicamente por producir mayor ren
 2. Utilidad financiera: comportamiento de las carteras construidas con esos escenarios cuando se evalúan sobre datos reales fuera de muestra.
 
 Esta separación evita confundir la calidad de generación de datos con el resultado financiero puntual de un periodo concreto.
+
+## Validación y robustez
+
+La fidelidad distribucional se revisa tanto frente al conjunto de entrenamiento como frente al conjunto de validación. El conjunto de prueba queda reservado para medir el rendimiento financiero de carteras ya definidas.
+
+Para TimeGAN, además de la ejecución de una semilla individual, se calcula una evaluación multi-semilla. Las tablas agregadas reportan media y desviación típica de las métricas para reducir la dependencia de una inicialización concreta, especialmente cuando se entrena con CUDA.

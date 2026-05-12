@@ -10,9 +10,8 @@ EPSILON = 1e-12
 
 
 def annualized_return(returns: pd.Series, periods_per_year: int = 252) -> float:
-    cumulative = float((1.0 + returns).prod())
-    years = len(returns) / periods_per_year
-    return cumulative ** (1.0 / years) - 1.0
+    annualized_log_return = float(returns.mean() * periods_per_year)
+    return float(np.expm1(annualized_log_return))
 
 
 def annualized_volatility(returns: pd.Series, periods_per_year: int = 252) -> float:
@@ -32,7 +31,7 @@ def sharpe_ratio(
 
 
 def max_drawdown(returns: pd.Series) -> float:
-    wealth = (1.0 + returns).cumprod()
+    wealth = np.exp(returns.cumsum())
     drawdown = wealth / wealth.cummax() - 1.0
     return float(drawdown.min())
 
@@ -43,7 +42,7 @@ def portfolio_metrics(
     risk_free_rate: float = 0.0,
 ) -> dict[str, float]:
     return {
-        "cumulative_return": float((1.0 + returns).prod() - 1.0),
+        "cumulative_return": float(np.expm1(returns.sum())),
         "annualized_return": annualized_return(returns, periods_per_year),
         "annualized_volatility": annualized_volatility(returns, periods_per_year),
         "sharpe_ratio": sharpe_ratio(returns, risk_free_rate, periods_per_year),

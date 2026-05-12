@@ -134,8 +134,5 @@ def run(output_dir: Path = Path("results/vae")) -> tuple[pd.DataFrame, pd.DataFr
 
 
 if __name__ == "__main__":
-    distribution, portfolio = run()
-    print("Distribution metrics")
-    print(distribution.to_string(index=False))
-    print("\nPortfolio metrics")
-    print(portfolio.to_string(index=False))
+    run()
+    print("VAE outputs written to results/vae")

@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 from .config import ExperimentConfig
@@ -43,6 +44,46 @@ def evaluate_synthetic_returns(
     summary = distribution_summary(real_returns, synthetic_returns)
     summary.insert(0, "variant", variant)
     return pd.DataFrame(distribution_rows), summary
+
+
+def diagnostic_summary(
+    distribution_report: pd.DataFrame,
+    summary_report: pd.DataFrame,
+) -> pd.DataFrame:
+    rows = []
+    for variant, metrics in distribution_report.groupby("variant"):
+        asset_metrics = metrics[metrics["asset"] != "ALL"]
+        all_metrics = metrics[metrics["asset"] == "ALL"].iloc[0]
+        variant_summary = summary_report[summary_report["variant"] == variant]
+        rows.append(
+            {
+                "variant": variant,
+                "mean_abs_mean_error": float(asset_metrics["mean_error"].abs().mean()),
+                "mean_abs_volatility_error": float(asset_metrics["volatility_error"].abs().mean()),
+                "mean_jensen_shannon": float(asset_metrics["jensen_shannon"].mean()),
+                "mean_wasserstein": float(asset_metrics["wasserstein"].mean()),
+                "correlation_matrix_error": float(all_metrics["correlation_matrix_error"]),
+                "mean_abs_skewness_error": float(
+                    (variant_summary["synthetic_skewness"] - variant_summary["real_skewness"]).abs().mean()
+                ),
+                "mean_abs_kurtosis_error": float(
+                    (variant_summary["synthetic_kurtosis"] - variant_summary["real_kurtosis"]).abs().mean()
+                ),
+            }
+        )
+    return pd.DataFrame(rows)
+
+
+def aggregate_by_model(results: pd.DataFrame, id_columns: list[str]) -> pd.DataFrame:
+    metric_columns = [column for column in results.columns if column not in id_columns]
+    numeric_metric_columns = [column for column in metric_columns if np.issubdtype(results[column].dtype, np.number)]
+    grouped = results.groupby(id_columns, as_index=False)[numeric_metric_columns]
+    mean = grouped.mean().add_suffix("_mean")
+    std = grouped.std(ddof=1).add_suffix("_std")
+    for column in id_columns:
+        mean = mean.rename(columns={f"{column}_mean": column})
+        std = std.rename(columns={f"{column}_std": column})
+    return mean.merge(std, on=id_columns, how="left")
 
 
 def evaluate_portfolios(

@@ -74,7 +74,7 @@ El script realiza estas etapas:
 4. Entrena un VAE sobre las ventanas de entrenamiento con early stopping segun perdida de validacion.
 5. Repite el entrenamiento para una pequena rejilla de valores beta.
 6. Genera escenarios sinteticos de retornos para cada beta.
-7. Evalua dos variantes: escenarios VAE sin calibrar y escenarios VAE calibrados a la volatilidad historica de entrenamiento.
+7. Evalua dos variantes: escenarios VAE sin calibrar y escenarios VAE calibrados a la media y volatilidad historicas de entrenamiento.
 8. Evalua la similitud distribucional entre retornos reales y sinteticos.
 9. Construye carteras basadas en escenarios VAE y las evalua sobre datos reales de prueba.
 
@@ -88,7 +88,7 @@ Salidas principales:
 | `results/vae/portfolio_metrics.csv` | Metricas financieras de carteras VAE fuera de muestra |
 | `results/vae/training_history_<beta>.csv` | Perdida total, reconstruccion y KL para cada beta |
 | `results/vae/synthetic_returns_<beta>.csv` | Retornos sinteticos sin calibrar |
-| `results/vae/synthetic_returns_<beta>_vol_calibrated.csv` | Retornos sinteticos calibrados a volatilidad historica |
+| `results/vae/synthetic_returns_<beta>_vol_calibrated.csv` | Retornos sinteticos calibrados a media y volatilidad historicas |
 | `results/vae/*_weights.json` | Pesos de cada cartera basada en escenarios VAE |
 
 Las variantes de cartera VAE son:
@@ -115,8 +115,9 @@ El script realiza estas etapas:
 3. Construye ventanas temporales de 30 dias manteniendo la estructura secuencial.
 4. Entrena un TimeGAN compacto con fases de autoencoder, supervisor y entrenamiento adversarial conjunto.
 5. Genera escenarios sinteticos secuenciales de retornos.
-6. Evalua dos variantes: TimeGAN sin calibrar y TimeGAN calibrado a la volatilidad historica de entrenamiento.
-7. Aplica el mismo protocolo de metricas distribucionales y evaluacion financiera fuera de muestra usado para VAE.
+6. Evalua dos variantes: TimeGAN sin calibrar y TimeGAN calibrado a la media y volatilidad historicas de entrenamiento.
+7. Calcula diagnosticos distribucionales frente a entrenamiento y validacion.
+8. Aplica el mismo protocolo de metricas distribucionales y evaluacion financiera fuera de muestra usado para VAE.
 
 Salidas principales:
 
@@ -124,13 +125,32 @@ Salidas principales:
 |---|---|
 | `results/timegan/distribution_metrics.csv` | Metricas de similitud real-sintetico |
 | `results/timegan/distribution_summary.csv` | Resumen estadistico por activo y variante |
+| `results/timegan/validation_distribution_metrics.csv` | Metricas de similitud frente a validacion |
+| `results/timegan/diagnostic_summary.csv` | Resumen compacto de errores distribucionales frente a entrenamiento |
+| `results/timegan/validation_diagnostic_summary.csv` | Resumen compacto de errores distribucionales frente a validacion |
 | `results/timegan/portfolio_metrics.csv` | Metricas financieras de carteras TimeGAN fuera de muestra |
 | `results/timegan/training_history.csv` | Perdidas de autoencoder, supervisor, generador y discriminador |
 | `results/timegan/synthetic_returns.csv` | Retornos sinteticos sin calibrar |
-| `results/timegan/synthetic_returns_vol_calibrated.csv` | Retornos sinteticos calibrados a volatilidad historica |
+| `results/timegan/synthetic_returns_vol_calibrated.csv` | Retornos sinteticos calibrados a media y volatilidad historicas |
 | `results/timegan/*_weights.json` | Pesos de cada cartera basada en escenarios TimeGAN |
 
-La configuracion inicial de TimeGAN prioriza ejecucion rapida y reproducibilidad. Si los resultados iniciales son estables, se puede aumentar el numero de epocas o la dimension oculta para la ejecucion final.
+La configuracion inicial de TimeGAN prioriza ejecucion rapida y reproducibilidad. Si los resultados iniciales son estables, se puede aumentar el numero de epocas o la dimension oculta para la ejecucion final. En CUDA se fijan semillas y opciones deterministas cuando PyTorch lo permite, pero la robustez final debe revisarse con varias semillas.
+
+Para ejecutar TimeGAN con varias semillas:
+
+```bash
+python -m tfm_pipeline.run_timegan_multiseed
+```
+
+Salidas principales multi-semilla:
+
+| Archivo | Contenido |
+|---|---|
+| `results/timegan_multiseed/portfolio_metrics_by_seed.csv` | Metricas financieras por semilla |
+| `results/timegan_multiseed/portfolio_metrics.csv` | Media y desviacion tipica por cartera |
+| `results/timegan_multiseed/diagnostic_summary_by_seed.csv` | Diagnosticos frente a entrenamiento por semilla |
+| `results/timegan_multiseed/validation_diagnostic_summary_by_seed.csv` | Diagnosticos frente a validacion por semilla |
+| `results/timegan_multiseed/validation_diagnostic_summary.csv` | Media y desviacion tipica de diagnosticos de validacion |
 
 ## Comparacion de resultados
 
