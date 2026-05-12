@@ -196,7 +196,57 @@ Una vez presentados los conceptos fundamentales de la inteligencia artificial y 
 
 Según \cite{Zhao2025}, la modernización por parte del consumidor y la creciente demanda de inversión han puesto la gestión de carteras en primer plano, siendo una base fundamental para la optimización de las mismas.
 
-La optimización de carteras puede definirse como el proceso de seleccionar la combinación más adecuada de activos financieros dentro de una cartera, asignando pesos a cada activo con el objetivo de encontrar el mejor equilibrio posible entre lo que se espera ganar y el riesgo que se está dispuesto a asumir. 
+Dentro de este ámbito, el enfoque propuesto por \cite{Markowitz1952}, conocido como teoría moderna de carteras, constituye uno de los pilares fundamentales ya que plantea que una cartera no debe valorarse únicamente por la rentabilidad que puede generar, sino también por el riesgo que implica asumir dicha inversión.
+
+En este artículo se define la teoría moderna de carteras como un enfoque financiero que permite construir carteras eficientes teniendo en cuenta la relación entre rentabilidad esperada y riesgo. Esta idea se encuentra directamente vinculada con el concepto de optimización de carteras, ya que optimizar una cartera implica seleccionar y asignar pesos a diferentes activos con el objetivo de alcanzar el mejor equilibrio posible entre el rendimiento esperado y el nivel de riesgo asumido.
+
+De la idea de \cite{Markowitz1952} nace otro concepto muy importante relacionado con la optimización, la frontera eficiente. Esta representa las carteras que ofrecen mayor rentabilidad para un nivel de riesgo dado, de forma que una cartera situada sobre la frontera eficiente se considera óptima porque no existe otra combinación de activos que proporcione una mayor rentabilidad esperada para el mismo nivel de riesgo.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.75\linewidth]{media/FronteraEficiente.jpg}
+\caption{Representación de la frontera eficiente y la frontera de mínima varianza.}
+\textbf{Fuente:} tomado de \citeA[p.~1563, Fig.~1]{Hu2022}.
+\label{fig:frontera-eficiente-minima-varianza}
+\end{figure}
+
+Con el fin de medir la distancia entre las distribuciones de retorno reales y las generadas se recurrirá a técnicas basadas en la teoría de la información, la cual ha quedado correctamente definida por \cite{Shannon1948} como una teoría matemática representada mediante un esquema general de comunicación que permite cuantificar la información generada por una fuente a partir de la incertidumbre asociada a sus posibles mensajes.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.75\linewidth]{media/esquema_sistComunicacion.png}
+\caption{Esquema general de un sistema de comunicación.}
+\textbf{Fuente:} tomado de \citeA[Fig.~1]{Shannon1948}.
+\label{fig:sistema-comunicacion-shannon}
+\end{figure}
+
+Aunque el esquema original de Shannon se plantea dentro del contexto de los sistemas de comunicación , su principal aportación consiste en formalizar la información como una magnitud cuantificable, esta idea se puede trasladar al contexto del análisis de datos y aprendizaje automático, por este motivo, como se comenta en el paper publicado por \cite{AlvarezChaves2024} la entropía, la información mutua y la divergencia de Kullback–Leibler (KL) son conceptos fundamentales de la teoría de la información
+
+En él se define la entropía de una variable aleatoria X como el contenido medio de información de cada uno de sus posibles resultados, cuantificando así el grado de incertidumbre o variabilidad asociado a dicha variable, y siendo la misma una medida a utilizar en nuestro futuro desarrollo. 
+
+Como podemos ver en la Figura\ref{fig:entropia-shannon} la entropía alcanza su valor máximo la incertidumbre es mayor, es decir cuando todos los resultados posibles son equiprobables y, por tanto, ninguno de ellos aporta más información que otro.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\linewidth]{media/entropia.png}
+\caption{Entropía en el caso de dos posibles resultados con probabilidades $p$ y $(1-p)$.}
+\textbf{Fuente:} tomado de \citeA[Fig.~7]{Shannon1948}.
+\label{fig:entropia-shannon}
+\end{figure}
+
+También establece la divergencia de Kullback-Leibler que permite medir la diferencia entre dos distribuciones de probabilidad definidas sobre el mismo espacio, puede interpretarse como la ineficiencia que se produce al asumir que la distribución es Q cuando la distribución verdadera es P. Esta métrica resulta especialmente útil para comparar la distribución de retornos reales con la distribución generada por el modelo, permitiendo evaluar hasta qué punto los escenarios sintéticos reproducen el comportamiento estadístico de los datos originales.
+
+La Figura\ref{fig:kullback-leibler} muestra visualmente dos distribuciones y cómo la divergencia KL permite comparar la diferencia entre ellas, de forma que, una menor divergencia entre la distribución real y la generada indicaría que el modelo reproduce de forma más precisa el comportamiento estadístico de los retornos financieros.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\linewidth]{media/Kullback-Leibler.png}
+\caption{Representación visual de la divergencia de Kullback-Leibler entre dos distribuciones de probabilidad.}
+\textbf{Fuente:} tomado de \citeA[Fig.~4]{Lysiak2021}.
+\label{fig:kullback-leibler}
+\end{figure}
+
+Por último, \cite{AlvarezChaves2024} define la información mutua como una métrica que permite medir la dependencia existente entre dos variables aleatorias, cuantificando la reducción media de incertidumbre sobre una variable X cuando se conoce otra variable Y. Esto la convierte en una herramienta esencial para el presente trabajo, ya que permite estudiar si el modelo es capaz de guardar las relaciones existentes entre los activos financieros incluyendo aquellas dependencias que otros enfoques podrían pasar por alto.
 
 \chapter{Contexto y Estado del Arte}
 
@@ -215,6 +265,8 @@ Ante esta problemática, han surgido nuevas líneas de investigación orientadas
 Por otro lado, la teoría de la información aporta herramientas que permiten cuantificar la incertidumbre y comparar distribuciones probabilísticas de manera rigurosa, lo que resulta especialmente útil para evaluar la calidad de los modelos y su capacidad para representar el comportamiento real de los activos financieros.
 
 En este contexto, la combinación de modelado generativo y teoría de la información se presenta como una línea de investigación prometedora para abordar el problema de la optimización de carteras desde una perspectiva más flexible y realista. Este enfoque permite no solo generar escenarios plausibles del mercado, sino también evaluar su calidad y utilidad en la toma de decisiones, lo que constituye la base sobre la que se desarrolla el presente trabajo.
+
+
 
 \section{Estado del arte}
 \subsection{Antecedentes}
