@@ -85,11 +85,41 @@ Las variantes de cartera VAE son:
 | `historical_mean_synthetic_covariance` | Usa media historica y covarianza sintetica |
 | `shrunk_mean_synthetic_covariance` | Usa media historica contraida hacia la media transversal y covarianza sintetica |
 
-El siguiente modulo deberia ser TimeGAN. Debe reutilizar la misma preparacion de datos, generar escenarios sinteticos secuenciales y aplicar el mismo protocolo de evaluacion.
+## TimeGAN baseline
+
+Para ejecutar el primer baseline generativo temporal:
+
+```bash
+python -m tfm_pipeline.run_timegan
+```
+
+El script realiza estas etapas:
+
+1. Reutiliza la misma descarga, calculo de retornos y particion temporal.
+2. Normaliza los retornos con estadisticos calculados solo en entrenamiento.
+3. Construye ventanas temporales de 30 dias manteniendo la estructura secuencial.
+4. Entrena un TimeGAN compacto con fases de autoencoder, supervisor y entrenamiento adversarial conjunto.
+5. Genera escenarios sinteticos secuenciales de retornos.
+6. Evalua dos variantes: TimeGAN sin calibrar y TimeGAN calibrado a la volatilidad historica de entrenamiento.
+7. Aplica el mismo protocolo de metricas distribucionales y evaluacion financiera fuera de muestra usado para VAE.
+
+Salidas principales:
+
+| Archivo | Contenido |
+|---|---|
+| `results/timegan/distribution_metrics.csv` | Metricas de similitud real-sintetico |
+| `results/timegan/distribution_summary.csv` | Resumen estadistico por activo y variante |
+| `results/timegan/portfolio_metrics.csv` | Metricas financieras de carteras TimeGAN fuera de muestra |
+| `results/timegan/training_history.csv` | Perdidas de autoencoder, supervisor, generador y discriminador |
+| `results/timegan/synthetic_returns.csv` | Retornos sinteticos sin calibrar |
+| `results/timegan/synthetic_returns_vol_calibrated.csv` | Retornos sinteticos calibrados a volatilidad historica |
+| `results/timegan/*_weights.json` | Pesos de cada cartera basada en escenarios TimeGAN |
+
+La configuracion inicial de TimeGAN prioriza ejecucion rapida y reproducibilidad. Si los resultados iniciales son estables, se puede aumentar el numero de epocas o la dimension oculta para la ejecucion final.
 
 ## Comparacion de resultados
 
-Tras ejecutar baselines y VAE, se puede generar una tabla combinada con:
+Tras ejecutar baselines, VAE y TimeGAN, se puede generar una tabla combinada con:
 
 ```bash
 python -m tfm_pipeline.compare_results
