@@ -25,7 +25,7 @@ def sharpe_ratio(
 ) -> float:
     ann_return = annualized_return(returns, periods_per_year)
     ann_vol = annualized_volatility(returns, periods_per_year)
-    if ann_vol == 0:
+    if ann_vol < EPSILON:
         return np.nan
     return float((ann_return - risk_free_rate) / ann_vol)
 

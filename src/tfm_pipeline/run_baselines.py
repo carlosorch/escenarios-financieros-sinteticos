@@ -8,6 +8,8 @@ import pandas as pd
 from .config import ExperimentConfig
 from .data import compute_log_returns, download_adjusted_close, split_returns
 from .evaluation import portfolio_metrics, weight_concentration, weight_entropy
+from .experiment_data import prepare_experiment_data
+from .metadata import write_metadata
 from .optimization import (
     equal_weights,
     mean_variance_weights,
@@ -16,13 +18,12 @@ from .optimization import (
 )
 
 
-def run(output_dir: Path = Path("results/baselines")) -> pd.DataFrame:
-    config = ExperimentConfig()
+def run(config: ExperimentConfig | None = None, output_dir: Path = Path("results/baselines")) -> pd.DataFrame:
+    config = config or ExperimentConfig()
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    prices = download_adjusted_close(config)
-    returns = compute_log_returns(prices)
-    splits = split_returns(returns, config)
+    data = prepare_experiment_data(config)
+    splits = data.splits
 
     weights = {
         "equal_weight": equal_weights(len(config.assets)),
@@ -56,7 +57,8 @@ def run(output_dir: Path = Path("results/baselines")) -> pd.DataFrame:
 
     metrics = pd.DataFrame(rows)
     metrics.to_csv(output_dir / "portfolio_metrics.csv", index=False)
-    returns.to_csv(output_dir / "log_returns.csv")
+    data.returns.to_csv(output_dir / "log_returns.csv")
+    write_metadata(output_dir, config, extra={"runner": "run_baselines"})
     return metrics
 
 

@@ -5,17 +5,9 @@ from pathlib import Path
 import pandas as pd
 
 from .config import ExperimentConfig
-from .data import (
-    compute_log_returns,
-    denormalize_windows,
-    download_adjusted_close,
-    fit_normalization,
-    make_windows,
-    match_training_volatility,
-    normalize_returns,
-    split_returns,
-    windows_to_frame,
-)
+from .data import denormalize_windows, match_training_volatility, windows_to_frame
+from .experiment_data import prepare_experiment_data
+from .metadata import write_metadata
 from .models.timegan import fit_timegan, sample_timegan
 from .synthetic_evaluation import (
     diagnostic_summary,
@@ -25,17 +17,14 @@ from .synthetic_evaluation import (
 )
 
 
-def run(output_dir: Path = Path("results/timegan")) -> tuple[pd.DataFrame, pd.DataFrame]:
-    config = ExperimentConfig()
+def run(config: ExperimentConfig | None = None, output_dir: Path = Path("results/timegan")) -> tuple[pd.DataFrame, pd.DataFrame]:
+    config = config or ExperimentConfig()
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    prices = download_adjusted_close(config)
-    returns = compute_log_returns(prices)
-    splits = split_returns(returns, config)
-
-    stats = fit_normalization(splits.train)
-    normalized_train = normalize_returns(splits.train, stats)
-    train_windows = make_windows(normalized_train, config.window_size)
+    data = prepare_experiment_data(config)
+    splits = data.splits
+    train_windows = data.train_windows
+    stats = data.normalization_stats
 
     model, history = fit_timegan(
         train_windows=train_windows,
@@ -124,6 +113,7 @@ def run(output_dir: Path = Path("results/timegan")) -> tuple[pd.DataFrame, pd.Da
     diagnostics.to_csv(output_dir / "diagnostic_summary.csv", index=False)
     validation_diagnostics.to_csv(output_dir / "validation_diagnostic_summary.csv", index=False)
     portfolio_report.to_csv(output_dir / "portfolio_metrics.csv", index=False)
+    write_metadata(output_dir, config, extra={"runner": "run_timegan"})
 
     return distribution_report, portfolio_report
 
