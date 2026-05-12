@@ -19,6 +19,24 @@ from .data import (
 
 
 @dataclass(frozen=True)
+class ReturnData:
+    """Lightweight container for prices, returns, and temporal splits."""
+
+    config: ExperimentConfig
+    prices: pd.DataFrame
+    returns: pd.DataFrame
+    splits: DatasetSplits
+
+
+def prepare_return_data(config: ExperimentConfig) -> ReturnData:
+    """Download prices, compute returns, and split. No normalisation or windowing."""
+    prices = download_adjusted_close(config)
+    returns = compute_log_returns(prices)
+    splits = split_returns(returns, config)
+    return ReturnData(config=config, prices=prices, returns=returns, splits=splits)
+
+
+@dataclass(frozen=True)
 class ExperimentData:
     """Container for all shared experimental data artifacts."""
 

@@ -21,9 +21,9 @@ def test_prepare_experiment_data_structure(monkeypatch: pytest.MonkeyPatch) -> N
         index=pd.date_range("2015-01-01", periods=1000),
     )
 
-    import tfm_pipeline.data
+    import tfm_pipeline.experiment_data as exp_data_module
 
-    monkeypatch.setattr(tfm_pipeline.data, "download_adjusted_close", lambda config: dummy_prices)
+    monkeypatch.setattr(exp_data_module, "download_adjusted_close", lambda config: dummy_prices)
 
     config = ExperimentConfig(
         assets=("AAPL", "MSFT"),

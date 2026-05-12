@@ -75,9 +75,9 @@ def build_metadata(
             for field in config.__dataclass_fields__.values()
         },
         "libraries": {
-            "pandas": pd.__version__,
-            **_numpy_info(),
-            **_torch_info(),
+            "pandas": {"version": pd.__version__},
+            "numpy": _numpy_info(),
+            "torch": _torch_info(),
         },
     }
     if extra:

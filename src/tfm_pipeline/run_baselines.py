@@ -6,9 +6,8 @@ from pathlib import Path
 import pandas as pd
 
 from .config import ExperimentConfig
-from .data import compute_log_returns, download_adjusted_close, split_returns
 from .evaluation import portfolio_metrics, weight_concentration, weight_entropy
-from .experiment_data import prepare_experiment_data
+from .experiment_data import prepare_return_data
 from .metadata import write_metadata
 from .optimization import (
     equal_weights,
@@ -22,7 +21,7 @@ def run(config: ExperimentConfig | None = None, output_dir: Path = Path("results
     config = config or ExperimentConfig()
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    data = prepare_experiment_data(config)
+    data = prepare_return_data(config)
     splits = data.splits
 
     weights = {
