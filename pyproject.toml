@@ -15,7 +15,7 @@ dependencies = [
     "scikit-learn",
     "matplotlib",
     "seaborn",
-    "torch",
+    "torch>=2.7",
 ]
 
 [tool.setuptools.packages.find]

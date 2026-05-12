@@ -100,6 +100,7 @@ def fit_vae(
 ) -> tuple[WindowVAE, VAETrainingHistory]:
     set_torch_seed(seed)
     selected_device = torch.device(device or ("cuda" if torch.cuda.is_available() else "cpu"))
+    print(f"Using torch device: {selected_device}")
 
     train_flat = flatten_windows(train_windows)
     validation_flat = flatten_windows(validation_windows)

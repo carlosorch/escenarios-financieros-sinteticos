@@ -12,6 +12,21 @@ python -m pip install -e .
 
 Esto instala el paquete `tfm_pipeline` en modo editable, de forma que los cambios en `src/` se reflejan sin reinstalar.
 
+Si se dispone de GPU NVIDIA, se recomienda instalar primero PyTorch con soporte CUDA y despues instalar el paquete en modo editable:
+
+```bash
+python -m pip install -r requirements-cuda.txt
+python -m pip install -e .
+```
+
+El archivo `requirements-cuda.txt` prioriza ruedas CUDA 12.8 de PyTorch, adecuadas para GPUs NVIDIA recientes. Si CUDA no queda disponible, los scripts siguen funcionando en CPU automaticamente.
+
+Para verificar que PyTorch detecta la GPU:
+
+```bash
+python -c "import torch; print(torch.__version__); print(torch.cuda.is_available()); print(torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU')"
+```
+
 ## Baselines clasicos
 
 Para ejecutar el flujo inicial:

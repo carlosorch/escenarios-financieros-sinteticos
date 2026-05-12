@@ -82,6 +82,7 @@ def fit_timegan(
 ) -> tuple[TimeGAN, TimeGANTrainingHistory]:
     set_torch_seed(seed)
     selected_device = torch.device(device or ("cuda" if torch.cuda.is_available() else "cpu"))
+    print(f"Using torch device: {selected_device}")
     _, window_size, n_assets = train_windows.shape
     model = TimeGAN(n_assets=n_assets, hidden_dim=hidden_dim, noise_dim=noise_dim).to(selected_device)
     loader = _make_loader(train_windows, batch_size, seed)
