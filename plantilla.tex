@@ -89,7 +89,7 @@ En particular, mediante el enfoque media-varianza, Markowitz estableció que el 
 
 No obstante, a pesar de su relevancia teórica, la aplicación de estos enfoques a datos financieros reales presenta limitaciones importantes. En la práctica, los retornos de los activos no suelen ajustarse a distribuciones normales, sino que muestran asimetrías, colas pesadas y episodios de volatilidad agrupada. Asimismo, las relaciones entre activos pueden ser no lineales y variar a lo largo del tiempo, especialmente en contextos de inestabilidad o crisis financieras. Estas características dificultan la estimación precisa de los parámetros necesarios para el modelo y pueden dar lugar a soluciones inestables o poco robustas, evidenciando la necesidad de desarrollar metodologías más flexibles capaces de capturar la complejidad inherente a los mercados financieros.
 
-En este contexto, el presente trabajo se sitúa en la intersección entre finanzas cuantitativas, inteligencia artificial y teoría de la información. En concreto, se propone estudiar si el uso de modelos generativos, como TimeGAN y los Autoencoders Variacionales, junto con medidas informacionales como la divergencia de Kullback-Leibler \cite{Kullback1951}, puede contribuir a construir carteras más robustas y con una mejor representación del riesgo. De este modo, el trabajo pretende explorar una alternativa metodológica a los enfoques clásicos, incorporando herramientas capaces de modelar distribuciones complejas de retornos y dependencias más realistas entre activos.
+En este contexto, el presente trabajo se sitúa en la intersección entre finanzas cuantitativas, inteligencia artificial y teoría de la información. En concreto, se propone estudiar si el uso de modelos generativos, como TimeGAN y los Autoencoders Variacionales, junto con medidas informacionales como la divergencia de Kullback-Leibler \cite{Kullback1951}, puede aportar una representación más rica del riesgo y de las distribuciones de retorno. De este modo, el trabajo pretende explorar una alternativa metodológica a los enfoques clásicos, incorporando herramientas capaces de modelar distribuciones complejas de retornos y dependencias más realistas entre activos.
 
 La relevancia de este problema no es únicamente teórica. En la práctica, una cartera se construye a partir de estimaciones sobre el comportamiento futuro de los activos, por lo que cualquier error en la representación de sus retornos puede trasladarse directamente a la asignación de pesos. Si dichas estimaciones simplifican en exceso la realidad del mercado, por ejemplo asumiendo normalidad o relaciones de dependencia estables, el resultado puede ser una cartera aparentemente eficiente en términos históricos pero vulnerable cuando cambia el entorno financiero. En consecuencia, mejorar la forma en que se representan los retornos no es una cuestión secundaria, sino un elemento central para reforzar la calidad del proceso de decisión.
 
@@ -123,7 +123,7 @@ En este contexto, los modelos generativos aparecen como una alternativa especial
 
 Junto a ello, la teoría de la información aporta herramientas muy útiles para evaluar la calidad de esas representaciones. En particular, la divergencia de Kullback-Leibler \cite{Kullback1951} permite medir la diferencia entre la distribución real de los retornos y la distribución generada por el modelo, lo que proporciona una forma rigurosa de comprobar hasta qué punto la información contenida en los datos originales se conserva en los datos sintéticos \cite{Cover2006}. Esta idea resulta especialmente relevante en este trabajo, ya que no solo interesa generar datos plausibles, sino también utilizarlos de forma útil dentro del proceso de optimización de carteras.
 
-La motivación de este estudio surge, por tanto, de la necesidad de explorar si la combinación de modelado generativo y teoría de la información puede ayudar a superar algunas de las limitaciones de los métodos clásicos de optimización de carteras. El interés del tema es claro en dos sentidos. Por un lado, desde una perspectiva académica, conecta áreas de gran actualidad como las finanzas cuantitativas, el aprendizaje automático y la teoría de la información. Por otro, desde una perspectiva aplicada, puede contribuir al diseño de carteras más robustas, con una mejor estimación del riesgo y con un comportamiento más estable en entornos de mercado complejos.
+La motivación de este estudio surge, por tanto, de la necesidad de explorar si la combinación de modelado generativo y teoría de la información puede ayudar a analizar algunas de las limitaciones de los métodos clásicos de optimización de carteras. El interés del tema es claro en dos sentidos. Por un lado, desde una perspectiva académica, conecta áreas de gran actualidad como las finanzas cuantitativas, el aprendizaje automático y la teoría de la información. Por otro, desde una perspectiva aplicada, permite estudiar si una representación más completa de los escenarios de mercado puede apoyar procesos de construcción de carteras evaluados fuera de muestra.
 
 Además, esta motivación no surge únicamente del atractivo conceptual de combinar distintas disciplinas, sino de un problema metodológico concreto. En muchos enfoques tradicionales, la calidad de la cartera depende de parámetros estimados a partir de una muestra histórica limitada, lo que puede introducir una fuerte sensibilidad a pequeñas perturbaciones en los datos. Cuando se trasladan esas estimaciones al cálculo de pesos, aparecen con frecuencia soluciones muy concentradas, poco diversificadas o excesivamente dependientes de supuestos que pueden dejar de cumplirse fuera de la muestra. Por ello, resulta pertinente estudiar métodos que no se limiten a resumir el mercado mediante unos pocos estadísticos, sino que intenten representar con mayor riqueza su incertidumbre subyacente.
 
@@ -580,7 +580,7 @@ La teoría de la información se utiliza como mecanismo de validación intermedi
 
 \section{Comprensión de los datos}
 
-Se prevé trabajar con datos diarios procedentes de Yahoo Finance mediante la biblioteca \texttt{yfinance}. El universo inicial estará formado por activos líquidos pertenecientes al S\&P 500 o al NASDAQ-100, con un número aproximado de entre 20 y 30 activos y un horizonte histórico de entre ocho y diez años. La variable inicial será el precio ajustado de cierre y la variable modelada serán los retornos logarítmicos.
+Se prevé trabajar con datos diarios procedentes de Yahoo Finance mediante la biblioteca \texttt{yfinance}. El universo inicial estará formado por diez activos líquidos de gran capitalización y distintos sectores: AAPL, MSFT, GOOGL, AMZN, META, NVDA, JPM, XOM, JNJ y PG. El periodo de estudio previsto abarca desde el 1 de enero de 2015 hasta el 12 de mayo de 2026, fecha próxima al inicio de la fase experimental del trabajo. La variable inicial será el precio ajustado de cierre y la variable modelada serán los retornos logarítmicos.
 
 El análisis exploratorio incluirá media, volatilidad, asimetría, curtosis, percentiles, valores extremos, distribuciones empíricas, matriz de correlaciones, autocorrelación de retornos y autocorrelación de retornos absolutos. Esta fase permitirá justificar la necesidad de modelos capaces de representar colas pesadas, cambios de volatilidad y relaciones de dependencia entre activos.
 
@@ -594,11 +594,11 @@ Los retornos se calcularán como:
 r_t = \ln \left(\frac{P_t}{P_{t-1}}\right)
 \end{equation}
 
-La partición de los datos será temporal y no aleatoria, con una distribución orientativa del 70\% para entrenamiento, 15\% para validación y 15\% para prueba. Las ventanas temporales tendrán una longitud inicial de 30 días por el número de activos seleccionados, por ejemplo, 30 días por 20 activos.
+La partición de los datos será temporal y no aleatoria: entrenamiento entre 2015 y 2022, validación desde enero de 2023 hasta junio de 2024 y prueba desde julio de 2024 hasta el 12 de mayo de 2026. Las ventanas temporales tendrán una longitud inicial de 30 días por el número de activos seleccionados, es decir, 30 días por 10 activos en el universo experimental propuesto.
 
 \section{Modelado generativo}
 
-El núcleo técnico del trabajo será la comparación entre VAE y TimeGAN. Ambos modelos se entrenarán sobre las mismas ventanas temporales y se evaluarán con un protocolo común, de forma que la comparación no dependa de diferencias en la preparación de datos o en el conjunto de evaluación.
+El núcleo técnico del trabajo será la comparación entre un VAE utilizado como baseline generativo probabilístico y TimeGAN como modelo generativo temporal principal. Ambos modelos se entrenarán sobre las mismas ventanas temporales y se evaluarán con un protocolo común, de forma que la comparación no dependa de diferencias en la preparación de datos o en el conjunto de evaluación. Los modelos de difusión se consideran una línea reciente y prometedora dentro del estado del arte, pero quedan planteados como posible extensión si el alcance temporal del proyecto lo permite.
 
 El VAE se utilizará como modelo generativo probabilístico basado en espacio latente. Su arquitectura incluirá un encoder, una representación latente, el mecanismo de reparametrización y un decoder. La función de pérdida combinará un término de reconstrucción y un término de regularización KL. En el estudio, el VAE actuará como baseline generativo estable para contrastar un modelo latente probabilístico frente a un modelo adversarial temporal. Su principal limitación esperada es que, si las ventanas se tratan de forma agregada, puede capturar peor ciertas dependencias temporales que un modelo diseñado específicamente para series.
 
@@ -614,7 +614,7 @@ TimeGAN se utilizará como modelo principal para la generación de series tempor
 
 \section{Generación de escenarios sintéticos}
 
-Los modelos no generarán precios directamente, sino retornos sintéticos. La salida esperada tendrá la forma de \texttt{N escenarios x T días x M activos}; por ejemplo, 1000 escenarios de 30 días para 20 activos. Estos escenarios se utilizarán para comparar distribuciones reales y sintéticas, estimar parámetros de retorno y riesgo, construir carteras mediante modelos de optimización y analizar la robustez de las asignaciones obtenidas mediante estabilidad de pesos, concentración, entropía y comportamiento fuera de muestra.
+Los modelos no generarán precios directamente, sino retornos sintéticos. La salida esperada tendrá la forma de \texttt{N escenarios x T días x M activos}; por ejemplo, 1000 escenarios de 30 días para 10 activos. Estos escenarios se utilizarán para comparar distribuciones reales y sintéticas, estimar parámetros de retorno y riesgo, construir carteras mediante modelos de optimización y analizar las asignaciones obtenidas mediante estabilidad de pesos, concentración, entropía y comportamiento fuera de muestra.
 
 \section{Evaluación de las distribuciones generadas}
 
@@ -647,7 +647,7 @@ Complementario & Wasserstein & Distancia entre distribuciones considerando su ge
 
 \section{Optimización y evaluación de carteras}
 
-Los baselines financieros serán la cartera equiponderada, Markowitz media-varianza con datos históricos reales, la cartera de mínima varianza, la cartera optimizada usando escenarios VAE y la cartera optimizada usando escenarios TimeGAN. Los escenarios sintéticos se emplearán para estimar medias, covarianzas o distribuciones de retornos y construir carteras long-only, pero la comparación de rendimiento se realizará siempre sobre retornos reales del conjunto de prueba.
+Los baselines financieros serán la cartera equiponderada, Markowitz media-varianza con datos históricos reales, la cartera de mínima varianza, la cartera optimizada usando escenarios VAE y la cartera optimizada usando escenarios TimeGAN. Los escenarios sintéticos se emplearán para estimar medias, covarianzas o distribuciones de retornos y construir carteras long-only, completamente invertidas y sin ventas en corto, pero la comparación de rendimiento se realizará siempre sobre retornos reales del conjunto de prueba.
 
 Las carteras generadas a partir de escenarios sintéticos se evaluarán sobre datos reales del periodo de prueba, evitando que la evaluación financiera dependa de los mismos datos artificiales utilizados para optimizar. Las métricas previstas incluyen rentabilidad acumulada, rentabilidad anualizada, volatilidad anualizada, ratio de Sharpe \cite{Sharpe1964}, máximo drawdown, entropía de pesos, concentración de pesos y estabilidad de pesos.
 
@@ -665,6 +665,10 @@ La reproducibilidad se garantizará mediante el uso de semillas aleatorias, una 
 \textbf{Elemento} & \textbf{Decisión metodológica} \\
 \hline
 Fuente de datos & Yahoo Finance \\
+\hline
+Universo de activos & AAPL, MSFT, GOOGL, AMZN, META, NVDA, JPM, XOM, JNJ y PG \\
+\hline
+Periodo & 2015-01-01 a 2026-05-12 \\
 \hline
 Frecuencia & Diaria \\
 \hline
@@ -711,5 +715,4 @@ Equiponderada & Heurístico simple & Número de activos & Pesos iguales & Refere
 
 
 \end{document}
-
 
