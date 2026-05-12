@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tfm-generative-portfolios"
+version = "0.1.0"
+description = "Experimental pipeline for generative financial scenarios and portfolio optimization"
+requires-python = ">=3.10"
+dependencies = [
+    "pandas",
+    "numpy",
+    "yfinance",
+    "scipy",
+    "scikit-learn",
+    "matplotlib",
+    "seaborn",
+    "torch",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
