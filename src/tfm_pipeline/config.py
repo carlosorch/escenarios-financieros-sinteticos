@@ -37,5 +37,13 @@ class ExperimentConfig:
     vae_learning_rate: float = 1e-3
     vae_beta: float = 1e-3
     vae_beta_grid: tuple[float, ...] = (0.0, 1e-5, 1e-4, 1e-3)
+    timegan_hidden_dim: int = 24
+    timegan_noise_dim: int = 10
+    timegan_epochs: int = 120
+    timegan_batch_size: int = 64
+    timegan_learning_rate: float = 1e-3
+    timegan_gamma: float = 1.0
+    timegan_supervised_weight: float = 100.0
+    timegan_reconstruction_weight: float = 10.0
     synthetic_scenarios: int = 1000
     mean_shrinkage_alpha: float = 0.25
