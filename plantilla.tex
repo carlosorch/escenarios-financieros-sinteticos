@@ -160,7 +160,7 @@ Sobre los escenarios generados, se incorporarán métricas fundamentadas en la t
 Finalmente, el trabajo contempla la implementación del enfoque propuesto y la realización de experimentos que permitan analizar su comportamiento y rendimiento. A partir de los resultados obtenidos, se elaborarán las conclusiones correspondientes, así como una reflexión sobre las posibles líneas de investigación futura que puedan contribuir a mejorar o ampliar la propuesta desarrollada.
 
 \chapter{Marco teórico}
-Antes de comenzar a analizar el estado del arte y las investigaciones más relevantes dentro del contexto del presenta trabajo, es necesario desarrollar el marco teórico sobre el que se fundamenta, de forma que se construya una base conceptual sólida que permita comprender tanto el vocabulario utilizado como las decisiones metodológicas tomadas durante el estudio. En este apartado definiremos los principales conceptos relacionados con la inteligencia artificial, el aprendizaje automático, la optimización de carteras, los modelos generativos y la teoría de la información, finalizando con las métricas empleadas posteriormente en la evaluación del modelo propuesto.
+Antes de comenzar a analizar el estado del arte y las investigaciones más relevantes dentro del contexto del presente trabajo, es necesario desarrollar el marco teórico sobre el que se fundamenta, de forma que se construya una base conceptual sólida que permita comprender tanto el vocabulario utilizado como las decisiones metodológicas tomadas durante el estudio. En este apartado definiremos los principales conceptos relacionados con la inteligencia artificial, el aprendizaje automático, la optimización de carteras, los modelos generativos y la teoría de la información, finalizando con las métricas empleadas posteriormente en la evaluación del modelo propuesto.
 
 Según \cite{IBM2024}, la Inteligencia Artificial (IA) es una tecnología que permite a las computadoras y máquinas simular el aprendizaje humano, la comprensión, la resolución de problemas, la toma de decisiones, la creatividad y la autonomía. Dentro de ella podemos encontrar numerosas áreas orientadas al desarrollo de sistemas capaces de aprender y tomar decisiones, entre las que destacamos el aprendizaje automático o machine learning y el aprendizaje profundo o Deep learning.
 
@@ -170,7 +170,7 @@ Dentro del aprendizaje profundo han surgido en los últimos años distintas arqu
 
 Entre las arquitecturas generativas más relevantes destacan los Autoencoders Variacionales (VAE) y las Redes Adversarias Generativas (GAN).
 
-Los Autoencoders Variacionales son modelos generativos diseñaos para aprender representaciones probabilísticas de manera no supervisada (es decir, sin datos etiquetados) para reconstruir la entrada original a partir de una versión comprimida, reduciendo los datos a lo esencial. Como puede observarse en la Figura X, la arquitectura de un VAE está compuesta principalmente por un encoder encargado de transformar los datos de entrada en una representación latente probabilística y un decoder cuya función consiste en reconstruir los datos originales a partir de muestras generadas en dicho espacio latente, esto permite que el modelo aprenda la distribución subyacente de los datos y pueda generar nuevas observaciones mediante procesos de muestreo \cite{Weng2018}.
+Los Autoencoders Variacionales son modelos generativos diseñados para aprender representaciones probabilísticas de manera no supervisada (es decir, sin datos etiquetados) para reconstruir la entrada original a partir de una versión comprimida, reduciendo los datos a lo esencial. Como puede observarse en la Figura~\ref{fig:arq-vae}, la arquitectura de un VAE está compuesta principalmente por un encoder encargado de transformar los datos de entrada en una representación latente probabilística y un decoder cuya función consiste en reconstruir los datos originales a partir de muestras generadas en dicho espacio latente, esto permite que el modelo aprenda la distribución subyacente de los datos y pueda generar nuevas observaciones mediante procesos de muestreo \cite{Weng2018}.
 
 \begin{figure}[H]
 \centering
@@ -180,9 +180,7 @@ Los Autoencoders Variacionales son modelos generativos diseñaos para aprender r
 \label{fig:arq-vae}
 \end{figure}
 
-Por otro lado, las redes adversarias generativas (GANs) son un método para la optimización competitivo entre dos redes neuronales, una generadora y otra discriminadora, con el objetivo de que la generadora aprenda a crear nuevos ejemplos sintéticos que resulten cada vez más difíciles de distinguir de los datos reales, siguiendo la misma distribución de probabilidad que los datos utilizados durante el entrenamiento. Esto lo podemos ver reflejado en la siguiente imagen.
-
-Las Redes Generativas Adversarias, conocidas como GAN, son modelos generativos formados por dos redes neuronales que compiten entre sí: un generador y un discriminador. El generador trata de crear muestras sintéticas similares a los datos reales, mientras que el discriminador intenta distinguir entre las muestras reales y las generadas. A través de este proceso adversarial, el generador mejora progresivamente su capacidad para producir datos plausibles \cite{Goodfellow2014}.
+Por otro lado, las redes generativas adversarias, conocidas como GAN, son modelos generativos formados por dos redes neuronales que compiten entre sí mediante un proceso de entrenamiento adversarial: un generador y un discriminador. El generador trata de crear muestras sintéticas similares a los datos reales, mientras que el discriminador intenta distinguir entre las muestras reales y las generadas. A través de este proceso, el generador mejora progresivamente su capacidad para producir datos plausibles siguiendo la distribución de probabilidad de los datos utilizados durante el entrenamiento \cite{Goodfellow2014}.
 
 Como puede observarse en la Figura~\ref{fig:arq-gan}, el proceso de entrenamiento de una GAN parte de un vector de ruido latente que es transformado por el generador en una muestra sintética. Posteriormente, el discriminador recibe tanto datos reales como datos generados y aprende a clasificarlos, proporcionando una señal que permite mejorar al generador durante el entrenamiento \cite{DeLaTorre2023}.
 
@@ -713,6 +711,5 @@ Equiponderada & Heurístico simple & Número de activos & Pesos iguales & Refere
 
 
 \end{document}
-
 
 
