@@ -1,7 +1,25 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 from tfm_pipeline.config import ExperimentConfig
-from tfm_pipeline.metadata import build_metadata
+from tfm_pipeline.metadata import _repo_root, build_metadata
+
+
+class TestRepoRoot:
+    def test_finds_parent_git_directory(self, tmp_path: Path) -> None:
+        repo = tmp_path / "repo"
+        nested = repo / "src" / "package"
+        nested.mkdir(parents=True)
+        (repo / ".git").mkdir()
+
+        assert _repo_root(nested) == repo
+
+    def test_returns_none_without_git_directory(self, tmp_path: Path) -> None:
+        nested = tmp_path / "not_repo" / "src"
+        nested.mkdir(parents=True)
+
+        assert _repo_root(nested) is None
 
 
 class TestBuildMetadata:
@@ -31,3 +49,8 @@ class TestBuildMetadata:
         config = ExperimentConfig()
         meta = build_metadata(config, extra={"runner": "test"})
         assert meta["extra"]["runner"] == "test"
+
+    def test_git_metadata_populated_inside_repo(self) -> None:
+        meta = build_metadata(ExperimentConfig())
+        assert meta["git_revision"]
+        assert meta["git_branch"]

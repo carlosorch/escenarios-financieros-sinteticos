@@ -13,11 +13,26 @@ import pandas as pd
 from .config import ExperimentConfig
 
 
+def _repo_root(start: Path | None = None) -> Path | None:
+    current = (start or Path(__file__)).resolve()
+    if current.is_file():
+        current = current.parent
+
+    for path in (current, *current.parents):
+        if (path / ".git").exists():
+            return path
+    return None
+
+
 def _git_revision() -> str | None:
+    repo_root = _repo_root()
+    if repo_root is None:
+        return None
+
     try:
         return subprocess.check_output(
             ["git", "rev-parse", "HEAD"],
-            cwd=Path(__file__).resolve().parents[3],
+            cwd=repo_root,
             text=True,
             stderr=subprocess.DEVNULL,
         ).strip()
@@ -26,10 +41,14 @@ def _git_revision() -> str | None:
 
 
 def _git_branch() -> str | None:
+    repo_root = _repo_root()
+    if repo_root is None:
+        return None
+
     try:
         return subprocess.check_output(
             ["git", "rev-parse", "--abbrev-ref", "HEAD"],
-            cwd=Path(__file__).resolve().parents[3],
+            cwd=repo_root,
             text=True,
             stderr=subprocess.DEVNULL,
         ).strip()
