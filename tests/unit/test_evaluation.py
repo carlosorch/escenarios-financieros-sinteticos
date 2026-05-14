@@ -7,12 +7,15 @@ import pytest
 from tfm_pipeline.evaluation import (
     annualized_return,
     annualized_volatility,
+    autocorrelation_error,
+    conditional_value_at_risk,
     correlation_matrix_error,
     distribution_metrics,
     histogram_probabilities,
     max_drawdown,
     portfolio_metrics,
     sharpe_ratio,
+    value_at_risk,
     weight_concentration,
     weight_entropy,
 )
@@ -69,6 +72,20 @@ class TestMaxDrawdown:
         assert result == pytest.approx(-0.1, rel=1e-6)
 
 
+class TestTailRisk:
+    def test_value_at_risk_uses_left_tail_quantile(self) -> None:
+        series = pd.Series([-0.10, -0.05, 0.0, 0.02, 0.04])
+        assert value_at_risk(series, confidence_level=0.6) == pytest.approx(series.quantile(0.4))
+
+    def test_conditional_value_at_risk_averages_tail_losses(self) -> None:
+        series = pd.Series([-0.10, -0.05, 0.0, 0.02, 0.04])
+        assert conditional_value_at_risk(series, confidence_level=0.6) == pytest.approx(-0.075)
+
+    def test_invalid_confidence_level_raises(self) -> None:
+        with pytest.raises(ValueError, match="confidence_level"):
+            value_at_risk(pd.Series([0.0]), confidence_level=1.0)
+
+
 class TestPortfolioMetrics:
     def test_basic_shape(self) -> None:
         series = pd.Series([0.001] * 100)
@@ -79,6 +96,8 @@ class TestPortfolioMetrics:
             "annualized_volatility",
             "sharpe_ratio",
             "max_drawdown",
+            "value_at_risk",
+            "conditional_value_at_risk",
         }
         assert set(metrics.keys()) == expected_keys
         assert all(isinstance(v, float) for v in metrics.values())
@@ -139,3 +158,23 @@ class TestCorrelationMatrixError:
         df2 = pd.DataFrame(np.random.default_rng(1).normal(size=(100, 3)), columns=["a", "b", "c"])
         error = correlation_matrix_error(df1, df2)
         assert error > 0
+
+
+class TestAutocorrelationError:
+    def test_identical_returns_have_zero_error(self) -> None:
+        df = pd.DataFrame(
+            {
+                "a": [0.1, 0.2, 0.1, 0.2, 0.1],
+                "b": [0.0, 0.1, 0.0, 0.1, 0.0],
+            }
+        )
+        assert autocorrelation_error(df, df.copy()) == pytest.approx(0.0, abs=1e-9)
+
+    def test_absolute_returns_can_be_evaluated(self) -> None:
+        real = pd.DataFrame({"a": [0.1, -0.2, 0.1, -0.2, 0.1]})
+        synthetic = pd.DataFrame({"a": [0.1, 0.2, 0.1, 0.2, 0.1]})
+        assert autocorrelation_error(real, synthetic, absolute=True) == pytest.approx(0.0, abs=1e-9)
+
+    def test_invalid_lag_raises(self) -> None:
+        with pytest.raises(ValueError, match="lag"):
+            autocorrelation_error(pd.DataFrame({"a": [0.0, 1.0]}), pd.DataFrame({"a": [0.0, 1.0]}), lag=0)

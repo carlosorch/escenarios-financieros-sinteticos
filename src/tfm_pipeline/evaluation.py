@@ -36,10 +36,25 @@ def max_drawdown(returns: pd.Series) -> float:
     return float(drawdown.min())
 
 
+def value_at_risk(returns: pd.Series, confidence_level: float = 0.95) -> float:
+    if not 0.0 < confidence_level < 1.0:
+        raise ValueError("confidence_level must be between 0 and 1")
+    return float(returns.quantile(1.0 - confidence_level))
+
+
+def conditional_value_at_risk(returns: pd.Series, confidence_level: float = 0.95) -> float:
+    threshold = value_at_risk(returns, confidence_level)
+    tail_returns = returns[returns <= threshold]
+    if tail_returns.empty:
+        return threshold
+    return float(tail_returns.mean())
+
+
 def portfolio_metrics(
     returns: pd.Series,
     periods_per_year: int = 252,
     risk_free_rate: float = 0.0,
+    var_confidence_level: float = 0.95,
 ) -> dict[str, float]:
     return {
         "cumulative_return": float(np.expm1(returns.sum())),
@@ -47,6 +62,8 @@ def portfolio_metrics(
         "annualized_volatility": annualized_volatility(returns, periods_per_year),
         "sharpe_ratio": sharpe_ratio(returns, risk_free_rate, periods_per_year),
         "max_drawdown": max_drawdown(returns),
+        "value_at_risk": value_at_risk(returns, var_confidence_level),
+        "conditional_value_at_risk": conditional_value_at_risk(returns, var_confidence_level),
     }
 
 
@@ -97,6 +114,19 @@ def correlation_matrix_error(real: pd.DataFrame, synthetic: pd.DataFrame) -> flo
     real_corr = real.corr().to_numpy()
     synthetic_corr = synthetic.corr().to_numpy()
     return float(np.linalg.norm(real_corr - synthetic_corr, ord="fro"))
+
+
+def autocorrelation_error(real: pd.DataFrame, synthetic: pd.DataFrame, lag: int = 1, absolute: bool = False) -> float:
+    if lag < 1:
+        raise ValueError("lag must be at least 1")
+    real_values = real.abs() if absolute else real
+    synthetic_values = synthetic.abs() if absolute else synthetic
+    real_autocorr = real_values.apply(lambda series: series.autocorr(lag=lag))
+    synthetic_autocorr = synthetic_values.apply(lambda series: series.autocorr(lag=lag))
+    differences = (real_autocorr - synthetic_autocorr).dropna()
+    if differences.empty:
+        return float("nan")
+    return float(np.sqrt(np.mean(np.square(differences))))
 
 
 def distribution_summary(real: pd.DataFrame, synthetic: pd.DataFrame) -> pd.DataFrame:

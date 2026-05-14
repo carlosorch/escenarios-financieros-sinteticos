@@ -8,6 +8,7 @@ import pandas as pd
 
 from .config import ExperimentConfig
 from .evaluation import (
+    autocorrelation_error,
     correlation_matrix_error,
     distribution_metrics,
     distribution_summary,
@@ -39,6 +40,8 @@ def evaluate_synthetic_returns(
             "asset": "ALL",
             **distribution_metrics(real_returns.to_numpy(), synthetic_returns.to_numpy()),
             "correlation_matrix_error": correlation_matrix_error(real_returns, synthetic_returns),
+            "autocorrelation_error": autocorrelation_error(real_returns, synthetic_returns),
+            "absolute_autocorrelation_error": autocorrelation_error(real_returns, synthetic_returns, absolute=True),
         }
     )
     summary = distribution_summary(real_returns, synthetic_returns)
@@ -63,6 +66,8 @@ def diagnostic_summary(
                 "mean_jensen_shannon": float(asset_metrics["jensen_shannon"].mean()),
                 "mean_wasserstein": float(asset_metrics["wasserstein"].mean()),
                 "correlation_matrix_error": float(all_metrics["correlation_matrix_error"]),
+                "autocorrelation_error": float(all_metrics["autocorrelation_error"]),
+                "absolute_autocorrelation_error": float(all_metrics["absolute_autocorrelation_error"]),
                 "mean_abs_skewness_error": float(
                     (variant_summary["synthetic_skewness"] - variant_summary["real_skewness"]).abs().mean()
                 ),
