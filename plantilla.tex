@@ -159,7 +159,12 @@ Sobre los escenarios generados, se incorporarán métricas fundamentadas en la t
 
 Finalmente, el trabajo contempla la implementación del enfoque propuesto y la realización de experimentos que permitan analizar su comportamiento y rendimiento. A partir de los resultados obtenidos, se elaborarán las conclusiones correspondientes, así como una reflexión sobre las posibles líneas de investigación futura que puedan contribuir a mejorar o ampliar la propuesta desarrollada.
 
-\chapter{Marco teórico}
+
+\chapter{Contexto y Estado del Arte}
+
+\section{Contexto del problema}
+El proceso de toma de decisiones en los mercados financieros se caracteriza por la presencia de incertidumbre, volatilidad y una elevada complejidad en la dinámica de los activos. En este contexto, la optimización de carteras se plantea como un problema fundamental cuyo objetivo consiste en determinar la mejor asignación posible de capital entre distintos activos, equilibrando la rentabilidad esperada y el riesgo asociado.
+
 Antes de comenzar a analizar el estado del arte y las investigaciones más relevantes dentro del contexto del presente trabajo, es necesario desarrollar el marco teórico sobre el que se fundamenta, de forma que se construya una base conceptual sólida que permita comprender tanto el vocabulario utilizado como las decisiones metodológicas tomadas durante el estudio. En este apartado definiremos los principales conceptos relacionados con la inteligencia artificial, el aprendizaje automático, la optimización de carteras, los modelos generativos y la teoría de la información, finalizando con las métricas empleadas posteriormente en la evaluación del modelo propuesto.
 
 Según \cite{IBM2024}, la Inteligencia Artificial (IA) es una tecnología que permite a las computadoras y máquinas simular el aprendizaje humano, la comprensión, la resolución de problemas, la toma de decisiones, la creatividad y la autonomía. Dentro de ella podemos encontrar numerosas áreas orientadas al desarrollo de sistemas capaces de aprender y tomar decisiones, entre las que destacamos el aprendizaje automático o machine learning y el aprendizaje profundo o Deep learning.
@@ -248,25 +253,7 @@ La Figura\ref{fig:kullback-leibler} muestra visualmente dos distribuciones y có
 
 Por último, \cite{AlvarezChaves2024} define la información mutua como una métrica que permite medir la dependencia existente entre dos variables aleatorias, cuantificando la reducción media de incertidumbre sobre una variable X cuando se conoce otra variable Y. Esto la convierte en una herramienta esencial para el presente trabajo, ya que permite estudiar si el modelo es capaz de guardar las relaciones existentes entre los activos financieros incluyendo aquellas dependencias que otros enfoques podrían pasar por alto.
 
-\chapter{Contexto y Estado del Arte}
-
-\section{Contexto del problema}
-
-El proceso de toma de decisiones en los mercados financieros se caracteriza por la presencia de incertidumbre, volatilidad y una elevada complejidad en la dinámica de los activos. En este contexto, la optimización de carteras se plantea como un problema fundamental cuyo objetivo consiste en determinar la mejor asignación posible de capital entre distintos activos, equilibrando la rentabilidad esperada y el riesgo asociado.
-
-Sin embargo, los mercados financieros presentan comportamientos difíciles de modelar mediante enfoques tradicionales, debido a la naturaleza no lineal de las relaciones entre activos, la presencia de eventos extremos y la variabilidad temporal de la volatilidad. Estas características hacen que la estimación de los retornos y del riesgo sea un proceso complejo, en el que los supuestos simplificadores pueden conducir a resultados poco representativos de la realidad.
-
-En la práctica, los métodos clásicos de optimización de carteras suelen basarse en datos históricos y en estimaciones puntuales de parámetros como la media y la covarianza. No obstante, este enfoque presenta limitaciones importantes, ya que no permite capturar de forma completa la incertidumbre inherente al comportamiento futuro del mercado ni generar escenarios alternativos que reflejen distintas posibles evoluciones de los activos.
-
-En este sentido, uno de los principales retos en la optimización de carteras consiste en desarrollar modelos capaces de representar adecuadamente las distribuciones de los retornos financieros, así como las dependencias existentes entre los distintos activos. Esta necesidad resulta especialmente relevante en entornos donde las relaciones entre variables no son lineales y pueden variar en función del contexto económico o de las condiciones del mercado.
-
-Ante esta problemática, han surgido nuevas líneas de investigación orientadas a la utilización de técnicas de inteligencia artificial que permitan superar las limitaciones de los enfoques tradicionales. En particular, los modelos generativos ofrecen la posibilidad de aprender distribuciones complejas a partir de datos reales y generar escenarios sintéticos que reflejen distintos comportamientos del mercado, proporcionando una visión probabilística más completa del riesgo.
-
-Por otro lado, la teoría de la información aporta herramientas que permiten cuantificar la incertidumbre y comparar distribuciones probabilísticas de manera rigurosa, lo que resulta especialmente útil para evaluar la calidad de los modelos y su capacidad para representar el comportamiento real de los activos financieros.
-
 En este contexto, la combinación de modelado generativo y teoría de la información se presenta como una línea de investigación prometedora para abordar el problema de la optimización de carteras desde una perspectiva más flexible y realista. Este enfoque permite no solo generar escenarios plausibles del mercado, sino también evaluar su calidad y utilidad en la toma de decisiones, lo que constituye la base sobre la que se desarrolla el presente trabajo.
-
-
 
 \section{Estado del arte}
 \subsection{Antecedentes}
