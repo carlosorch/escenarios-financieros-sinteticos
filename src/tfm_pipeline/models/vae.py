@@ -87,6 +87,16 @@ def set_torch_seed(seed: int) -> None:
         torch.use_deterministic_algorithms(True)
 
 
+def select_torch_device(device: str | None = None) -> torch.device:
+    if device is not None:
+        return torch.device(device)
+    if torch.cuda.is_available():
+        return torch.device("cuda")
+    if torch.backends.mps.is_available():
+        return torch.device("mps")
+    return torch.device("cpu")
+
+
 def flatten_windows(windows: np.ndarray) -> np.ndarray:
     return windows.reshape(windows.shape[0], -1).astype(np.float32)
 
@@ -105,7 +115,7 @@ def fit_vae(
     device: str | None = None,
 ) -> tuple[WindowVAE, VAETrainingHistory]:
     set_torch_seed(seed)
-    selected_device = torch.device(device or ("cuda" if torch.cuda.is_available() else "cpu"))
+    selected_device = select_torch_device(device)
     print(f"Using torch device: {selected_device}")
 
     train_flat = flatten_windows(train_windows)
@@ -202,7 +212,7 @@ def sample_vae(
     device: str | None = None,
 ) -> np.ndarray:
     set_torch_seed(seed)
-    selected_device = torch.device(device or next(model.parameters()).device)
+    selected_device = torch.device(device) if device is not None else next(model.parameters()).device
     model.eval()
     with torch.no_grad():
         latent = torch.randn(n_scenarios, model.latent_dim, device=selected_device)

@@ -7,7 +7,7 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader, TensorDataset
 
-from .vae import set_torch_seed
+from .vae import select_torch_device, set_torch_seed
 
 
 @dataclass(frozen=True)
@@ -81,7 +81,7 @@ def fit_timegan(
     device: str | None = None,
 ) -> tuple[TimeGAN, TimeGANTrainingHistory]:
     set_torch_seed(seed)
-    selected_device = torch.device(device or ("cuda" if torch.cuda.is_available() else "cpu"))
+    selected_device = select_torch_device(device)
     print(f"Using torch device: {selected_device}")
     _, window_size, n_assets = train_windows.shape
     model = TimeGAN(n_assets=n_assets, hidden_dim=hidden_dim, noise_dim=noise_dim).to(selected_device)
@@ -194,7 +194,7 @@ def sample_timegan(
     device: str | None = None,
 ) -> np.ndarray:
     set_torch_seed(seed)
-    selected_device = torch.device(device or next(model.parameters()).device)
+    selected_device = torch.device(device) if device is not None else next(model.parameters()).device
     model.eval()
     with torch.no_grad():
         generated_hidden = model.generator(_noise(n_scenarios, window_size, model.noise_dim, selected_device))

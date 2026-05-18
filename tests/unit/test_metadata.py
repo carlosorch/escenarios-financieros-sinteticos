@@ -38,6 +38,9 @@ class TestBuildMetadata:
         assert "version" not in libs
         # pandas dict should contain version
         assert "version" in libs["pandas"]
+        if libs["torch"]:
+            assert "mps_available" in libs["torch"]
+            assert "mps_built" in libs["torch"]
 
     def test_config_snapshot(self) -> None:
         config = ExperimentConfig(assets=("AAPL", "MSFT"), window_size=60)

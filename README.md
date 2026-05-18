@@ -20,6 +20,8 @@ Este repositorio esta preparado para trabajar la tesis en local con VS Code, LaT
 
 En Windows, el setup instala MiKTeX y Strawberry Perl con `winget` si no estan instalados. Puede pedir permisos de administrador.
 
+Para ejecutar el pipeline Python de experimentos, usar la guia `docs/flujo_codigo.md`.
+
 ## Requisitos base
 
 Cada persona del equipo debe tener:

@@ -1,163 +1,110 @@
-# Flujo inicial de codigo
+# Flujo de ejecucion del codigo
 
-Este documento resume como ejecutar el primer flujo reproducible del proyecto antes de incorporar VAE y TimeGAN.
+Guia minima para instalar y ejecutar el pipeline Python del TFM desde la raiz del repositorio.
 
-## Instalacion
+## Requisitos
 
-Desde la raiz del repositorio:
+- Python 3.10 o superior.
+- Git.
+- Conexion a internet para descargar precios desde Yahoo Finance.
 
-```bash
-python -m pip install -e .
-```
+Usamos `python3` porque en macOS y Linux suele ser el comando correcto. Si tu equipo usa `python`, puedes sustituirlo.
 
-Esto instala el paquete `tfm_pipeline` en modo editable, de forma que los cambios en `src/` se reflejan sin reinstalar.
-
-Si se dispone de GPU NVIDIA, se recomienda instalar primero PyTorch con soporte CUDA y despues instalar el paquete en modo editable:
+## Instalacion rapida
 
 ```bash
-python -m pip install -r requirements-cuda.txt
-python -m pip install -e .
+python3 -m pip install --upgrade pip
+python3 -m pip install -e ".[dev]"
 ```
 
-El archivo `requirements-cuda.txt` prioriza ruedas CUDA 12.8 de PyTorch, adecuadas para GPUs NVIDIA recientes. Si CUDA no queda disponible, los scripts siguen funcionando en CPU automaticamente.
-
-Para verificar que PyTorch detecta la GPU:
+Si aparece un error de permisos:
 
 ```bash
-python -c "import torch; print(torch.__version__); print(torch.cuda.is_available()); print(torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU')"
+python3 -m pip install --user -e ".[dev]"
 ```
 
-## Baselines clasicos
+## Mac
 
-Para ejecutar el flujo inicial:
+En Mac no uses `requirements-cuda.txt`: eso es solo para CUDA/NVIDIA.
+
+En Mac con Apple Silicon (`M1`, `M2`, `M3` o `M4`), VAE y TimeGAN intentan usar `mps`, que es la alternativa de Apple a CUDA. Si `mps` no esta disponible, el codigo cae automaticamente a CPU.
+
+No hay que instalar `mps` aparte: viene incluido con PyTorch en macOS cuando el equipo y la version de macOS lo soportan.
+
+Para comprobar si PyTorch detecta `mps`:
 
 ```bash
-python -m tfm_pipeline.run_baselines
+python3 -c "import torch; print(torch.__version__); print(torch.backends.mps.is_available())"
 ```
 
-El script realiza estas etapas:
+## Linux / NVIDIA
 
-1. Descarga precios ajustados desde Yahoo Finance.
-2. Calcula retornos logaritmicos diarios.
-3. Divide los datos en entrenamiento, validacion y prueba con corte temporal.
-4. Calcula tres carteras base: equiponderada, minima varianza y Markowitz.
-5. Evalua las carteras sobre retornos reales del conjunto de prueba.
-6. Guarda metricas y pesos en `results/baselines/`.
+Si tienes GPU NVIDIA y quieres usar CUDA:
 
-## Salidas generadas
+```bash
+python3 -m pip install -r requirements-cuda.txt
+python3 -m pip install -e ".[dev]"
+```
+
+Para comprobar CUDA:
+
+```bash
+python3 -c "import torch; print(torch.__version__); print(torch.cuda.is_available()); print(torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU')"
+```
+
+## Comprobacion inicial
+
+Antes de lanzar experimentos largos:
+
+```bash
+python3 -c "import tfm_pipeline; print('tfm_pipeline OK')"
+python3 -m pytest tests/unit
+```
+
+Si aparece `ModuleNotFoundError: No module named 'tfm_pipeline'`, usa temporalmente:
+
+```bash
+PYTHONPATH=src python3 -m pytest tests/unit
+```
+
+## Para la tarea de Lola
+
+Lola solo necesita comprobar tests y ejecutar baselines. No hace falta ejecutar VAE ni TimeGAN.
+
+```bash
+python3 -m pip install -e ".[dev]"
+python3 -m pytest tests/unit
+python3 -m tfm_pipeline.run_baselines
+```
+
+Salidas principales:
 
 | Archivo | Contenido |
 |---|---|
 | `results/baselines/portfolio_metrics.csv` | Metricas financieras fuera de muestra |
-| `results/baselines/equal_weight_weights.json` | Pesos de la cartera equiponderada |
-| `results/baselines/minimum_variance_weights.json` | Pesos de la cartera de minima varianza |
-| `results/baselines/markowitz_weights.json` | Pesos de la cartera Markowitz |
-| `results/baselines/log_returns.csv` | Retornos logaritmicos descargados y alineados |
+| `results/baselines/*_weights.json` | Pesos de las carteras base |
+| `results/baselines/log_returns.csv` | Retornos descargados y alineados |
 
-`results/` esta ignorado por Git porque son artefactos reproducibles.
+`results/` esta ignorado por Git porque contiene artefactos reproducibles.
 
-## Siguiente paso
+## Flujo completo
 
-## VAE baseline
-
-Para ejecutar el primer modelo generativo:
+Ejecutar en este orden:
 
 ```bash
-python -m tfm_pipeline.run_vae
+python3 -m tfm_pipeline.run_baselines
+python3 -m tfm_pipeline.run_vae
+python3 -m tfm_pipeline.run_timegan
+python3 -m tfm_pipeline.run_timegan_multiseed
+python3 -m tfm_pipeline.compare_results
 ```
-
-El script realiza estas etapas:
-
-1. Reutiliza la misma descarga, calculo de retornos y particion temporal.
-2. Normaliza los retornos con media y desviacion calculadas solo en entrenamiento.
-3. Construye ventanas temporales de 30 dias.
-4. Entrena un VAE sobre las ventanas de entrenamiento con early stopping segun perdida de validacion.
-5. Repite el entrenamiento para una pequena rejilla de valores beta.
-6. Genera escenarios sinteticos de retornos para cada beta.
-7. Evalua dos variantes: escenarios VAE sin calibrar y escenarios VAE calibrados a la media y volatilidad historicas de entrenamiento.
-8. Evalua la similitud distribucional entre retornos reales y sinteticos.
-9. Construye carteras basadas en escenarios VAE y las evalua sobre datos reales de prueba.
 
 Salidas principales:
 
-| Archivo | Contenido |
+| Carpeta | Contenido |
 |---|---|
-| `results/vae/distribution_metrics.csv` | Metricas de similitud real-sintetico |
-| `results/vae/distribution_summary.csv` | Resumen de media, volatilidad, cuantiles, asimetria y curtosis |
-| `results/vae/beta_grid_summary.csv` | Comparacion agregada entre valores beta y variantes calibradas |
-| `results/vae/portfolio_metrics.csv` | Metricas financieras de carteras VAE fuera de muestra |
-| `results/vae/training_history_<beta>.csv` | Perdida total, reconstruccion y KL para cada beta |
-| `results/vae/synthetic_returns_<beta>.csv` | Retornos sinteticos sin calibrar |
-| `results/vae/synthetic_returns_<beta>_vol_calibrated.csv` | Retornos sinteticos calibrados a media y volatilidad historicas |
-| `results/vae/*_weights.json` | Pesos de cada cartera basada en escenarios VAE |
-
-Las variantes de cartera VAE son:
-
-| Variante | Descripcion |
-|---|---|
-| `minimum_variance` | Usa solo la covarianza estimada con escenarios sinteticos |
-| `markowitz` | Usa media y covarianza estimadas con escenarios sinteticos |
-| `historical_mean_synthetic_covariance` | Usa media historica y covarianza sintetica |
-| `shrunk_mean_synthetic_covariance` | Usa media historica contraida hacia la media transversal y covarianza sintetica |
-
-## TimeGAN baseline
-
-Para ejecutar el primer baseline generativo temporal:
-
-```bash
-python -m tfm_pipeline.run_timegan
-```
-
-El script realiza estas etapas:
-
-1. Reutiliza la misma descarga, calculo de retornos y particion temporal.
-2. Normaliza los retornos con estadisticos calculados solo en entrenamiento.
-3. Construye ventanas temporales de 30 dias manteniendo la estructura secuencial.
-4. Entrena un TimeGAN compacto con fases de autoencoder, supervisor y entrenamiento adversarial conjunto.
-5. Genera escenarios sinteticos secuenciales de retornos.
-6. Evalua dos variantes: TimeGAN sin calibrar y TimeGAN calibrado a la media y volatilidad historicas de entrenamiento.
-7. Calcula diagnosticos distribucionales frente a entrenamiento y validacion.
-8. Aplica el mismo protocolo de metricas distribucionales y evaluacion financiera fuera de muestra usado para VAE.
-
-Salidas principales:
-
-| Archivo | Contenido |
-|---|---|
-| `results/timegan/distribution_metrics.csv` | Metricas de similitud real-sintetico |
-| `results/timegan/distribution_summary.csv` | Resumen estadistico por activo y variante |
-| `results/timegan/validation_distribution_metrics.csv` | Metricas de similitud frente a validacion |
-| `results/timegan/diagnostic_summary.csv` | Resumen compacto de errores distribucionales frente a entrenamiento |
-| `results/timegan/validation_diagnostic_summary.csv` | Resumen compacto de errores distribucionales frente a validacion |
-| `results/timegan/portfolio_metrics.csv` | Metricas financieras de carteras TimeGAN fuera de muestra |
-| `results/timegan/training_history.csv` | Perdidas de autoencoder, supervisor, generador y discriminador |
-| `results/timegan/synthetic_returns.csv` | Retornos sinteticos sin calibrar |
-| `results/timegan/synthetic_returns_vol_calibrated.csv` | Retornos sinteticos calibrados a media y volatilidad historicas |
-| `results/timegan/*_weights.json` | Pesos de cada cartera basada en escenarios TimeGAN |
-
-La configuracion inicial de TimeGAN prioriza ejecucion rapida y reproducibilidad. Si los resultados iniciales son estables, se puede aumentar el numero de epocas o la dimension oculta para la ejecucion final. En CUDA se fijan semillas y opciones deterministas cuando PyTorch lo permite, pero la robustez final debe revisarse con varias semillas.
-
-Para ejecutar TimeGAN con varias semillas:
-
-```bash
-python -m tfm_pipeline.run_timegan_multiseed
-```
-
-Salidas principales multi-semilla:
-
-| Archivo | Contenido |
-|---|---|
-| `results/timegan_multiseed/portfolio_metrics_by_seed.csv` | Metricas financieras por semilla |
-| `results/timegan_multiseed/portfolio_metrics.csv` | Media y desviacion tipica por cartera |
-| `results/timegan_multiseed/diagnostic_summary_by_seed.csv` | Diagnosticos frente a entrenamiento por semilla |
-| `results/timegan_multiseed/validation_diagnostic_summary_by_seed.csv` | Diagnosticos frente a validacion por semilla |
-| `results/timegan_multiseed/validation_diagnostic_summary.csv` | Media y desviacion tipica de diagnosticos de validacion |
-
-## Comparacion de resultados
-
-Tras ejecutar baselines, VAE y TimeGAN, se puede generar una tabla combinada con:
-
-```bash
-python -m tfm_pipeline.compare_results
-```
-
-La salida se guarda en `results/combined_portfolio_metrics.csv`.
+| `results/baselines/` | Baselines clasicos |
+| `results/vae/` | Escenarios y metricas VAE |
+| `results/timegan/` | Escenarios y metricas TimeGAN |
+| `results/timegan_multiseed/` | Robustez TimeGAN por semilla |
+| `results/combined_portfolio_metrics.csv` | Comparacion agregada |

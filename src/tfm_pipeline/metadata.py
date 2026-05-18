@@ -64,6 +64,8 @@ def _torch_info() -> dict[str, Any]:
             "version": torch.__version__,
             "cuda_available": torch.cuda.is_available(),
             "cuda_version": torch.version.cuda,
+            "mps_available": torch.backends.mps.is_available(),
+            "mps_built": torch.backends.mps.is_built(),
         }
     except Exception:
         return {}
