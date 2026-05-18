@@ -1,0 +1,110 @@
+# Flujo de ejecucion del codigo
+
+Guia minima para instalar y ejecutar el pipeline Python del TFM desde la raiz del repositorio.
+
+## Requisitos
+
+- Python 3.10 o superior.
+- Git.
+- Conexion a internet para descargar precios desde Yahoo Finance.
+
+Usamos `python3` porque en macOS y Linux suele ser el comando correcto. Si tu equipo usa `python`, puedes sustituirlo.
+
+## Instalacion rapida
+
+```bash
+python3 -m pip install --upgrade pip
+python3 -m pip install -e ".[dev]"
+```
+
+Si aparece un error de permisos:
+
+```bash
+python3 -m pip install --user -e ".[dev]"
+```
+
+## Mac
+
+En Mac no uses `requirements-cuda.txt`: eso es solo para CUDA/NVIDIA.
+
+En Mac con Apple Silicon (`M1`, `M2`, `M3` o `M4`), VAE y TimeGAN intentan usar `mps`, que es la alternativa de Apple a CUDA. Si `mps` no esta disponible, el codigo cae automaticamente a CPU.
+
+No hay que instalar `mps` aparte: viene incluido con PyTorch en macOS cuando el equipo y la version de macOS lo soportan.
+
+Para comprobar si PyTorch detecta `mps`:
+
+```bash
+python3 -c "import torch; print(torch.__version__); print(torch.backends.mps.is_available())"
+```
+
+## Linux / NVIDIA
+
+Si tienes GPU NVIDIA y quieres usar CUDA:
+
+```bash
+python3 -m pip install -r requirements-cuda.txt
+python3 -m pip install -e ".[dev]"
+```
+
+Para comprobar CUDA:
+
+```bash
+python3 -c "import torch; print(torch.__version__); print(torch.cuda.is_available()); print(torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU')"
+```
+
+## Comprobacion inicial
+
+Antes de lanzar experimentos largos:
+
+```bash
+python3 -c "import tfm_pipeline; print('tfm_pipeline OK')"
+python3 -m pytest tests/unit
+```
+
+Si aparece `ModuleNotFoundError: No module named 'tfm_pipeline'`, usa temporalmente:
+
+```bash
+PYTHONPATH=src python3 -m pytest tests/unit
+```
+
+## Para la tarea de Lola
+
+Lola solo necesita comprobar tests y ejecutar baselines. No hace falta ejecutar VAE ni TimeGAN.
+
+```bash
+python3 -m pip install -e ".[dev]"
+python3 -m pytest tests/unit
+python3 -m tfm_pipeline.run_baselines
+```
+
+Salidas principales:
+
+| Archivo | Contenido |
+|---|---|
+| `results/baselines/portfolio_metrics.csv` | Metricas financieras fuera de muestra |
+| `results/baselines/*_weights.json` | Pesos de las carteras base |
+| `results/baselines/log_returns.csv` | Retornos descargados y alineados |
+
+`results/` esta ignorado por Git porque contiene artefactos reproducibles.
+
+## Flujo completo
+
+Ejecutar en este orden:
+
+```bash
+python3 -m tfm_pipeline.run_baselines
+python3 -m tfm_pipeline.run_vae
+python3 -m tfm_pipeline.run_timegan
+python3 -m tfm_pipeline.run_timegan_multiseed
+python3 -m tfm_pipeline.compare_results
+```
+
+Salidas principales:
+
+| Carpeta | Contenido |
+|---|---|
+| `results/baselines/` | Baselines clasicos |
+| `results/vae/` | Escenarios y metricas VAE |
+| `results/timegan/` | Escenarios y metricas TimeGAN |
+| `results/timegan_multiseed/` | Robustez TimeGAN por semilla |
+| `results/combined_portfolio_metrics.csv` | Comparacion agregada |
