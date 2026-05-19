@@ -529,29 +529,9 @@ La metodología del trabajo se define como aplicada, experimental y comparativa.
 
 El planteamiento combina técnicas de ciencia de datos, aprendizaje profundo y evaluación financiera. En primer lugar, se trabaja con datos históricos de mercado; después, se preparan retornos y ventanas temporales; posteriormente, se entrenan modelos generativos y se construyen carteras a partir de información empírica o sintética. Finalmente, todas las alternativas se comparan mediante métricas comunes y sobre datos reales fuera de muestra.
 
-Este capítulo cumple una función de encuadre metodológico. La descripción técnica completa del experimento se desarrolla en el Capítulo 5 para mantener separadas la justificación metodológica general, la ejecución concreta del pipeline y la interpretación posterior de los resultados.
+Este capítulo recoge el marco metodológico general, el diseño del pipeline, los criterios de evaluación y las decisiones de reproducibilidad. La descripción concreta de los datos utilizados, los modelos ejecutados y los resultados observados se desarrolla en el Capítulo 5, para separar el método de su aplicación experimental.
 
-\section{Criterios generales de evaluación}
-
-La evaluación se organiza alrededor de dos ideas. La primera es que la calidad de un escenario sintético no puede medirse únicamente por su aspecto visual o por una métrica aislada, sino por su capacidad para preservar propiedades relevantes de los retornos reales. La segunda es que la utilidad financiera de esos escenarios debe comprobarse de forma separada, evaluando las carteras resultantes sobre un periodo de prueba que no haya intervenido en el entrenamiento ni en la selección de configuraciones.
-
-Con este enfoque se pretende evitar una interpretación excesivamente optimista de los modelos generativos. El trabajo compara VAE y TimeGAN con baselines clásicos, mantiene una división temporal fija y reserva el conjunto de test para la evaluación final. De esta forma, la metodología busca que las conclusiones dependan del protocolo experimental completo y no de una ejecución concreta o de una selección posterior del mejor resultado.
-
-\chapter{Desarrollo específico de la contribución}
-
-\section{Descripción detallada del experimento}
-
-\subsection{Planteamiento experimental}
-
-El experimento desarrollado en este trabajo se plantea como un piloto académico para evaluar si determinados modelos generativos pueden producir escenarios sintéticos de retornos financieros útiles dentro de un proceso de optimización de carteras. La idea de fondo no es construir un sistema de trading ni anticipar el comportamiento exacto del mercado, sino estudiar de forma controlada si los escenarios generados por VAE y TimeGAN conservan propiedades estadísticas, temporales y de dependencia que resultan relevantes para la construcción de carteras.
-
-Por este motivo, el diseño experimental combina tres elementos. En primer lugar, se utilizan datos reales de mercado para construir una base empírica común. En segundo lugar, se comparan métodos clásicos de optimización de carteras con modelos generativos entrenados sobre los mismos datos históricos. En tercer lugar, se evalúan los resultados mediante un protocolo reproducible que separa entrenamiento, validación y prueba, evitando que las decisiones de selección de modelo se apoyen en el conjunto de test.
-
-El flujo completo se entiende como una cadena de trabajo: descarga de precios, limpieza y alineación de series, transformación a retornos, análisis exploratorio, división temporal, entrenamiento de modelos, generación de escenarios sintéticos, evaluación de dichos escenarios, construcción de carteras y evaluación financiera fuera de muestra. Cada una de estas fases tiene una función concreta y produce salidas que pueden ser revisadas de forma independiente.
-
-La pregunta metodológica central puede formularse del siguiente modo: ¿hasta qué punto los escenarios de retornos financieros generados mediante VAE y TimeGAN preservan información relevante de los datos reales y pueden servir como apoyo, no como sustituto automático, de los métodos clásicos de optimización de carteras?
-
-\subsection{Marco de trabajo adoptado}
+\section{Marco de trabajo adoptado}
 
 Como guía general se toma CRISP-DM, por tratarse de un marco ampliamente utilizado en proyectos de ciencia de datos basados en comprensión del problema, preparación de datos, modelado, evaluación y revisión de resultados. En este TFM no se aplica como una metodología empresarial cerrada, sino como una forma ordenada de estructurar un experimento cuantitativo reproducible. Sus fases se adaptan al contexto financiero y experimental de la siguiente forma:
 
@@ -574,7 +554,7 @@ Despliegue & Construcción de un prototipo experimental reproducible para análi
 \hline
 \end{longtable}
 
-\subsection{Diseño técnico del pipeline}
+\section{Diseño técnico del pipeline}
 
 La solución se implementa como un pipeline modular en Python. Esta decisión facilita separar las responsabilidades del experimento: un módulo se encarga de la descarga y preparación de datos, otros implementan los modelos generativos, otros calculan métricas y otros ejecutan las comparaciones financieras. Esta separación resulta importante porque permite repetir partes concretas del experimento sin rehacer todo el proceso y reduce el riesgo de mezclar la generación de datos sintéticos con la evaluación final.
 
@@ -586,6 +566,75 @@ El flujo general se resume en la Figura~\ref{fig:pipeline-metodologico}, que org
     \textbf{Fuente:} elaboración propia.
     \label{fig:pipeline-metodologico}
 \end{figure}
+
+\section{Criterios generales de evaluación}
+
+La evaluación se organiza alrededor de dos ideas. La primera es que la calidad de un escenario sintético no puede medirse únicamente por su aspecto visual o por una métrica aislada, sino por su capacidad para preservar propiedades relevantes de los retornos reales. La segunda es que la utilidad financiera de esos escenarios debe comprobarse de forma separada, evaluando las carteras resultantes sobre un periodo de prueba que no haya intervenido en el entrenamiento ni en la selección de configuraciones.
+
+Con este enfoque se pretende evitar una interpretación excesivamente optimista de los modelos generativos. El trabajo compara VAE y TimeGAN con baselines clásicos, mantiene una división temporal fija y reserva el conjunto de test para la evaluación final. De esta forma, la metodología busca que las conclusiones dependan del protocolo experimental completo y no de una ejecución concreta o de una selección posterior del mejor resultado.
+
+\section{Herramientas y entorno de desarrollo}
+
+El desarrollo se apoya en Python 3 y en bibliotecas habituales dentro de la ciencia de datos y las finanzas cuantitativas. \texttt{Pandas} y \texttt{NumPy} se utilizan para la manipulación de series temporales y el cálculo numérico. \texttt{yfinance} permite descargar los datos financieros utilizados en el estudio. \texttt{PyTorch} se emplea para implementar y entrenar los modelos VAE y TimeGAN, ya que ofrece control sobre la arquitectura, la función de pérdida y el dispositivo de entrenamiento.
+
+También se utilizan pruebas automatizadas con \texttt{pytest} para validar funciones críticas del pipeline, especialmente aquellas relacionadas con métricas, preparación de datos, optimización y selección de dispositivo. Git se utiliza como herramienta de control de versiones y parte de su información se registra junto con los resultados para mejorar la trazabilidad de los experimentos. La memoria del trabajo se redacta en LaTeX, lo que permite mantener un documento técnico estructurado y reproducible.
+
+En cuanto al hardware, el código contempla ejecución con CUDA en entornos con GPU NVIDIA, MPS en equipos Apple Silicon y CPU como alternativa general. Esta selección automática de dispositivo no cambia el diseño del experimento, pero sí mejora su portabilidad y facilita que el pipeline pueda ejecutarse en distintos equipos sin modificar manualmente el código principal.
+
+\section{Protocolo experimental y reproducibilidad}
+
+El protocolo experimental se define antes de la interpretación de resultados. En primer lugar se descargan los precios históricos y se preparan los retornos. Después se realiza la división temporal en entrenamiento, validación y prueba. A continuación se entrenan o evalúan los baselines clásicos, se entrena el VAE sobre los datos de entrenamiento y se generan escenarios sintéticos. El mismo procedimiento se aplica a TimeGAN, incorporando evaluación multi-semilla para analizar la sensibilidad del modelo.
+
+Una vez generados los escenarios, se evalúa su calidad mediante métricas estadísticas, temporales e informacionales. Después se construyen carteras utilizando información empírica o sintética y se evalúan sobre el conjunto de test. Los resultados se guardan en el directorio \texttt{results/}, junto con metadatos de ejecución que permiten identificar la configuración utilizada.
+
+La separación entre entrenamiento, validación y prueba es uno de los puntos metodológicos más importantes del trabajo. Los hiperparámetros y semillas deben seleccionarse usando datos de validación, mientras que el conjunto de test se reserva para la evaluación final. De este modo se evita escoger una configuración porque haya obtenido el mejor resultado en test, lo que produciría una forma de cherry-picking y sobreestimaría la capacidad real del modelo.
+
+En esta versión del experimento, la validación se utiliza para comparar configuraciones generativas antes de observar el rendimiento financiero final en test. En el caso del VAE, la cuadrícula de valores de \texttt{beta} se resume mediante métricas de validación y pérdida de reconstrucción. En el caso de TimeGAN, las distintas semillas se analizan mediante diagnósticos de validación y dispersión entre ejecuciones. Por tanto, los resultados de test deben leerse como evaluación final de configuraciones ya documentadas, no como criterio para escoger retrospectivamente la mejor ejecución.
+
+Para reforzar la reproducibilidad, el pipeline registra información como la revisión de Git, la rama activa, la versión de Python, la plataforma, información de paquetes, disponibilidad de PyTorch, disponibilidad de CUDA, disponibilidad de MPS y estado de compilación de MPS. Estos datos no garantizan por sí solos que dos ejecuciones sean idénticas, especialmente en modelos estocásticos, pero ayudan a explicar diferencias entre resultados y a reconstruir el entorno experimental.
+
+\begin{longtable}{|p{0.35\textwidth}|p{0.55\textwidth}|}
+\caption{Decisiones metodológicas previstas}\label{tab:decisiones-metodologicas}\\
+\hline
+\textbf{Elemento} & \textbf{Decisión metodológica} \\
+\hline
+Fuente de datos & Yahoo Finance \\
+\hline
+Universo de activos & AAPL, MSFT, GOOGL, AMZN, META, NVDA, JPM, XOM, JNJ y PG \\
+\hline
+Periodo & 2015-01-01 a 2026-05-12 \\
+\hline
+Frecuencia & Diaria \\
+\hline
+Variable modelada & Retornos logarítmicos \\
+\hline
+Modelos generativos & VAE y TimeGAN \\
+\hline
+Baselines financieros & Equiponderada, Markowitz y mínima varianza \\
+\hline
+Evaluación distribucional & Momentos, correlaciones y autocorrelación \\
+\hline
+Evaluación informacional & KL, Jensen-Shannon y entropía \\
+\hline
+Evaluación financiera & Rentabilidad anualizada, volatilidad anualizada, Sharpe, drawdown, VaR y CVaR \\
+\hline
+Validación & División temporal entrenamiento/validación/prueba \\
+\hline
+\end{longtable}
+
+\chapter{Desarrollo específico de la contribución}
+
+\section{Descripción detallada del experimento}
+
+\subsection{Planteamiento experimental}
+
+El experimento desarrollado en este trabajo se plantea como un piloto académico para evaluar si determinados modelos generativos pueden producir escenarios sintéticos de retornos financieros útiles dentro de un proceso de optimización de carteras. La idea de fondo no es construir un sistema de trading ni anticipar el comportamiento exacto del mercado, sino estudiar de forma controlada si los escenarios generados por VAE y TimeGAN conservan propiedades estadísticas, temporales y de dependencia que resultan relevantes para la construcción de carteras.
+
+Por este motivo, el diseño experimental combina tres elementos. En primer lugar, se utilizan datos reales de mercado para construir una base empírica común. En segundo lugar, se comparan métodos clásicos de optimización de carteras con modelos generativos entrenados sobre los mismos datos históricos. En tercer lugar, se evalúan los resultados mediante un protocolo reproducible que separa entrenamiento, validación y prueba, evitando que las decisiones de selección de modelo se apoyen en el conjunto de test.
+
+El flujo completo se entiende como una cadena de trabajo: descarga de precios, limpieza y alineación de series, transformación a retornos, análisis exploratorio, división temporal, entrenamiento de modelos, generación de escenarios sintéticos, evaluación de dichos escenarios, construcción de carteras y evaluación financiera fuera de muestra. Cada una de estas fases tiene una función concreta y produce salidas que pueden ser revisadas de forma independiente.
+
+La pregunta metodológica central puede formularse del siguiente modo: ¿hasta qué punto los escenarios de retornos financieros generados mediante VAE y TimeGAN preservan información relevante de los datos reales y pueden servir como apoyo, no como sustituto automático, de los métodos clásicos de optimización de carteras?
 
 \subsection{Datos utilizados}
 
@@ -712,55 +761,6 @@ La cartera de mínima varianza se obtiene resolviendo el problema
 \end{equation}
 
 donde $w$ representa los pesos de cartera y $\Sigma$ la matriz de covarianzas estimada. La cartera de tipo Markowitz utiliza la misma estructura de restricciones, pero incorpora también la estimación de rentabilidad esperada. En las variantes basadas en escenarios sintéticos, $\mu$ y $\Sigma$ se estiman a partir de los retornos generados, mientras que la evaluación final de la cartera se realiza siempre con retornos reales del conjunto de prueba.
-
-\subsection{Herramientas y entorno de desarrollo}
-
-El desarrollo se apoya en Python 3 y en bibliotecas habituales dentro de la ciencia de datos y las finanzas cuantitativas. \texttt{Pandas} y \texttt{NumPy} se utilizan para la manipulación de series temporales y el cálculo numérico. \texttt{yfinance} permite descargar los datos financieros utilizados en el estudio. \texttt{PyTorch} se emplea para implementar y entrenar los modelos VAE y TimeGAN, ya que ofrece control sobre la arquitectura, la función de pérdida y el dispositivo de entrenamiento.
-
-También se utilizan pruebas automatizadas con \texttt{pytest} para validar funciones críticas del pipeline, especialmente aquellas relacionadas con métricas, preparación de datos, optimización y selección de dispositivo. Git se utiliza como herramienta de control de versiones y parte de su información se registra junto con los resultados para mejorar la trazabilidad de los experimentos. La memoria del trabajo se redacta en LaTeX, lo que permite mantener un documento técnico estructurado y reproducible.
-
-En cuanto al hardware, el código contempla ejecución con CUDA en entornos con GPU NVIDIA, MPS en equipos Apple Silicon y CPU como alternativa general. Esta selección automática de dispositivo no cambia el diseño del experimento, pero sí mejora su portabilidad y facilita que el pipeline pueda ejecutarse en distintos equipos sin modificar manualmente el código principal.
-
-\subsection{Protocolo experimental y reproducibilidad}
-
-El protocolo experimental se define antes de la interpretación de resultados. En primer lugar se descargan los precios históricos y se preparan los retornos. Después se realiza la división temporal en entrenamiento, validación y prueba. A continuación se entrenan o evalúan los baselines clásicos, se entrena el VAE sobre los datos de entrenamiento y se generan escenarios sintéticos. El mismo procedimiento se aplica a TimeGAN, incorporando evaluación multi-semilla para analizar la sensibilidad del modelo.
-
-Una vez generados los escenarios, se evalúa su calidad mediante métricas estadísticas, temporales e informacionales. Después se construyen carteras utilizando información empírica o sintética y se evalúan sobre el conjunto de test. Los resultados se guardan en el directorio \texttt{results/}, junto con metadatos de ejecución que permiten identificar la configuración utilizada.
-
-La separación entre entrenamiento, validación y prueba es uno de los puntos metodológicos más importantes del trabajo. Los hiperparámetros y semillas deben seleccionarse usando datos de validación, mientras que el conjunto de test se reserva para la evaluación final. De este modo se evita escoger una configuración porque haya obtenido el mejor resultado en test, lo que produciría una forma de cherry-picking y sobreestimaría la capacidad real del modelo.
-
-En esta versión del experimento, la validación se utiliza para comparar configuraciones generativas antes de observar el rendimiento financiero final en test. En el caso del VAE, la cuadrícula de valores de \texttt{beta} se resume mediante métricas de validación y pérdida de reconstrucción. En el caso de TimeGAN, las distintas semillas se analizan mediante diagnósticos de validación y dispersión entre ejecuciones. Por tanto, los resultados de test deben leerse como evaluación final de configuraciones ya documentadas, no como criterio para escoger retrospectivamente la mejor ejecución.
-
-Para reforzar la reproducibilidad, el pipeline registra información como la revisión de Git, la rama activa, la versión de Python, la plataforma, información de paquetes, disponibilidad de PyTorch, disponibilidad de CUDA, disponibilidad de MPS y estado de compilación de MPS. Estos datos no garantizan por sí solos que dos ejecuciones sean idénticas, especialmente en modelos estocásticos, pero ayudan a explicar diferencias entre resultados y a reconstruir el entorno experimental.
-
-\begin{longtable}{|p{0.35\textwidth}|p{0.55\textwidth}|}
-\caption{Decisiones metodológicas previstas}\label{tab:decisiones-metodologicas}\\
-\hline
-\textbf{Elemento} & \textbf{Decisión metodológica} \\
-\hline
-Fuente de datos & Yahoo Finance \\
-\hline
-Universo de activos & AAPL, MSFT, GOOGL, AMZN, META, NVDA, JPM, XOM, JNJ y PG \\
-\hline
-Periodo & 2015-01-01 a 2026-05-12 \\
-\hline
-Frecuencia & Diaria \\
-\hline
-Variable modelada & Retornos logarítmicos \\
-\hline
-Modelos generativos & VAE y TimeGAN \\
-\hline
-Baselines financieros & Equiponderada, Markowitz y mínima varianza \\
-\hline
-Evaluación distribucional & Momentos, correlaciones y autocorrelación \\
-\hline
-Evaluación informacional & KL, Jensen-Shannon y entropía \\
-\hline
-Evaluación financiera & Rentabilidad anualizada, volatilidad anualizada, Sharpe, drawdown, VaR y CVaR \\
-\hline
-Validación & División temporal entrenamiento/validación/prueba \\
-\hline
-\end{longtable}
 
 {\small
 \setlength{\tabcolsep}{3pt}
