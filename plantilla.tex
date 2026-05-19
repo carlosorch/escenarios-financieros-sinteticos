@@ -2,8 +2,12 @@
 \usepackage{float}
 \usepackage{estilo_unir-1}
 \usepackage{apacite}
-\usepackage{graphicx}
 \usepackage{longtable}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
 
 \numberwithin{equation}{chapter}
 %\usepackage{caption}
@@ -637,11 +641,13 @@ Validación & División temporal entrenamiento/validación/prueba \\
 
 \subsection{Planteamiento experimental}
 
-El experimento desarrollado en este trabajo se plantea como un piloto académico para evaluar si determinados modelos generativos pueden producir escenarios sintéticos de retornos financieros útiles dentro de un proceso de optimización de carteras. La idea de fondo no es construir un sistema de trading ni anticipar el comportamiento exacto del mercado, sino estudiar de forma controlada si los escenarios generados por VAE y TimeGAN conservan propiedades estadísticas, temporales y de dependencia que resultan relevantes para la construcción de carteras.
+El experimento desarrollado en este trabajo se plantea como un piloto académico para evaluar si determinados modelos generativos pueden producir escenarios sintéticos de retornos financieros útiles dentro de un proceso de optimización de carteras. La idea de fondo no es construir un sistema de trading ni anticipar el comportamiento exacto del mercado, sino estudiar de forma controlada si los escenarios generados por VAE y TimeGAN conservan propiedades estadísticas, temporales y de dependencia que resultan relevantes para la construcción de carteras. Por lo que, el objetivo no consiste en demostrar que un modelo generativo debe sustituir de forma directa a los métodos clásicos, sino en analizar si dichos escenarios pueden servir como apoyo al proceso de estimación del riesgo.
 
 Por este motivo, el diseño experimental combina tres elementos. En primer lugar, se utilizan datos reales de mercado para construir una base empírica común. En segundo lugar, se comparan métodos clásicos de optimización de carteras con modelos generativos entrenados sobre los mismos datos históricos. En tercer lugar, se evalúan los resultados mediante un protocolo reproducible que separa entrenamiento, validación y prueba, evitando que las decisiones de selección de modelo se apoyen en el conjunto de test.
 
 El flujo completo se entiende como una cadena de trabajo: descarga de precios, limpieza y alineación de series, transformación a retornos, análisis exploratorio, división temporal, entrenamiento de modelos, generación de escenarios sintéticos, evaluación de dichos escenarios, construcción de carteras y evaluación financiera fuera de muestra. Cada una de estas fases tiene una función concreta y produce salidas que pueden ser revisadas de forma independiente.
+
+Una parte adicional incorporada durante el desarrollo ha consistido en reforzar los baselines clásicos mediante una estimación más robusta de la matriz de covarianzas añadiendo el estimador Ledoit-Wolf sobre la covarianza muestral con el objetivo de obtener una matriz mejor condicionada y menos sensible al ruido de los datos históricos. Esta mejora resulta especialmente relevante porque los métodos de Markowitz y mínima varianza dependen de forma directa de la matriz de covarianzas, de forma que si dicha matriz es inestable, la cartera resultante puede variar de manera significativa ante pequeños cambios en los datos.
 
 La pregunta metodológica central puede formularse del siguiente modo: ¿hasta qué punto los escenarios de retornos financieros generados mediante VAE y TimeGAN preservan información relevante de los datos reales y pueden servir como apoyo, no como sustituto automático, de los métodos clásicos de optimización de carteras?
 
@@ -657,9 +663,106 @@ La partición temporal se define de antemano. El conjunto de entrenamiento cubre
 
 Antes del entrenamiento de los modelos se realiza una fase de análisis exploratorio con el objetivo de conocer la estructura de las series financieras utilizadas. Esta fase no tiene como finalidad extraer conclusiones definitivas sobre los activos, sino comprobar la calidad de los datos y describir las características que condicionan el problema de modelado.
 
-En particular, se revisan los valores ausentes, la evolución temporal de los precios, la distribución empírica de los retornos, la volatilidad observada, las correlaciones entre activos y la posible presencia de estructura temporal en las series. Los valores ausentes se analizan durante esta fase y se gestionan mediante el procedimiento de limpieza definido en el pipeline de datos. En caso de disponer de resultados gráficos, esta parte del trabajo puede apoyarse en series de precios, histogramas de retornos, mapas de calor de correlación, resúmenes de valores faltantes, gráficos de volatilidad móvil y una visualización de la división entre entrenamiento, validación y prueba.
+En particular se llevaron a cabo las siguientes acciones para el análisis y limpieza de los datos.
 
-Este análisis es especialmente relevante porque los retornos financieros suelen presentar colas pesadas, episodios de volatilidad agrupada y cambios en las relaciones entre activos. Estas características hacen que el problema sea más exigente que una simple generación de muestras con media y varianza parecidas, ya que para la optimización de carteras también importa preservar la estructura de dependencia y el comportamiento de los riesgos extremos.
+En primer lugar, se comprueba la presencia de valores ausentes en el conjunto de datos, añadiendo además la función dropna() para eliminar aquellas filas que contengan valores de este tipo. Tras ejecutar dicha función y consultar los estadísticos confirmamos que no existen valores nulos en la extracción del dataset inicial, al tratarse de series financieras procedentes de una fuente que habitualmente proporciona datos ya alineados y sin huecos. Esto se termina de confirmar tras el uso de la función mencionada, que no eliminó ninguna fila, manteniéndose el mismo número de registros antes y después de su ejecución.
+
+En segundo lugar,  se analiza la evolución temporal de los precios seleccionados durante el periodo de estudio y se analiza la posible presencia de estructura temporal en las series para observar el comportamiento histórico de cada serie y detectar aspectos relevantes antes de transformar los precios.
+
+Como se observa en la figura \ref{fig:eda-precios} se aprecia una tendencia creciente en la mayoría de los activos, aunque con diferencias relevantes entre ellos. En concreto los activos tecnológicos como META,MSFT, GOOGL, AAPL y NVDA, presentan un crecimiento más acusado a los largo del tiempo, especialmente desde 2020. Algunos activos como por ejemplo, META, presentan episodios de inestabilidad y fuertes caídas con una repercusión muy marcada en los años siguientes, lo que demuestra que las series financieras no evolucionan de forma estable o lineal, sino que pueden presentar períodos de grandes cambios. A diferencia de los ya comentados, se puede ver reflejado que activos como JNJ, JPM o XOM muestran una evolución más moderada en términos de precio.
+
+Estas diferencias entre ellos justifican la necesidad de analizar la relación que existe y no sólo la rentabilidad individual ya que la optimización de carteras depende de la estructura conjunta de retornos, volatilidades y correlaciones.
+
+La gráfica también sugiere la posible presencia de estructura temporal en las series, los precios no se mueven de forma aleatoria e independiente, sino que presentan tendencias sostenidas en el tiempo. Esta dependencia se debe tener muy en cuenta a la hora de entrenar los modelos generativos considerados, ya que deben ser capaces de ir más allá de reproducir la distribución de los retornos en un momento dado y capturar también la dinámica con la que estos evolucionan a lo largo del tiempo.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{media/eda_prices.png}
+    \caption{Evolución temporal de los precios ajustados de cierre por activo}
+    \textbf{Fuente:} Elaboración propia.
+    \label{fig:eda-precios}
+\end{figure}
+
+En tercer lugar se consideran los precios ajustados descargados directamente de la fuente de datos y los retornos logarítmicos calculados a partir de dichos datos para analizar los estadísticos descriptivos antes de aplicar la limpieza final del pipeline, en este análisis se incluyen datos relevantes como la media de los precios, el precio máximo y mínimo o la asimetría que presentan.
+
+Como se muestra en la Tabla~\ref{tab:eda-estadisticos-origen}, las medias de los retornos logarítmicos se sitúan próximas a cero en todos los activos, algo habitual en series financieras diarias ya que la tendencia media de crecimiento esperada en un único día es prácticamente despreciable frente a la volatilidad del mercado. Sin embargo, existen diferencias importantes en la desviación típica con las que se deduce una gran volatilidad, activos como NVDA, META o AMZN presentan una mayor dispersión en sus retornos, mientras que otros como JNJ o PG muestran una variabilidad más reducida.
+
+También resultan relevantes los valores mínimo y máximo de los retornos, ya que permiten identificar la existencia de movimientos diarios extremos y la asimetría y la curtosis que permiten caracterizar la forma de la distribución empírica y apreciar con mayor detalle la probabilidad de observar eventos extremos respecto a una distribución normal .En este contexto se observa que activos como META y NVDA presentan los movimientos diarios más extremos, mientras que NVDA muestra la mayor desviación típica de los retornos, reflejando un comportamiento más volátil.
+
+\begin{table}[H]
+\centering
+\scriptsize
+\resizebox{\textwidth}{!}{
+\begin{tabular}{lrrrrrrrrrr}
+\toprule
+Activo & Media precio & Desv. precio & Min. precio & Max. precio & Media retorno & Desv. retorno & Min. retorno & Max. retorno & Asimetría & Curtosis \\
+\midrule
+AAPL  & 111.018297 & 77.965578  & 20.565866 & 293.050018 & 0.000874 & 0.018083 & -0.137708 & 0.142617 & -0.089950 & 6.286027 \\
+MSFT  & 212.196360 & 145.411782 & 34.358742 & 539.825195 & 0.000820 & 0.017056 & -0.159453 & 0.132929 & -0.174653 & 8.120587 \\
+GOOGL & 100.839742 & 69.508376  & 24.649275 & 400.799988 & 0.000944 & 0.018167 & -0.123684 & 0.150645 & 0.085077  & 5.838203 \\
+AMZN  & 115.429892 & 64.237783  & 14.347500 & 274.989990 & 0.001002 & 0.020628 & -0.151398 & 0.132178 & 0.162403  & 5.677324 \\
+META  & 272.797038 & 183.285856 & 73.473419 & 788.148987 & 0.000715 & 0.023908 & -0.306391 & 0.209307 & -1.070028 & 24.991456 \\
+NVDA  & 37.652237  & 56.040355  & 0.459232  & 219.440002 & 0.002144 & 0.030256 & -0.207711 & 0.260876 & 0.136630  & 6.936124 \\
+JPM   & 124.520611 & 72.089830  & 40.268799 & 332.906250 & 0.000655 & 0.017033 & -0.162106 & 0.165620 & -0.080355 & 12.804156 \\
+XOM   & 70.380772  & 28.246735  & 23.823557 & 170.313995 & 0.000335 & 0.017337 & -0.130391 & 0.119442 & -0.200592 & 6.186542 \\
+JNJ   & 127.624395 & 34.930180  & 67.917770 & 248.559998 & 0.000372 & 0.011448 & -0.105781 & 0.076940 & -0.378805 & 9.445005 \\
+PG    & 107.460645 & 36.431501  & 50.494148 & 172.541000 & 0.000274 & 0.011718 & -0.091428 & 0.113410 & -0.089291 & 10.198174 \\
+\bottomrule
+\end{tabular}
+}
+\caption{Estadísticos descriptivos de precios ajustados y retornos logarítmicos en origen}
+\label{tab:eda-estadisticos-origen}
+\end{table}
+
+Para continuar con el análisis de los datos, en cuarto lugar, se genera la matriz de correlación de los retornos logarítmicos con el objetivo de estudiar la relación existente entre los activos seleccionados.
+
+Como se observa en la Figura~\ref{fig:eda-matriz-correlacion}, todas las correlaciones son positivas, aunque con intensidades diferentes según el tipo de activo.
+
+Se aprecia que los activos tecnológicos presentan correlaciones relativamente elevadas entre sí. Por ejemplo, MSFT, GOOGL, AMZN, META, NVDA y AAPL muestran valores de correlación moderados o altos, lo que indica que tienden a moverse en la misma dirección en muchos periodos del mercado. Este comportamiento resulta coherente, ya que pertenecen a sectores próximos y pueden verse afectados por factores comunes, como expectativas sobre crecimiento tecnológico, tipos de interés o sentimiento general del mercado.
+
+Por otro lado, activos como XOM, JNJ o PG presentan correlaciones más bajas con las grandes tecnológicas. Esto sugiere que aportan cierto grado de diversificación dentro de la cartera, al no comportarse exactamente igual que los activos más orientados al crecimiento. En particular, se observa una relación más intensa entre JNJ y PG, ambos vinculados a sectores más defensivos, y entre JPM y XOM, lo que refleja cierta proximidad en su comportamiento respecto al resto de activos no tecnológicos.
+
+Este análisis es especialmente relevante para nuestro trabajo ya que modelos como mínima varianza y Markowitz dependen directamente de la matriz de covarianzas y una estimación inestable de estas relaciones puede afectar de forma significativa a los pesos finales de la cartera.Es por ello que en el trabajo se incorpora posteriormente el estimador Ledoit-Wolf, con el objetivo de obtener una estimación más robusta de la matriz de covarianzas.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{media/eda_matriz_correlación.png}
+    \caption{Matriz de correlación de los retornos}
+      \textbf{Fuente:} Elaboración propia.
+    \label{fig:eda-matriz-correlacion}
+\end{figure}
+
+En quinto lugar, se analiza la distribución empírica de los retornos logarítmicos de los activos seleccionados, mediante los correspondientes histogramas, para estudiar si estos siguen una distribución normal o presentan desviaciones relevantes como colas o asimetría. 
+
+Como se observa en la Figura~\ref{fig:eda-histogramas}, todos los activos presentan distribuciones concentradas alrededor de cero, lo cual es habitual en series financieras diarias debido a que la mayor parte de las variaciones diarias de precio son moderadas, mientras que los movimientos de mayor magnitud aparecen con menor frecuencia.
+
+Aunque los histogramas presentan una forma general similar, existen diferencias relevantes entre activos, ya que META, NVDA o AMZN muestran una mayor dispersión y colas más amplias, lo que refleja una mayor probabilidad de observar variaciones diarias extremas, mientras que JNJ o PG presentan distribuciones más estrechas y concentradas en torno a cero, sugiriendo un comportamiento más estable y defensivo dentro del conjunto analizado. 
+
+La forma de estas distribuciones y la presencia de colas pronunciadas y valores alejados del centro permite apreciar que los retornos financieros no siguen un comportamiento perfectamente normal existiendo episodios de alta volatilidad y movimientos extremos, esto presenta un reto para el actual trabajo ya que si un modelo no reproduce adecuadamente la distribución empírica de los retornos, especialmente en sus extremos, las métricas de riesgo y las decisiones de asignación de pesos podrían verse afectadas.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{media/eda_histogramas.png}
+    \caption{Distribución empírica de los retornos logarítmicos}
+        \textbf{Fuente:} Elaboración propia.
+    \label{fig:eda-histogramas}
+\end{figure}
+
+Por último, la Figura~\ref{fig:eda-division-temporal} representa la división temporal de los datos en los subconjuntos de entrenamiento, validación y test, partición que se realiza respetando el orden cronológico de las observaciones de forma que el entrenamiento corresponde al primer tramo temporal, la validación a un periodo posterior y el test al tramo final, como ya explicamos en el apartado anterior.
+
+Esta separación es muy importante en series financieras, ya que una división aleatoria podría introducir fuga de información al permitir que datos futuros influyeran en el entrenamiento o la selección de los modelos, por lo que el uso de una partición temporal permite simular un escenario más realista en el que las estrategias se construyen con información pasada y se evalúan sobre datos posteriores no vistos durante el entrenamiento. 
+
+Además, la figura permite observar que el periodo de test se sitúa en una etapa reciente del mercado caracterizada por un crecimiento acusado y una gran variabilidad, lo que refuerza la necesidad de evaluar los modelos sobre un tramo temporal separado dado que el comportamiento del mercado puede diferir notablemente entre los periodos de entrenamiento, validación y prueba. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{media/eda-division-temporal.png}
+    \caption{División temporal de los datos en entrenamiento, validación y test}
+    \textbf{Fuente:} Elaboración propia.
+    \label{fig:eda-division-temporal}
+\end{figure}
+
+El análisis llevado a cabo permite es fundamental antes de aplicar cualquier tipo de modelo ya que nos ha permitido obtener una visión completa del comportamiento inicial de los datos financieros utilizados en el trabajo, conociendo su estructura y calidad de forma que permite justificar decisiones posteriores como el uso de retornos logarítmicos, la división temporal en entrenamiento, validación y test o la comparación mediante métricas estadísticas.
 
 \subsection{Preparación de los datos}
 
@@ -680,6 +783,12 @@ La normalización se calcula únicamente con la media y la desviación típica d
 El experimento compara tres familias de técnicas: baselines clásicos de cartera, un Autoencoder Variacional y TimeGAN. No se evalúa una GAN básica como modelo separado; la comparación adversarial se realiza mediante TimeGAN por su orientación específica a series temporales. Esta organización permite distinguir entre métodos financieros consolidados y modelos generativos utilizados como generadores de escenarios sintéticos.
 
 Los baselines clásicos actúan como referencia principal. Se incluyen la cartera equiponderada, la cartera de mínima varianza y una cartera de estilo Markowitz basada en media y covarianza históricas. Estos métodos no se tratan como comparadores débiles, sino como referencias necesarias y exigentes. Precisamente porque son métodos sencillos, conocidos y ampliamente utilizados, permiten valorar si los modelos generativos aportan información adicional o si, por el contrario, introducen complejidad sin una mejora clara.
+
+Además de estos baselines clásicos, se incorporan dos variantes robustas basadas en el estimador Ledoit-Wolf: \texttt{ledoit\_wolf\_minimum\_variance} y \texttt{ledoit\_wolf\_markowitz}. 
+
+Ambas mantienen la misma lógica de optimización y las mismas restricciones que los modelos originales, con la diferencia de que sustituyen la covarianza muestral histórica por una estimación más robusta de la matriz de covarianzas, lo que resulta especialmente relevante dado que tanto la cartera de mínima varianza como el modelo de Markowitz dependen directamente de ella. 
+
+Cuando dicha estimación es inestable, los pesos resultantes pueden variar de forma significativa ante pequeños cambios en los datos, comprometiendo la robustez de la cartera fuera de muestra.
 
 El VAE se utiliza como modelo generativo probabilístico basado en espacio latente. Su arquitectura combina un encoder, una representación latente, el mecanismo de reparametrización y un decoder. En la implementación utilizada, la dimensión latente es 16, la dimensión oculta es 128, el tamaño de lote es 64, la tasa de aprendizaje es 0,001 y el entrenamiento se limita a 80 épocas con parada temprana de paciencia 10. La función de pérdida incorpora un término de reconstrucción y una regularización KL, ponderada mediante distintos valores de \texttt{beta}. En la configuración experimental se consideran los valores 0,0, 0,00001, 0,0001 y 0,001. Su papel en el estudio consiste en aprender una representación comprimida de las ventanas históricas de retornos y generar nuevas muestras sintéticas a partir de ese espacio latente.
 
@@ -763,6 +872,16 @@ La cartera de mínima varianza se obtiene resolviendo el problema
 
 donde $w$ representa los pesos de cartera y $\Sigma$ la matriz de covarianzas estimada. La cartera de tipo Markowitz utiliza la misma estructura de restricciones, pero incorpora también la estimación de rentabilidad esperada. En las variantes basadas en escenarios sintéticos, $\mu$ y $\Sigma$ se estiman a partir de los retornos generados, mientras que la evaluación final de la cartera se realiza siempre con retornos reales del conjunto de prueba.
 
+En las variantes robustas incorporadas en este trabajo, la matriz $\Sigma$ no se estima mediante la covarianza muestral histórica sino mediante el estimador Ledoit-Wolf \cite{LedoitWolf2004}, que aplica un proceso de regularización sobre la matriz de covarianzas con el objetivo de obtener una estimación mejor condicionada y menos sensible al ruido de los datos históricos. 
+
+La idea de este estimador consiste en combinar la covarianza muestral con una matriz objetivo más estable, ponderando ambas mediante un coeficiente de contracción estimado de forma óptima y reduciendo la influencia de los valores extremos presentes en la muestra. 
+
+El objetivo del mismo se cumple si se obtiene una matriz que tiende a ser más estable cuando el número de activos es elevado en relación con el número de observaciones disponibles, una situación que resulta común en problemas de optimización de carteras.
+
+Las carteras \texttt{ledoit\_wolf\_minimum\_variance} y \texttt{ledoit\_wolf\_markowitz} mantienen las mismas restricciones de optimización que sus equivalentes clásicos, pero parten de esta estimación más robusta del riesgo conjunto entre activos. Esta distinción resulta relevante porque una matriz de covarianzas inestable puede generar pesos excesivamente sensibles a pequeñas variaciones en los retornos históricos, comprometiendo el comportamiento de la cartera fuera de muestra. 
+
+La incorporación de estas variantes permite así reforzar los baselines financieros y plantear una comparación más exigente frente a las carteras basadas en escenarios sintéticos, ya que no basta con superar versiones clásicas potencialmente frágiles, sino también métodos que incorporan una gestión más cuidadosa de la estimación del riesgo.
+
 {\small
 \setlength{\tabcolsep}{3pt}
 \begin{longtable}{|p{0.14\textwidth}|p{0.16\textwidth}|p{0.17\textwidth}|p{0.16\textwidth}|p{0.14\textwidth}|}
@@ -779,6 +898,10 @@ Markowitz & Optimización clásica & Media y covarianza & Pesos de cartera & Bas
 Mínima varianza & Optimización clásica & Covarianza & Pesos de cartera & Baseline de riesgo \\
 \hline
 Equiponderada & Heurístico simple & Número de activos & Pesos iguales & Referencia simple \\
+\hline
+Ledoit-Wolf mínima varianza & Optimización robusta & Covarianza Ledoit-Wolf & Pesos de cartera & Baseline financiero robusto \\
+\hline
+Ledoit-Wolf Markowitz & Optimización robusta & Media histórica y covarianza Ledoit-Wolf & Pesos de cartera & Baseline financiero robusto \\
 \hline
 \end{longtable}
 }
@@ -839,6 +962,48 @@ Calibrada media contraída y covarianza sintética & 21,87\% & 19,90\% & 1,13 $\
 
 La comparación con la cartera equiponderada es especialmente relevante: aunque algunas variantes TimeGAN alcanzan un Sharpe medio similar o ligeramente superior, la desviación típica entre semillas es alta. Por tanto, los resultados no deben presentarse como una superioridad robusta de TimeGAN frente a los enfoques clásicos, sino como una evidencia descriptiva de que determinadas configuraciones pueden comportarse de forma competitiva bajo este periodo y este universo de activos.
 
+\subsection{Resultados de los baselines robustos con Ledoit-Wolf}
+
+Como ya hemos comentado anteriormente, además de los baselines clásicos iniciales, se incorporaron dos variantes robustas basadas en la estimación de covarianza Ledoit-Wolf \cite{LedoitWolf2004}, en concreto \texttt{ledoit\_wolf\_minimum\_variance} y \texttt{ledoit\_wolf\_markowitz}. con el objetivo de reforzar la comparación financiera mediante una estimación más estable de la matriz de covarianzas, manteniendo las mismas restricciones del experimento.
+
+La Tabla~\ref{tab:resultados-ledoit-wolf} muestra la comparación entre los modelos clásicos basados en covarianza muestral y sus equivalentes robustos con Ledoit-Wolf.
+
+{\small
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{|p{0.31\textwidth}|p{0.13\textwidth}|p{0.13\textwidth}|p{0.10\textwidth}|p{0.14\textwidth}|}
+\caption{Comparación de baselines clásicos y variantes robustas con Ledoit-Wolf}
+\label{tab:resultados-ledoit-wolf}\\
+\hline
+\textbf{Modelo} & \textbf{Rent. anual.} & \textbf{Vol. anual.} & \textbf{Sharpe} & \textbf{Drawdown} \\
+\hline
+\endfirsthead
+
+\hline
+\textbf{Modelo} & \textbf{Rent. anual.} & \textbf{Vol. anual.} & \textbf{Sharpe} & \textbf{Drawdown} \\
+\hline
+\endhead
+
+Mínima varianza & 13,50\% & 12,81\% & 1,05 & -10,52\% \\
+\hline
+Ledoit-Wolf mínima varianza & 13,62\% & 12,73\% & 1,07 & -10,53\% \\
+\hline
+Markowitz histórico & 22,94\% & 38,21\% & 0,60 & -31,34\% \\
+\hline
+Ledoit-Wolf Markowitz & 23,20\% & 38,36\% & 0,60 & -31,42\% \\
+\hline
+
+\end{longtable}
+}
+
+Los resultados muestran que la variante Ledoit-Wolf de mínima varianza mejora ligeramente a la cartera de mínima varianza clásica, con un aumento de la rentabilidad anualizada de 13,50\% a 13,62\%, una reducción de la volatilidad de 12,81\% a 12,73\% y una mejora del ratio de Sharpe de 1,05 a 1,07.
+
+Las diferencias no son muy elevadas, lo cual era esperable ya que cuando la muestra histórica es suficientemente larga y los activos no son demasiado numerosos, la covarianza muestral ya ofrece una estimación razonablemente estable, dejando poco margen para que la introducir mejoras. 
+
+En el caso de Markowitz, el efecto es más limitado. La variante robusta obtiene una rentabilidad anualizada algo superior, pasando de 22,94\% a 23,20\%, pero mantiene una volatilidad y un drawdown prácticamente iguales a los del modelo clásico. Esto sugiere que, en esta configuración experimental, la sensibilidad de Markowitz no depende únicamente de la matriz de covarianzas sino también de la estimación de los retornos esperados, que permanece inalterada en ambas variantes. 
+
+Por tanto, la incorporación de Ledoit-Wolf no pretende transformar de forma radical los baselines, sino reforzar la comparación metodológica de forma los modelos generativos deban medirse no sólo frente a versiones clásicas , sino también frente a variantes que incorporan una estimación más cuidadosa del riesgo.
+
 \subsection{Fidelidad distribucional observada}
 
 Los diagnósticos distribucionales muestran que la generación de escenarios financieros sigue siendo una tarea difícil. En validación, el error medio de la matriz de correlación de TimeGAN se situó alrededor de 4,01, lo que indica que la estructura de dependencia multiactivo no se reproduce de forma completamente satisfactoria. Del mismo modo, el error medio de curtosis fue aproximadamente 6,01, señal de que el modelo tiende a suavizar las colas y reproduce con dificultad eventos extremos.
@@ -875,11 +1040,46 @@ Como línea futura, podría plantearse una propuesta preliminar de puesta en pro
 
 Por tanto, el trabajo no justifica reemplazar los métodos clásicos de optimización de carteras por modelos generativos. Su aportación debe entenderse de forma más acotada: proporciona un marco experimental reproducible para evaluar VAE y TimeGAN como generadores de escenarios sintéticos y para estudiar si dichos escenarios pueden complementar, bajo ciertas condiciones, el análisis clásico de riesgo y asignación de activos.
 
+\chapter{Propuesta de puesta en producción}
+
+Aunque el sistema desarrollado en este trabajo tiene un carácter experimental resulta conveniente plantear cómo podría evolucionar y avanzar hacia una versión más accesible por parte de los distintos usuarios interesados en él. En esta línea, se plantea como posible propuesta el desarrollo de una web que permita ejecutar el pipeline desarrollado de forma controlada, visualizar los resultados obtenidos y facilitar la comparación de modelos clásicos, robustos y generativos sin necesidad de interactuar directamente con el código.
+
+La idea principal consiste en transformar el pipeline actual, consistente en distintos scripts de Python, en una plataforma web sencilla que permita centralizar en una interfaz única las principales fases de nuestro trabajo: la descarga de datos, el análisis exploratorio, la generación de escenarios sintéticos, la evaluación y optimización de carteras y una comparación final de resultados. De esta forma, se obtiene una interfaz donde un usuario puede seleccionar un conjunto de activos, definir un periodo temporal, ejecutar el análisis y consultar los resultados obtenidos.
+
+Desde el punto de vista funcional, la aplicación podría organizarse como un panel web dividido en varias secciones o módulos que quedan resumidas a continuación en forma de tabla:
+
+\begin{itemize}
+\item Módulo de ingesta de datos: encargado de descargar precios ajustados desde Yahoo Finance mediante \texttt{yfinance}, validar que existen datos suficientes y almacenar una copia local de los datos utilizados en cada ejecución.
+
+\item Módulo de validación y EDA: responsable de calcular valores nulos, estadísticos descriptivos, retornos logarítmicos, histogramas, matriz de correlación y partición temporal. Este módulo permitiría comprobar la calidad de los datos antes de utilizarlos en los modelos.
+
+\item Módulo de optimización de carteras: encargado de ejecutar las estrategias equiponderada, mínima varianza, Markowitz, Ledoit-Wolf mínima varianza y Ledoit-Wolf Markowitz.
+
+\item Módulo de modelos generativos: destinado a entrenar o cargar modelos VAE y TimeGAN para generar escenarios sintéticos de retornos. En producción, este módulo debería ejecutarse con control de semillas, registro de configuración y almacenamiento de resultados.
+
+\item Módulo de evaluación: responsable de calcular métricas estadísticas, temporales, informacionales y financieras. Entre ellas se incluirían rentabilidad anualizada, volatilidad anualizada, ratio de Sharpe, drawdown, VaR, CVaR, divergencia KL, divergencia Jensen-Shannon, correlaciones y autocorrelaciones.
+
+\item Módulo de visualización: encargado de mostrar tablas, gráficas y comparativas de modelos dentro de la aplicación web.
+
+\end{itemize}
+
+
+La arquitectura técnica propuesta sería sencilla y modular, con un backend desarrollado en FastAPI por su capacidad para exponer endpoints REST de forma clara y su buena integración con código Python existente, y un frontend que nos permita construir paneles interactivos rápidamente reutilizando los gráficos y resultados generados por el pipeline sin necesidad de desarrollar una capa de presentación desde cero. 
+
+El flujo de uso sería sencillo: el usuario seleccionaría los activos y el periodo de análisis, tras lo cual el sistema descargaría automáticamente los precios ajustados, verificaría la calidad de los datos y calcularía los retornos logarítmicos mostrando el análisis exploratorio correspondiente. Una vez revisada esta fase, el usuario podría lanzar la comparación de baselines, obteniendo los pesos de cada cartera, su evaluación sobre el conjunto de test y una tabla comparativa con las métricas principales.
+
+En una versión inicial, la aplicación podría ejecutarse localmente o desplegarse en un servidor sencillo, como una máquina virtual o un servicio cloud básico,  sin necesidad de una infraestructura compleja.
+
+Por último, esta propuesta debe mantenerse alineada con el carácter experimental del trabajo, el objetivo no es automatizar decisiones de inversión sino ofrecer una herramienta que permita ejecutar el pipeline, revisar los datos y comparar estrategias bajo criterios controlados.
+
+No obstante, esta propuesta debe entenderse como una primera aproximación orientada a hacer el pipeline más accesible y reproducible con el objetivo principal de transformar el trabajo desarrollado en un prototipo utilizable desde el que ejecutar experimentos, visualizar resultados y comparar modelos de forma ordenada. De cara al futuro se podría desarrollar otra versión que contenga mejoras notables como incorporar fuentes de datos adicionales y mecanismos de actualización periódica o añadir una gestión más completa de los modelos entrenados que permitiera almacenar configuraciones, registrar semillas y repetir experimentos anteriores de forma exacta.
+
 %\begin{thebibliography}{a}
 %\bibitem{etiqueta} \textsc{Autores},
 %\textit{nombre referencia.}
 %Información addicional
 %\end{thebibliography}
+\backmatter
 \bibliographystyle{apacite}
 \bibliography{bibliografia}
 
