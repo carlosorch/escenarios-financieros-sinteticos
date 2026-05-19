@@ -139,25 +139,23 @@ En definitiva, este trabajo se justifica por la oportunidad de estudiar una meto
 
 \section{Planteamiento del trabajo}
 
-El presente trabajo busca abordar el problema de la optimización de carteras financieras mediante el diseño de un enfoque que permita capturar tanto las distribuciones de retorno de los activos como las correlaciones existentes entre ellos, proponiendo una solución basada en técnicas de Inteligencia Artificial.
+El presente trabajo se plantea como un estudio experimental sobre el uso de modelos generativos para construir escenarios sintéticos de retornos financieros y analizar su posible utilidad en un problema de optimización de carteras. El objetivo no es predecir el mercado ni demostrar que una técnica de aprendizaje profundo sustituye a los métodos clásicos, sino comprobar, bajo un protocolo reproducible, qué tipo de información pueden aportar estos modelos cuando se comparan con referencias financieras consolidadas.
 
-Para dar solución a este problema se plantea el desarrollo de un modelo que utilice datos reales del mercado para aprender la distribución de los retornos de los activos mediante el uso de redes generativas adversarias y autoencoders variacionales, con el fin de generar escenarios o predicciones del comportamiento del mercado, permitiéndonos obtener una visión probabilística de los posibles escenarios futuros.
+Para ello se parte de datos reales de mercado, se transforman los precios en retornos diarios y se construyen ventanas temporales multiactivo. Sobre esta información se entrenan dos familias de modelos generativos, Autoencoders Variacionales (VAE) y TimeGAN, con la finalidad de generar escenarios sintéticos de retornos. Estos escenarios no se interpretan como predicciones exactas del comportamiento futuro, sino como muestras artificiales que permiten estudiar si se conservan propiedades relevantes de los datos reales, como la dispersión, las dependencias entre activos o cierta estructura temporal.
 
-Sobre los escenarios resultantes se integrarán métricas basadas en la teoría de la información con el objetivo de medir la distancia o diferencia entre las distribuciones reales y las estimadas por el modelo, permitiendo así evaluar su calidad. Este análisis permitirá determinar si el modelo es lo suficientemente fiable como para tomar decisiones en función a él o si, por lo contrario, es necesario mejorar su capacidad para modelar la incertidumbre y la dependencia entre los activos hasta obtener resultados óptimos que nos permitan reflejar de manera precisa el comportamiento del mercado.
+El análisis se completa mediante métricas estadísticas, financieras e informacionales. Por un lado, se evalúa la calidad de los escenarios generados comparando sus propiedades con las observadas en los datos reales. Por otro, se estudia si el uso de dichos escenarios para estimar medias, covarianzas o distribuciones de retornos produce carteras competitivas frente a métodos clásicos como la cartera equiponderada, la cartera de mínima varianza o el enfoque de Markowitz. En todos los casos, la evaluación financiera se realiza sobre datos reales fuera de muestra, con el fin de evitar que la comparación dependa únicamente de datos generados por los propios modelos.
 
-De este modo, la propuesta consiste en diseñar e implementar una solución software que integre el modelado generativo con medidas de información para optimizar carteras, lo que posibilitará una distribución de activos más eficaz en cuanto a rendimiento y riesgo.
+De este modo, la aportación principal del trabajo consiste en desarrollar y documentar un piloto experimental reproducible que permita evaluar VAE y TimeGAN como generadores de escenarios financieros sintéticos aplicados a la optimización de carteras. El enfoque es deliberadamente prudente: los modelos generativos se estudian como herramientas complementarias para el análisis del riesgo y la generación de escenarios, no como una garantía de mejora automática frente a la teoría clásica de carteras.
 
 \section{Estructura del trabajo}
 
-El documento se organiza de forma progresiva con el propósito de abordar el problema de la optimización de carteras financieras desde una perspectiva basada en técnicas avanzadas de inteligencia artificial. A lo largo del trabajo, se combinan fundamentos teóricos y desarrollo metodológico con el fin de construir una propuesta capaz de modelar adecuadamente las distribuciones de retorno de los activos y las relaciones de dependencia entre ellos.
+El documento se organiza de forma progresiva para separar con claridad el marco conceptual, el diseño del experimento, la presentación de resultados y su interpretación. Esta separación es importante porque el trabajo no pretende presentar una estrategia de inversión cerrada, sino evaluar de forma controlada si los modelos generativos pueden resultar útiles como generadores de escenarios sintéticos dentro de un proceso de optimización de carteras.
 
-En primer lugar, se introduce el contexto del problema, destacando la relevancia de la optimización de carteras en el ámbito financiero y las limitaciones de los enfoques tradicionales para capturar la incertidumbre inherente a los mercados. A continuación, se presenta una revisión del estado del arte en la que se analizan tanto los modelos clásicos como las aproximaciones más recientes basadas en aprendizaje automático y modelado probabilístico, prestando especial atención a aquellas técnicas orientadas a la generación de datos y al análisis de distribuciones.
+En primer lugar, se introduce el problema de la optimización de carteras y se justifica la relevancia de estudiar técnicas capaces de representar mejor la incertidumbre de los retornos financieros. A continuación, se desarrolla el contexto y el estado del arte, donde se revisan los fundamentos de la teoría moderna de carteras, los modelos generativos, la teoría de la información y las herramientas utilizadas habitualmente en este tipo de estudios.
 
-Seguidamente, se definen los objetivos del trabajo y se describe la metodología que guiará su desarrollo. En este sentido, se plantea la utilización de modelos generativos, tales como redes generativas adversarias y autoencoders variacionales, con el objetivo de aprender la distribución de los retornos a partir de datos reales del mercado. Estos modelos permitirán generar escenarios sintéticos que proporcionen una representación probabilística de los posibles comportamientos futuros de los activos.
+Después se presentan los objetivos del trabajo y se define el planteamiento metodológico general. El desarrollo específico se estructura en tres capítulos principales. El Capítulo 4 describe con detalle el experimento realizado: datos utilizados, preparación de la información, modelos comparados, métricas, protocolo de evaluación y controles de reproducibilidad. El Capítulo 5 recoge los resultados obtenidos de forma descriptiva, mediante tablas y comparaciones objetivas entre baselines clásicos, VAE y TimeGAN. Finalmente, el Capítulo 6 discute el significado de esos resultados, sus limitaciones y las posibles líneas de trabajo futuro.
 
-Sobre los escenarios generados, se incorporarán métricas fundamentadas en la teoría de la información, orientadas a evaluar la calidad de las distribuciones estimadas mediante la comparación con los datos reales. Este análisis permitirá valorar la capacidad del modelo para capturar tanto la incertidumbre como las dependencias existentes entre los activos, constituyendo un elemento clave para determinar su aplicabilidad en procesos de toma de decisiones financieras.
-
-Finalmente, el trabajo contempla la implementación del enfoque propuesto y la realización de experimentos que permitan analizar su comportamiento y rendimiento. A partir de los resultados obtenidos, se elaborarán las conclusiones correspondientes, así como una reflexión sobre las posibles líneas de investigación futura que puedan contribuir a mejorar o ampliar la propuesta desarrollada.
+Esta organización permite mantener una distinción clara entre lo que se ha medido y lo que puede concluirse a partir de dichas mediciones. En particular, la interpretación de los resultados se reserva para la discusión final, evitando presentar como conclusiones generales lo que pueda depender de una configuración concreta, de una semilla de entrenamiento o de un periodo histórico determinado.
 
 
 \chapter{Contexto y Estado del Arte}
@@ -525,15 +523,33 @@ A continuación, se presentan los objetivos específicos que guiarán el desarro
 
 \section{Enfoque metodológico}
 
-La metodología del trabajo se plantea con un enfoque aplicado, experimental y comparativo. El objetivo no es formular una nueva teoría financiera ni proponer un algoritmo completamente nuevo, sino desarrollar un prototipo técnico reproducible de inteligencia artificial generativa aplicado a la generación de escenarios financieros sintéticos y a su evaluación en un problema real de optimización de carteras.
+La metodología del trabajo se define como aplicada, experimental y comparativa. Se parte de un problema financiero conocido, la optimización de carteras, y se estudia si los modelos generativos pueden aportar escenarios sintéticos útiles para analizarlo bajo condiciones controladas. Por tanto, el trabajo no se orienta a desarrollar una estrategia de inversión lista para su uso real, sino a construir un procedimiento reproducible que permita comparar resultados y valorar sus limitaciones.
 
-El proyecto se concibe como un pipeline experimental en el que cada etapa produce una salida verificable que alimenta a la siguiente: obtención de datos reales, transformación de precios en retornos, construcción de ventanas temporales multiactivo, entrenamiento de modelos VAE y TimeGAN, generación de escenarios sintéticos, validación estadística e informacional de dichos escenarios, optimización de carteras y evaluación fuera de muestra frente a baselines clásicos.
+El planteamiento combina técnicas de ciencia de datos, aprendizaje profundo y evaluación financiera. En primer lugar, se trabaja con datos históricos de mercado; después, se preparan retornos y ventanas temporales; posteriormente, se entrenan modelos generativos y se construyen carteras a partir de información empírica o sintética. Finalmente, todas las alternativas se comparan mediante métricas comunes y sobre datos reales fuera de muestra.
 
-La pregunta metodológica central puede formularse del siguiente modo: ¿hasta qué punto los escenarios de retornos financieros generados mediante VAE y TimeGAN preservan la información estadística, temporal e informacional de los datos reales y pueden contribuir al análisis de carteras más robustas frente a enfoques clásicos?
+\section{Criterios generales de evaluación}
 
-\section{Adaptación de CRISP-DM al proyecto}
+La evaluación se organiza alrededor de dos ideas. La primera es que la calidad de un escenario sintético no puede medirse únicamente por su aspecto visual o por una métrica aislada, sino por su capacidad para preservar propiedades relevantes de los retornos reales. La segunda es que la utilidad financiera de esos escenarios debe comprobarse de forma separada, evaluando las carteras resultantes sobre un periodo de prueba que no haya intervenido en el entrenamiento ni en la selección de configuraciones.
 
-Como marco general se adopta CRISP-DM, por su adecuación a proyectos de ciencia de datos e inteligencia artificial basados en datos reales, preparación, modelado, evaluación y análisis de resultados. En este TFM, sus fases se adaptan al contexto financiero y experimental de la siguiente forma:
+Con este enfoque se pretende evitar una interpretación excesivamente optimista de los modelos generativos. El trabajo compara VAE y TimeGAN con baselines clásicos, mantiene una división temporal fija y reserva el conjunto de test para la evaluación final. De esta forma, la metodología busca que las conclusiones dependan del protocolo experimental completo y no de una ejecución concreta o de una selección posterior del mejor resultado.
+
+\chapter{Desarrollo específico de la contribución}
+
+\section{Descripción detallada del experimento}
+
+\subsection{Planteamiento experimental}
+
+El experimento desarrollado en este trabajo se plantea como un piloto académico para evaluar si determinados modelos generativos pueden producir escenarios sintéticos de retornos financieros útiles dentro de un proceso de optimización de carteras. La idea de fondo no es construir un sistema de trading ni anticipar el comportamiento exacto del mercado, sino estudiar de forma controlada si los escenarios generados por VAE y TimeGAN conservan propiedades estadísticas, temporales y de dependencia que resultan relevantes para la construcción de carteras.
+
+Por este motivo, el diseño experimental combina tres elementos. En primer lugar, se utilizan datos reales de mercado para construir una base empírica común. En segundo lugar, se comparan métodos clásicos de optimización de carteras con modelos generativos entrenados sobre los mismos datos históricos. En tercer lugar, se evalúan los resultados mediante un protocolo reproducible que separa entrenamiento, validación y prueba, evitando que las decisiones de selección de modelo se apoyen en el conjunto de test.
+
+El flujo completo se entiende como una cadena de trabajo: descarga de precios, limpieza y alineación de series, transformación a retornos, análisis exploratorio, división temporal, entrenamiento de modelos, generación de escenarios sintéticos, evaluación de dichos escenarios, construcción de carteras y evaluación financiera fuera de muestra. Cada una de estas fases tiene una función concreta y produce salidas que pueden ser revisadas de forma independiente.
+
+La pregunta metodológica central puede formularse del siguiente modo: ¿hasta qué punto los escenarios de retornos financieros generados mediante VAE y TimeGAN preservan información relevante de los datos reales y pueden servir como apoyo, no como sustituto automático, de los métodos clásicos de optimización de carteras?
+
+\subsection{Marco de trabajo adoptado}
+
+Como guía general se toma CRISP-DM, por tratarse de un marco ampliamente utilizado en proyectos de ciencia de datos basados en comprensión del problema, preparación de datos, modelado, evaluación y revisión de resultados. En este TFM no se aplica como una metodología empresarial cerrada, sino como una forma ordenada de estructurar un experimento cuantitativo reproducible. Sus fases se adaptan al contexto financiero y experimental de la siguiente forma:
 
 \begin{longtable}{|p{0.28\textwidth}|p{0.62\textwidth}|}
 \caption{Adaptación de CRISP-DM al proyecto}\label{tab:crispdm-adaptacion}\\
@@ -550,15 +566,15 @@ Modelado & Entrenamiento y comparación de VAE y TimeGAN como modelos generativo
 \hline
 Evaluación & Evaluación estadística, temporal, informacional y financiera de los escenarios y carteras resultantes. \\
 \hline
-Despliegue & Construcción de un prototipo experimental reproducible para análisis académico, sin implicar una puesta en producción financiera. \\
+Despliegue & Construcción de un prototipo experimental reproducible para análisis académico, sin implicar una puesta en producción financiera inmediata. \\
 \hline
 \end{longtable}
 
-\section{Diseño técnico de la solución propuesta}
+\subsection{Diseño técnico del pipeline}
 
-La solución se diseña como un pipeline modular compuesto por etapas diferenciadas de adquisición de datos, preprocesamiento, análisis exploratorio y construcción de ventanas temporales. Sobre esta base se incorporan los módulos de modelado generativo con VAE y TimeGAN, generación de escenarios sintéticos, evaluación estadística, temporal e informacional, optimización de carteras y comparación final de resultados.
+La solución se implementa como un pipeline modular en Python. Esta decisión facilita separar las responsabilidades del experimento: un módulo se encarga de la descarga y preparación de datos, otros implementan los modelos generativos, otros calculan métricas y otros ejecutan las comparaciones financieras. Esta separación resulta importante porque permite repetir partes concretas del experimento sin rehacer todo el proceso y reduce el riesgo de mezclar la generación de datos sintéticos con la evaluación final.
 
-Este flujo general se resume en la Figura~\ref{fig:pipeline-metodologico}, que organiza de manera visual las etapas del trabajo desde la obtención de datos hasta la comparación final con métodos base.
+El flujo general se resume en la Figura~\ref{fig:pipeline-metodologico}, que organiza de manera visual las etapas del trabajo desde la obtención de datos hasta la comparación final con métodos base.
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\textwidth]{media/fig_pipeline_metodologico.png}
@@ -567,21 +583,25 @@ Este flujo general se resume en la Figura~\ref{fig:pipeline-metodologico}, que o
     \label{fig:pipeline-metodologico}
 \end{figure}
 
-\section{Comprensión del problema}
+\subsection{Datos utilizados}
 
-El problema se formula desde una perspectiva técnica: no se pretende predecir precios exactos ni anticipar el mercado, sino aprender distribuciones y secuencias de retornos financieros que permitan generar escenarios alternativos plausibles. Los enfoques clásicos de optimización dependen de estimaciones puntuales de media y covarianza, mientras que los modelos generativos permiten trabajar con conjuntos de escenarios que representan distintas configuraciones posibles del mercado.
+El experimento utiliza datos diarios de mercado obtenidos a través de Yahoo Finance mediante la biblioteca \texttt{yfinance}. Se selecciona un universo inicial de diez activos líquidos y de gran capitalización, pertenecientes a distintos sectores económicos: AAPL, MSFT, GOOGL, AMZN, META, NVDA, JPM, XOM, JNJ y PG. La elección de un universo acotado responde al carácter piloto del estudio, ya que permite analizar un problema multiactivo real manteniendo un tamaño manejable para el entrenamiento de modelos generativos.
 
-La teoría de la información se utiliza como mecanismo de validación intermedio para evaluar si las distribuciones generadas preservan información relevante de los datos reales antes de emplearlas en la construcción de carteras.
+El periodo considerado abarca desde el 1 de enero de 2015 hasta el 12 de mayo de 2026. La variable descargada es el precio ajustado de cierre, ya que incorpora ajustes por dividendos y desdoblamientos cuando la fuente los proporciona. A partir de estos precios se calculan retornos logarítmicos diarios, que son la variable finalmente utilizada por los modelos y por las funciones de evaluación.
 
-\section{Comprensión de los datos}
+La partición temporal se define de antemano. El conjunto de entrenamiento cubre el periodo comprendido hasta el 31 de diciembre de 2022; el conjunto de validación abarca desde el 1 de enero de 2023 hasta el 30 de junio de 2024; y el conjunto de prueba queda reservado para el periodo posterior, desde julio de 2024 hasta el 12 de mayo de 2026. Esta división evita mezclas aleatorias entre pasado y futuro y reproduce de forma más realista la situación en la que un modelo se entrena con información histórica y se evalúa sobre datos posteriores.
 
-Se prevé trabajar con datos diarios procedentes de Yahoo Finance mediante la biblioteca \texttt{yfinance}. El universo inicial estará formado por diez activos líquidos de gran capitalización y distintos sectores: AAPL, MSFT, GOOGL, AMZN, META, NVDA, JPM, XOM, JNJ y PG. El periodo de estudio previsto abarca desde el 1 de enero de 2015 hasta el 12 de mayo de 2026, fecha próxima al inicio de la fase experimental del trabajo. La variable inicial será el precio ajustado de cierre y la variable modelada serán los retornos logarítmicos.
+\subsection{Análisis exploratorio de los datos}
 
-El análisis exploratorio incluirá media, volatilidad, asimetría, curtosis, percentiles, valores extremos, distribuciones empíricas, matriz de correlaciones, autocorrelación de retornos y autocorrelación de retornos absolutos. Esta fase permitirá justificar la necesidad de modelos capaces de representar colas pesadas, cambios de volatilidad y relaciones de dependencia entre activos.
+Antes del entrenamiento de los modelos se realiza una fase de análisis exploratorio con el objetivo de conocer la estructura de las series financieras utilizadas. Esta fase no tiene como finalidad extraer conclusiones definitivas sobre los activos, sino comprobar la calidad de los datos y describir las características que condicionan el problema de modelado.
 
-\section{Preparación de los datos}
+En particular, se revisan los valores ausentes, la evolución temporal de los precios, la distribución empírica de los retornos, la volatilidad observada, las correlaciones entre activos y la posible presencia de estructura temporal en las series. Los valores ausentes se analizan durante esta fase y se gestionan mediante el procedimiento de limpieza definido en el pipeline de datos. En caso de disponer de resultados gráficos, esta parte del trabajo puede apoyarse en series de precios, histogramas de retornos, mapas de calor de correlación, resúmenes de valores faltantes, gráficos de volatilidad móvil y una visualización de la división entre entrenamiento, validación y prueba.
 
-La preparación de datos seguirá una secuencia fija: descarga de precios ajustados, alineación temporal de activos, tratamiento de valores faltantes, cálculo de retornos logarítmicos, división temporal de los datos, normalización con estadísticos calculados exclusivamente sobre el conjunto de entrenamiento y construcción de ventanas temporales multiactivo.
+Este análisis es especialmente relevante porque los retornos financieros suelen presentar colas pesadas, episodios de volatilidad agrupada y cambios en las relaciones entre activos. Estas características hacen que el problema sea más exigente que una simple generación de muestras con media y varianza parecidas, ya que para la optimización de carteras también importa preservar la estructura de dependencia y el comportamiento de los riesgos extremos.
+
+\subsection{Preparación de los datos}
+
+La preparación de datos sigue una secuencia fija: descarga de precios ajustados, alineación temporal de activos, tratamiento de valores faltantes, cálculo de retornos logarítmicos, división temporal de los datos, normalización con estadísticos calculados exclusivamente sobre el conjunto de entrenamiento y construcción de ventanas temporales multiactivo. Mantener esta secuencia fija es importante para que todos los modelos trabajen con la misma información de partida.
 
 Los retornos se calcularán como:
 
@@ -589,15 +609,17 @@ Los retornos se calcularán como:
 r_t = \ln \left(\frac{P_t}{P_{t-1}}\right)
 \end{equation}
 
-La partición de los datos será temporal y no aleatoria: entrenamiento entre 2015 y 2022, validación desde enero de 2023 hasta junio de 2024 y prueba desde julio de 2024 hasta el 12 de mayo de 2026. Las ventanas temporales tendrán una longitud inicial de 30 días por el número de activos seleccionados, es decir, 30 días por 10 activos en el universo experimental propuesto.
+Las ventanas temporales tienen una longitud de 30 sesiones bursátiles. Cada muestra utilizada por los modelos generativos representa, por tanto, una secuencia de 30 días para los 10 activos considerados. Esta forma de organizar los datos permite que TimeGAN trabaje con secuencias multivariantes y que el VAE aprenda una representación compacta de ventanas completas de retornos.
 
-\section{Modelado generativo}
+\subsection{Familias de algoritmos evaluadas}
 
-El núcleo técnico del trabajo será la comparación entre un VAE utilizado como baseline generativo probabilístico y TimeGAN como modelo generativo temporal principal. Ambos modelos se entrenarán sobre las mismas ventanas temporales y se evaluarán con un protocolo común, de forma que la comparación no dependa de diferencias en la preparación de datos o en el conjunto de evaluación. Los modelos de difusión se consideran una línea reciente y prometedora dentro del estado del arte, pero quedan planteados como posible extensión si el alcance temporal del proyecto lo permite.
+El experimento compara tres familias de técnicas: baselines clásicos de cartera, un Autoencoder Variacional y TimeGAN. Esta organización permite distinguir entre métodos financieros consolidados y modelos generativos utilizados como generadores de escenarios sintéticos.
 
-El VAE se utilizará como modelo generativo probabilístico basado en espacio latente. Su arquitectura incluirá un encoder, una representación latente, el mecanismo de reparametrización y un decoder. La función de pérdida combinará un término de reconstrucción y un término de regularización KL. En el estudio, el VAE actuará como baseline generativo estable para contrastar un modelo latente probabilístico frente a un modelo adversarial temporal. Su principal limitación esperada es que, si las ventanas se tratan de forma agregada, puede capturar peor ciertas dependencias temporales que un modelo diseñado específicamente para series.
+Los baselines clásicos actúan como referencia principal. Se incluyen la cartera equiponderada, la cartera de mínima varianza y una cartera de estilo Markowitz basada en media y covarianza históricas. Estos métodos no se tratan como comparadores débiles, sino como referencias necesarias y exigentes. Precisamente porque son métodos sencillos, conocidos y ampliamente utilizados, permiten valorar si los modelos generativos aportan información adicional o si, por el contrario, introducen complejidad sin una mejora clara.
 
-TimeGAN se utilizará como modelo principal para la generación de series temporales multivariantes, precisamente porque su diseño está orientado a preservar dinámica temporal además de estructura distribucional. Su arquitectura incorporará red de embedding, red de recuperación, generador, supervisor y discriminador, combinando entrenamiento adversarial y supervisado. Su papel en el estudio será generar secuencias sintéticas de retornos capaces de preservar dependencias temporales y relaciones multivariantes entre activos.
+El VAE se utiliza como modelo generativo probabilístico basado en espacio latente. Su arquitectura combina un encoder, una representación latente, el mecanismo de reparametrización y un decoder. La función de pérdida incorpora un término de reconstrucción y una regularización KL, ponderada mediante distintos valores de \texttt{beta}. En la configuración experimental se consideran los valores 0,0, 0,00001, 0,0001 y 0,001. Su papel en el estudio consiste en aprender una representación comprimida de las ventanas históricas de retornos y generar nuevas muestras sintéticas a partir de ese espacio latente.
+
+TimeGAN se utiliza como modelo generativo secuencial para series temporales financieras. Su interés dentro del trabajo radica en que, a diferencia de un modelo que trate cada ventana de forma más agregada, está diseñado para generar secuencias y preservar cierta dinámica temporal. En el experimento se evalúa con varias semillas, concretamente 42, 43, 44, 45 y 46, ya que el entrenamiento adversarial puede ser sensible a la inicialización y a la propia dinámica estocástica del proceso de aprendizaje. La selección de configuraciones debe apoyarse en métricas de validación y no en el rendimiento final sobre el conjunto de test, evitando así un sesgo por selección a posteriori.
 
 \begin{figure}[htbp]
     \centering
@@ -607,15 +629,19 @@ TimeGAN se utilizará como modelo principal para la generación de series tempor
     \label{fig:timegan-externo}
 \end{figure}
 
-\section{Generación de escenarios sintéticos}
+\subsection{Generación de escenarios sintéticos}
 
-Los modelos no generarán precios directamente, sino retornos sintéticos. La salida esperada tendrá la forma de \texttt{N escenarios x T días x M activos}; por ejemplo, 1000 escenarios de 30 días para 10 activos. Estos escenarios se utilizarán para comparar distribuciones reales y sintéticas, estimar parámetros de retorno y riesgo, construir carteras mediante modelos de optimización y analizar las asignaciones obtenidas mediante estabilidad de pesos, concentración, entropía y comportamiento fuera de muestra.
+Los modelos no generan precios directamente, sino retornos sintéticos. La salida esperada tiene la forma \texttt{N escenarios x T días x M activos}; por ejemplo, múltiples escenarios de 30 días para los 10 activos del universo experimental. Trabajar con retornos evita tener que reconstruir trayectorias de precios y centra el análisis en la variable utilizada realmente para estimar riesgo y construir carteras.
 
-\section{Evaluación de las distribuciones generadas}
+Estos escenarios se emplean con dos finalidades. La primera es diagnóstica: comparar distribuciones reales y sintéticas para comprobar si se preservan propiedades relevantes. La segunda es financiera: utilizar los escenarios generados para estimar información de media, covarianza o distribución y construir carteras que después se evalúan sobre datos reales del conjunto de prueba.
 
-La evaluación se organizará en tres niveles. La evaluación estadística comparará media, volatilidad, asimetría, curtosis, percentiles, colas de la distribución y, si el alcance lo permite, VaR o CVaR. La evaluación temporal y de dependencia analizará matrices de correlación, error entre matrices, autocorrelación, autocorrelación de retornos absolutos e información mutua entre activos si se implementa. La evaluación informacional se basará en divergencia de Kullback-Leibler, divergencia de Jensen-Shannon y entropía, pudiendo añadirse la distancia de Wasserstein como métrica complementaria.
+\subsection{Evaluación de los escenarios sintéticos}
 
-La divergencia KL puede ser inestable cuando existen intervalos con probabilidad cero, por lo que se aplicará suavizado o se complementará con Jensen-Shannon, que es simétrica y acotada. Esta evaluación no se confundirá con la evaluación financiera final: un modelo puede generar datos plausibles y, sin embargo, no preservar relaciones relevantes para la diversificación o para la estimación del riesgo.
+La evaluación de escenarios se organiza en varios niveles. En primer lugar, se comparan momentos y propiedades básicas de los retornos, como la media y la desviación típica. En segundo lugar, se analizan dependencias entre activos mediante el error de correlación. En tercer lugar, se estudia la estructura temporal mediante errores de autocorrelación de retornos y de retornos absolutos. Esta última medida resulta especialmente útil porque la autocorrelación de retornos absolutos puede dar información sobre agrupación de volatilidad, un rasgo frecuente en series financieras.
+
+Junto a estas métricas, se consideran indicadores financieros de riesgo como VaR y CVaR cuando se evalúan carteras o distribuciones de retornos. El VaR resume una pérdida extrema bajo un nivel de confianza determinado, mientras que el CVaR aporta información adicional sobre la severidad esperada de las pérdidas más allá de ese umbral. Además, la divergencia KL y la divergencia de Jensen-Shannon permiten comparar distribuciones desde una perspectiva informacional. La divergencia KL puede ser inestable cuando existen intervalos con probabilidad cero, por lo que se complementa con Jensen-Shannon, que es simétrica y acotada.
+
+Es importante no confundir esta evaluación con la evaluación financiera final. Un modelo puede generar datos que se parezcan razonablemente a los reales en algunas métricas y, aun así, no producir carteras mejores. Del mismo modo, una cartera puede obtener un buen resultado fuera de muestra por una configuración concreta sin que el generador haya capturado de forma robusta toda la estructura estadística del mercado.
 
 \begin{longtable}{|p{0.22\textwidth}|p{0.18\textwidth}|p{0.28\textwidth}|p{0.22\textwidth}|}
 \caption{Métricas previstas para evaluar los escenarios sintéticos}\label{tab:metricas-escenarios}\\
@@ -640,19 +666,31 @@ Complementario & Wasserstein & Distancia entre distribuciones considerando su ge
 \hline
 \end{longtable}
 
-\section{Optimización y evaluación de carteras}
+\subsection{Optimización y evaluación de carteras}
 
-Los baselines financieros serán la cartera equiponderada, Markowitz media-varianza con datos históricos reales, la cartera de mínima varianza, la cartera optimizada usando escenarios VAE y la cartera optimizada usando escenarios TimeGAN. Los escenarios sintéticos se emplearán para estimar medias, covarianzas o distribuciones de retornos y construir carteras long-only, completamente invertidas y sin ventas en corto, pero la comparación de rendimiento se realizará siempre sobre retornos reales del conjunto de prueba.
+Los baselines financieros son la cartera equiponderada, Markowitz media-varianza con datos históricos reales y la cartera de mínima varianza. Frente a ellos se comparan carteras construidas a partir de escenarios VAE y TimeGAN. En todos los casos se mantiene una restricción long-only, con pesos entre 0 y 1 y suma total igual a 1. Por tanto, no se permiten ventas en corto ni apalancamiento dentro del experimento.
 
-Las carteras generadas a partir de escenarios sintéticos se evaluarán sobre datos reales del periodo de prueba, evitando que la evaluación financiera dependa de los mismos datos artificiales utilizados para optimizar. Las métricas previstas incluyen rentabilidad acumulada, rentabilidad anualizada, volatilidad anualizada, ratio de Sharpe \cite{Sharpe1964}, máximo drawdown, entropía de pesos, concentración de pesos y estabilidad de pesos.
+Los escenarios sintéticos se emplean para estimar medias, covarianzas o distribuciones de retornos y construir carteras optimizadas. Sin embargo, la comparación de rendimiento se realiza siempre sobre retornos reales del conjunto de prueba. Esta decisión es clave para que el resultado financiero no dependa de evaluar una cartera sobre los mismos datos artificiales que han servido para construirla.
 
-\section{Herramientas y entorno de desarrollo}
+Las métricas utilizadas incluyen rentabilidad anualizada, volatilidad anualizada, ratio de Sharpe \cite{Sharpe1964}, máximo drawdown, VaR y CVaR. La rentabilidad y la volatilidad resumen el comportamiento medio de la cartera, el Sharpe relaciona rentabilidad y riesgo, el drawdown mide caídas acumuladas desde máximos previos y VaR/CVaR aportan una visión específica del riesgo de cola.
 
-El desarrollo se apoyará en Python y bibliotecas de uso habitual en ciencia de datos e inteligencia artificial, como \texttt{pandas}, \texttt{NumPy}, \texttt{yfinance}, \texttt{scikit-learn}, \texttt{PyTorch}, \texttt{SciPy}, \texttt{matplotlib} y \texttt{seaborn}. Para la optimización de carteras se valorará el uso de \texttt{PyPortfolioOpt} o \texttt{CVXPY}. La implementación de VAE y TimeGAN se realizará preferentemente en PyTorch, ya que permite controlar la arquitectura de los modelos y explicar con claridad el desarrollo técnico.
+\subsection{Herramientas y entorno de desarrollo}
 
-\section{Protocolo experimental y reproducibilidad}
+El desarrollo se apoya en Python 3 y en bibliotecas habituales dentro de la ciencia de datos y las finanzas cuantitativas. \texttt{Pandas} y \texttt{NumPy} se utilizan para la manipulación de series temporales y el cálculo numérico. \texttt{yfinance} permite descargar los datos financieros utilizados en el estudio. \texttt{PyTorch} se emplea para implementar y entrenar los modelos VAE y TimeGAN, ya que ofrece control sobre la arquitectura, la función de pérdida y el dispositivo de entrenamiento.
 
-La reproducibilidad se garantizará mediante el uso de semillas aleatorias, una división temporal fija, configuración explícita de hiperparámetros, registro de resultados, misma evaluación para todos los modelos, separación clara entre entrenamiento, validación y prueba, exportación de métricas y gráficas, y organización del código por módulos o notebooks reproducibles.
+También se utilizan pruebas automatizadas con \texttt{pytest} para validar funciones críticas del pipeline, especialmente aquellas relacionadas con métricas, preparación de datos, optimización y selección de dispositivo. Git se utiliza como herramienta de control de versiones y parte de su información se registra junto con los resultados para mejorar la trazabilidad de los experimentos. La memoria del trabajo se redacta en LaTeX, lo que permite mantener un documento técnico estructurado y reproducible.
+
+En cuanto al hardware, el código contempla ejecución con CUDA en entornos con GPU NVIDIA, MPS en equipos Apple Silicon y CPU como alternativa general. Esta selección automática de dispositivo no cambia el diseño del experimento, pero sí mejora su portabilidad y facilita que el pipeline pueda ejecutarse en distintos equipos sin modificar manualmente el código principal.
+
+\subsection{Protocolo experimental y reproducibilidad}
+
+El protocolo experimental se define antes de la interpretación de resultados. En primer lugar se descargan los precios históricos y se preparan los retornos. Después se realiza la división temporal en entrenamiento, validación y prueba. A continuación se entrenan o evalúan los baselines clásicos, se entrena el VAE sobre los datos de entrenamiento y se generan escenarios sintéticos. El mismo procedimiento se aplica a TimeGAN, incorporando evaluación multi-semilla para analizar la sensibilidad del modelo.
+
+Una vez generados los escenarios, se evalúa su calidad mediante métricas estadísticas, temporales e informacionales. Después se construyen carteras utilizando información empírica o sintética y se evalúan sobre el conjunto de test. Los resultados se guardan en el directorio \texttt{results/}, junto con metadatos de ejecución que permiten identificar la configuración utilizada.
+
+La separación entre entrenamiento, validación y prueba es uno de los puntos metodológicos más importantes del trabajo. Los hiperparámetros y semillas deben seleccionarse usando datos de validación, mientras que el conjunto de test se reserva para la evaluación final. De este modo se evita escoger una configuración porque haya obtenido el mejor resultado en test, lo que produciría una forma de cherry-picking y sobreestimaría la capacidad real del modelo.
+
+Para reforzar la reproducibilidad, el pipeline registra información como la revisión de Git, la rama activa, la versión de Python, la plataforma, información de paquetes, disponibilidad de PyTorch, disponibilidad de CUDA, disponibilidad de MPS y estado de compilación de MPS. Estos datos no garantizan por sí solos que dos ejecuciones sean idénticas, especialmente en modelos estocásticos, pero ayudan a explicar diferencias entre resultados y a reconstruir el entorno experimental.
 
 \begin{longtable}{|p{0.35\textwidth}|p{0.55\textwidth}|}
 \caption{Decisiones metodológicas previstas}\label{tab:decisiones-metodologicas}\\
@@ -677,7 +715,7 @@ Evaluación distribucional & Momentos, correlaciones y autocorrelación \\
 \hline
 Evaluación informacional & KL, Jensen-Shannon y entropía \\
 \hline
-Evaluación financiera & Sharpe, drawdown, volatilidad y rentabilidad \\
+Evaluación financiera & Rentabilidad anualizada, volatilidad anualizada, Sharpe, drawdown, VaR y CVaR \\
 \hline
 Validación & División temporal entrenamiento/validación/prueba \\
 \hline
@@ -700,15 +738,17 @@ Equiponderada & Heurístico simple & Número de activos & Pesos iguales & Refere
 \hline
 \end{longtable}
 
-\chapter{Resultados preliminares}
+\section{Descripción de los resultados}
 
-\section{Ejecución del pipeline experimental}
+Este capítulo presenta los resultados obtenidos en la fase experimental de forma descriptiva. La interpretación de sus implicaciones se desarrolla posteriormente en la discusión, por lo que aquí se evita extraer conclusiones generales a partir de una única métrica o de una configuración concreta. El objetivo es mostrar qué se ha ejecutado, qué valores se han observado y cómo se comportan los distintos métodos bajo el protocolo definido en el capítulo anterior.
 
-Tras definir el protocolo metodológico, se implementó una primera versión reproducible del pipeline experimental en Python. El flujo descarga precios ajustados desde Yahoo Finance, calcula retornos logarítmicos diarios, aplica la partición temporal definida en la metodología y entrena modelos generativos VAE y TimeGAN sobre ventanas multiactivo de 30 días. La evaluación financiera se realiza siempre sobre retornos reales del conjunto de prueba, mientras que los escenarios sintéticos se utilizan únicamente para estimar información de media, covarianza o distribución antes de construir las carteras.
+\subsection{Ejecución del pipeline experimental}
+
+Tras definir el protocolo metodológico, se implementó una primera versión reproducible del pipeline experimental en Python. El flujo descarga precios ajustados desde Yahoo Finance, calcula retornos logarítmicos diarios, aplica la partición temporal definida en la metodología y entrena modelos generativos VAE y TimeGAN sobre ventanas multiactivo de 30 días. La evaluación financiera se realiza siempre sobre retornos reales del conjunto de prueba, mientras que los escenarios sintéticos se utilizan para estimar información de media, covarianza o distribución antes de construir las carteras.
 
 Para evitar interpretar resultados dependientes de una única inicialización, TimeGAN se evaluó también con cinco semillas distintas. Además de la variante sin calibrar, se incluyó una variante calibrada a la media y volatilidad del conjunto de entrenamiento. Esta calibración debe entenderse como un post-procesado diagnóstico, no como evidencia de que el modelo haya aprendido por sí mismo esos momentos de forma exacta.
 
-\section{Resultados financieros fuera de muestra}
+\subsection{Resultados financieros fuera de muestra}
 
 La Tabla~\ref{tab:resultados-baselines} resume los principales baselines clásicos evaluados sobre el periodo de prueba. La cartera equiponderada obtuvo un ratio de Sharpe de 1,14, mientras que la cartera de mínima varianza alcanzó 1,05 con menor volatilidad y menor drawdown. El modelo de Markowitz histórico obtuvo mayor rentabilidad anualizada, pero con una volatilidad sustancialmente superior y un Sharpe inferior.
 
@@ -725,7 +765,7 @@ Markowitz histórico & 22,94\% & 38,21\% & 0,60 & -31,34\% \\
 \hline
 \end{longtable}
 
-En la evaluación multi-semilla de TimeGAN, los resultados muestran un comportamiento competitivo, aunque no una superioridad robusta frente a los baselines. La variante TimeGAN sin calibrar usada para mínima varianza obtuvo un Sharpe medio de 1,22 con desviación típica de 0,55. La variante calibrada a media y volatilidad para mínima varianza obtuvo un Sharpe medio de 1,09 con desviación típica de 0,57. Por su parte, la cartera con media histórica contraída y covarianza sintética calibrada obtuvo un Sharpe medio de 1,13 con desviación típica de 0,66. Estos valores sugieren que los escenarios generados pueden aportar información útil para estimar riesgo, pero también muestran una sensibilidad relevante a la semilla de entrenamiento.
+En la evaluación multi-semilla de TimeGAN, los resultados muestran un comportamiento competitivo en algunas configuraciones, aunque con una variabilidad importante entre ejecuciones. La variante TimeGAN sin calibrar usada para mínima varianza obtuvo un Sharpe medio de 1,22 con desviación típica de 0,55. La variante calibrada a media y volatilidad para mínima varianza obtuvo un Sharpe medio de 1,09 con desviación típica de 0,57. Por su parte, la cartera con media histórica contraída y covarianza sintética calibrada obtuvo un Sharpe medio de 1,13 con desviación típica de 0,66. Estos valores describen un comportamiento sensible a la semilla de entrenamiento, por lo que deben leerse junto con la dispersión indicada y no solo a partir de la media.
 
 \begin{longtable}{|p{0.30\textwidth}|p{0.16\textwidth}|p{0.16\textwidth}|p{0.16\textwidth}|}
 \caption{Resultados multi-semilla de carteras basadas en TimeGAN}\label{tab:resultados-timegan-multisemilla}\\
@@ -744,17 +784,41 @@ Calibrada media contraída y covarianza sintética & 21,87\% & 19,90\% & 1,13 $\
 \hline
 \end{longtable}
 
-La comparación con la cartera equiponderada es especialmente relevante: aunque algunas variantes TimeGAN alcanzan Sharpe medio similar o ligeramente superior, la desviación típica entre semillas es alta. Por tanto, no resulta adecuado afirmar que TimeGAN supere de forma robusta a los enfoques clásicos en esta fase preliminar. Una lectura más prudente es que TimeGAN produce estimaciones de covarianza que pueden ser competitivas en determinadas configuraciones, pero cuya estabilidad debe analizarse con mayor profundidad.
+La comparación con la cartera equiponderada es especialmente relevante: aunque algunas variantes TimeGAN alcanzan un Sharpe medio similar o ligeramente superior, la desviación típica entre semillas es alta. Por tanto, los resultados no deben presentarse como una superioridad robusta de TimeGAN frente a los enfoques clásicos, sino como una evidencia descriptiva de que determinadas configuraciones pueden comportarse de forma competitiva bajo este periodo y este universo de activos.
 
-\section{Fidelidad distribucional y limitaciones}
+\subsection{Fidelidad distribucional y limitaciones}
 
 Los diagnósticos distribucionales muestran que la generación de escenarios financieros sigue siendo una tarea difícil. En validación, el error medio de la matriz de correlación de TimeGAN se situó alrededor de 4,01, lo que indica que la estructura de dependencia multiactivo no se reproduce de forma completamente satisfactoria. Del mismo modo, el error medio de curtosis fue aproximadamente 6,01, señal de que el modelo tiende a suavizar las colas y reproduce con dificultad eventos extremos.
 
 Estos resultados son coherentes con una limitación habitual de modelos generativos compactos aplicados a retornos financieros: pueden capturar parte de la escala y de la forma central de las distribuciones, especialmente tras calibración, pero tienen más dificultad para preservar simultáneamente colas pesadas, asimetrías y relaciones de dependencia entre activos. En consecuencia, los resultados deben interpretarse como evidencia preliminar de viabilidad del pipeline, no como demostración concluyente de superioridad financiera.
 
-\section{Interpretación provisional}
+\subsection{Síntesis descriptiva de resultados}
 
-En conjunto, los experimentos iniciales permiten extraer tres conclusiones provisionales. En primer lugar, el pipeline técnico es reproducible y permite comparar baselines clásicos, VAE y TimeGAN bajo el mismo protocolo de datos y evaluación. En segundo lugar, la evaluación fuera de muestra confirma que algunas carteras construidas con información sintética pueden comportarse de forma competitiva frente a baselines clásicos, especialmente cuando los escenarios se usan para estimar covarianzas y no para depender directamente de medias sintéticas inestables. En tercer lugar, la sensibilidad entre semillas y los errores de correlación y curtosis obligan a mantener una interpretación cautelosa y a reforzar la validación antes de formular conclusiones definitivas.
+En conjunto, los resultados muestran que el pipeline técnico permite comparar baselines clásicos, VAE y TimeGAN bajo un mismo protocolo de datos y evaluación. Las carteras clásicas ofrecen referencias sólidas, especialmente la cartera equiponderada y la de mínima varianza. Algunas variantes basadas en TimeGAN obtienen valores de Sharpe competitivos, pero muestran dispersión entre semillas. Por su parte, los diagnósticos de fidelidad distribucional indican que la generación de retornos financieros sigue presentando dificultades, en particular al reproducir correlaciones, colas y ciertos rasgos temporales de las series.
+
+Esta síntesis no debe interpretarse como una conclusión definitiva sobre la superioridad de una familia de modelos, sino como una descripción ordenada de los resultados observados hasta este punto del experimento. La valoración metodológica de estas evidencias se desarrolla en el capítulo siguiente.
+
+\chapter{Discusión}
+
+Los resultados obtenidos permiten analizar el papel de los modelos generativos dentro del problema de optimización de carteras desde una perspectiva prudente. El experimento no muestra que VAE o TimeGAN deban sustituir a los enfoques clásicos, pero sí permite estudiar en qué condiciones los escenarios sintéticos pueden aportar información útil y qué riesgos aparecen cuando se utilizan modelos generativos en series financieras.
+
+Una primera observación relevante es que los baselines clásicos mantienen un comportamiento sólido. La cartera equiponderada y la cartera de mínima varianza ofrecen resultados competitivos con una complejidad mucho menor que la requerida por los modelos generativos. Esto refuerza la importancia de no tratar estos métodos como simples comparadores básicos, sino como referencias exigentes. En un problema financiero real, una técnica más compleja solo resulta interesante si aporta una mejora suficientemente estable o una información adicional que justifique su coste metodológico.
+
+En el caso de los modelos generativos, los resultados sugieren una lectura más matizada. TimeGAN puede generar escenarios que, utilizados para estimar determinadas estructuras de riesgo, dan lugar a carteras competitivas en algunas configuraciones. Sin embargo, la sensibilidad a la semilla de entrenamiento impide interpretar estos resultados como una mejora robusta. Esta variabilidad es especialmente importante porque, si se eligiera la mejor ejecución mirando el conjunto de test, se estaría introduciendo un sesgo de selección. Por ello, cualquier selección de semilla o configuración debe realizarse con métricas de validación y reservar el test exclusivamente para la evaluación final.
+
+El VAE, por su parte, cumple el papel de modelo generativo probabilístico basado en una representación latente. Su interés está en proporcionar una forma relativamente estable de generar escenarios sintéticos, aunque puede tener dificultades para reproducir fenómenos financieros extremos o dependencias temporales complejas. Este comportamiento es coherente con una limitación habitual de este tipo de modelos: al aprender una representación comprimida, pueden suavizar parte de la distribución y reproducir peor eventos de cola o cambios bruscos de volatilidad.
+
+Los diagnósticos distribucionales muestran que no basta con obtener una cartera con buen Sharpe para considerar que el modelo generativo funciona correctamente. En optimización de carteras, la preservación de la matriz de correlaciones es fundamental, ya que afecta directamente a la diversificación y a la estimación del riesgo conjunto. Del mismo modo, las colas de la distribución y las medidas como VaR y CVaR son necesarias para valorar pérdidas extremas que pueden no quedar reflejadas en métricas medias. La autocorrelación de retornos y, especialmente, la autocorrelación de retornos absolutos también aportan información sobre estructura temporal y agrupación de volatilidad.
+
+Desde el punto de vista metodológico, el principal valor del trabajo está en el protocolo de evaluación más que en una única cifra de rendimiento. Separar entrenamiento, validación y prueba, registrar metadatos de ejecución, evaluar varias semillas y comparar contra baselines clásicos permite reducir el riesgo de sobreinterpretar resultados puntuales. En modelos generativos aplicados a finanzas, esta disciplina experimental es especialmente importante porque las mejoras aparentes pueden depender de una inicialización concreta, de un periodo histórico favorable o de una métrica que no capture adecuadamente el riesgo.
+
+También deben reconocerse varias limitaciones. El universo de inversión está formado únicamente por diez activos, todos ellos de gran capitalización. La frecuencia de los datos es diaria y el análisis se limita a un único periodo histórico. Además, el experimento no incorpora una validación en mercado real, ni debe interpretarse como una propuesta lista para producción. Salvo que se incorpore explícitamente en fases posteriores, tampoco se consideran costes de transacción, impacto de mercado, restricciones operativas adicionales ni aspectos regulatorios. Estas limitaciones no invalidan el piloto, pero sí acotan el alcance de las conclusiones.
+
+En consecuencia, la conclusión más razonable es que los modelos generativos pueden ser herramientas prometedoras para la generación de escenarios financieros, pero su utilidad depende de una validación estricta. No basta con generar datos visualmente plausibles ni con obtener un buen resultado financiero en una ejecución concreta. Para que estos modelos sean útiles en optimización de carteras, deben preservar propiedades relevantes de los retornos, mostrar estabilidad entre semillas y demostrar valor frente a baselines clásicos robustos.
+
+Como línea futura, podría plantearse una propuesta preliminar de puesta en producción, aunque siempre condicionada a validaciones adicionales. Una versión más cercana a un entorno operativo requeriría ingesta automática de datos, reentrenamiento programado, validación previa al despliegue, monitorización de deriva de datos, control continuo del riesgo de cartera, versionado de modelos, seguimiento reproducible de experimentos, backtesting con costes de transacción y revisión humana antes de utilizar cualquier cartera generada. Además, sería necesario ampliar el universo de activos, incorporar pruebas de estrés y revisar posibles implicaciones regulatorias y operativas.
+
+Por tanto, el trabajo no justifica reemplazar los métodos clásicos de optimización de carteras por modelos generativos. Su aportación debe entenderse de forma más acotada: proporciona un marco experimental reproducible para evaluar VAE y TimeGAN como generadores de escenarios sintéticos y para estudiar si dichos escenarios pueden complementar, bajo ciertas condiciones, el análisis clásico de riesgo y asignación de activos.
 
 %\begin{thebibliography}{a}
 %\bibitem{etiqueta} \textsc{Autores},
