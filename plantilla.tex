@@ -153,7 +153,7 @@ El documento se organiza de forma progresiva para separar con claridad el marco 
 
 En primer lugar, se introduce el problema de la optimización de carteras y se justifica la relevancia de estudiar técnicas capaces de representar mejor la incertidumbre de los retornos financieros. A continuación, se desarrolla el contexto y el estado del arte, donde se revisan los fundamentos de la teoría moderna de carteras, los modelos generativos, la teoría de la información y las herramientas utilizadas habitualmente en este tipo de estudios.
 
-Después se presentan los objetivos del trabajo y se define el planteamiento metodológico general. El Capítulo 4 establece el enfoque metodológico, los criterios generales de evaluación y la lógica de separación entre entrenamiento, validación y prueba. A continuación, el Capítulo 5 desarrolla de forma operativa la contribución: describe el experimento realizado, los datos utilizados, la preparación de la información, los modelos comparados, las métricas, el protocolo de reproducibilidad y los resultados obtenidos. Finalmente, el Capítulo 6 discute el significado de esos resultados, sus limitaciones y las posibles líneas de trabajo futuro.
+Después se presentan los objetivos del trabajo y se define el planteamiento metodológico general. El Capítulo 4 establece el enfoque metodológico, el diseño del pipeline, los criterios generales de evaluación y la lógica de separación entre entrenamiento, validación y prueba. A continuación, el Capítulo 5 desarrolla de forma operativa la contribución: describe el experimento realizado, los datos utilizados, la preparación de la información, los modelos comparados, las métricas aplicadas y los resultados obtenidos. Finalmente, el Capítulo 6 discute el significado de esos resultados, sus limitaciones y las posibles líneas de trabajo futuro.
 
 Esta organización permite mantener una distinción clara entre lo que se ha medido y lo que puede concluirse a partir de dichas mediciones. En particular, la interpretación de los resultados se reserva para la discusión final, evitando presentar como conclusiones generales lo que pueda depender de una configuración concreta, de una semilla de entrenamiento o de un periodo histórico determinado.
 
@@ -838,7 +838,7 @@ Calibrada media contraída y covarianza sintética & 21,87\% & 19,90\% & 1,13 $\
 
 La comparación con la cartera equiponderada es especialmente relevante: aunque algunas variantes TimeGAN alcanzan un Sharpe medio similar o ligeramente superior, la desviación típica entre semillas es alta. Por tanto, los resultados no deben presentarse como una superioridad robusta de TimeGAN frente a los enfoques clásicos, sino como una evidencia descriptiva de que determinadas configuraciones pueden comportarse de forma competitiva bajo este periodo y este universo de activos.
 
-\subsection{Fidelidad distribucional y limitaciones}
+\subsection{Fidelidad distribucional observada}
 
 Los diagnósticos distribucionales muestran que la generación de escenarios financieros sigue siendo una tarea difícil. En validación, el error medio de la matriz de correlación de TimeGAN se situó alrededor de 4,01, lo que indica que la estructura de dependencia multiactivo no se reproduce de forma completamente satisfactoria. Del mismo modo, el error medio de curtosis fue aproximadamente 6,01, señal de que el modelo tiende a suavizar las colas y reproduce con dificultad eventos extremos.
 
