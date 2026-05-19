@@ -14,6 +14,8 @@ from .optimization import (
     mean_variance_weights,
     minimum_variance_weights,
     portfolio_returns,
+    ledoit_wolf_minimum_variance_weights,
+    ledoit_wolf_mean_variance_weights,
 )
 
 
@@ -31,6 +33,14 @@ def run(config: ExperimentConfig | None = None, output_dir: Path = Path("results
             periods_per_year=config.trading_days_per_year,
         ),
         "markowitz": mean_variance_weights(
+            splits.train,
+            periods_per_year=config.trading_days_per_year,
+        ),
+        "ledoit_wolf_minimum_variance": ledoit_wolf_minimum_variance_weights(
+            splits.train,
+            periods_per_year=config.trading_days_per_year,
+        ),
+        "ledoit_wolf_markowitz": ledoit_wolf_mean_variance_weights(
             splits.train,
             periods_per_year=config.trading_days_per_year,
         ),
