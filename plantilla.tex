@@ -171,7 +171,7 @@ Se define el aprendizaje automático como una disciplina de la inteligencia arti
 
 Dentro del aprendizaje profundo han surgido en los últimos años distintas arquitecturas orientadas al aprendizaje probabilístico y a la generación de datos sintéticos, conocidas como modelos generativos. Según \cite{BanosIzquierdo2022}, los modelos generativos son arquitecturas diseñadas para aprender la distribución probabilística de un conjunto de datos con el objetivo de generar nuevas muestras sintéticas similares a las originales. Esta definición conecta directamente con el objetivo del presente trabajo, centrado en la generación y evaluación de escenarios financieros sintéticos.
 
-Entre las arquitecturas generativas más relevantes destacan los Autoencoders Variacionales (VAE) y las Redes Adversarias Generativas (GAN).
+Entre las arquitecturas generativas más relevantes destacan los Autoencoders Variacionales (VAE) y las Redes Adversarias Generativas (GAN). En este trabajo, la familia VAE se utiliza de forma directa, mientras que el enfoque adversarial se concreta posteriormente en TimeGAN, una variante diseñada para series temporales. Por tanto, la GAN estándar se presenta aquí como antecedente conceptual del mecanismo adversarial, no como un modelo experimental independiente.
 
 Los Autoencoders Variacionales son modelos generativos diseñados para aprender representaciones probabilísticas de manera no supervisada (es decir, sin datos etiquetados) para reconstruir la entrada original a partir de una versión comprimida, reduciendo los datos a lo esencial. Como puede observarse en la Figura~\ref{fig:arq-vae}, la arquitectura de un VAE está compuesta principalmente por un encoder encargado de transformar los datos de entrada en una representación latente probabilística y un decoder cuya función consiste en reconstruir los datos originales a partir de muestras generadas en dicho espacio latente, esto permite que el modelo aprenda la distribución subyacente de los datos y pueda generar nuevas observaciones mediante procesos de muestreo \cite{Weng2018}.
 
@@ -194,6 +194,8 @@ Como puede observarse en la Figura~\ref{fig:arq-gan}, el proceso de entrenamient
 \textbf{Fuente:} adaptado de \citeA{DeLaTorre2023}.
 \label{fig:arq-gan}
 \end{figure}
+
+En el caso de datos financieros temporales, una GAN básica no resulta suficiente para representar de forma explícita la estructura secuencial de las observaciones. Por ese motivo, el modelo adversarial considerado en el experimento es TimeGAN, que adapta el aprendizaje generativo adversarial al tratamiento de series temporales mediante componentes de representación, recuperación y supervisión temporal.
 
 Una vez presentados los conceptos fundamentales de la inteligencia artificial y los modelos generativos, se introduce el otro pilar del trabajo: la optimización de carteras y la teoría moderna de carteras. Este ámbito resulta esencial para entender cómo los escenarios sintéticos generados pueden trasladarse posteriormente a un problema de asignación de activos. 
 
@@ -282,9 +284,28 @@ La Figura~\ref{fig:diversificacion} muestra que el riesgo total disminuye confor
 
 Posteriormente surgieron modelos como el CAPM de Sharpe \cite{Sharpe1964}, que relaciona la rentabilidad esperada de un activo con su riesgo sistemático. Más adelante, los modelos ARCH y GARCH \cite{Bollerslev1986} permitieron representar la volatilidad variable en el tiempo, mientras que el modelo Black-Litterman \cite{BlackLitterman1992} incorporó información del mercado y expectativas del inversor para obtener carteras más estables.
 
-Con el desarrollo computacional, comenzaron a aplicarse técnicas de aprendizaje automático y modelos generativos, como los autoencoders variacionales (VAE) \cite{Kingma2013} y TimeGAN \cite{Yoon2019}, capaces de generar escenarios sintéticos de mercado y representar mejor la incertidumbre financiera. Paralelamente, la teoría de la información introdujo métricas como la entropía y la información mutua para analizar dependencias complejas entre activos.
+En paralelo, el aumento en la disponibilidad de datos financieros y el desarrollo de nuevas capacidades computacionales favorecieron la incorporación de técnicas de aprendizaje automático en el análisis financiero. En el ámbito de la optimización de carteras, esto ha dado lugar a propuestas como la Deep Portfolio Theory, que utiliza redes neuronales profundas para aprender representaciones latentes de los activos y construir carteras a partir de dichas representaciones \cite{Heaton2016}.
 
-La evolución de estos enfoques puede resumirse en la siguiente figura.
+Más recientemente, los modelos generativos han adquirido una relevancia creciente y han comenzado a aplicarse en finanzas. A diferencia de los modelos predictivos tradicionales, que se centran en estimar valores esperados, los modelos generativos buscan aprender la distribución de los datos para generar nuevas muestras coherentes con el comportamiento observado. Entre estos modelos destacan los autoencoders variacionales (VAE), que permiten aprender representaciones probabilísticas en espacios latentes \cite{Kingma2013}, y TimeGAN, que adapta el aprendizaje adversarial a la generación de series temporales mediante componentes de embedding, recuperación y supervisión temporal \cite{Yoon2019}.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{media/timegan_yoon2019_fig1.png}
+    \caption{Esquema conceptual de TimeGAN como modelo generativo temporal: diagrama de bloques funcionales y esquema de entrenamiento.}
+    \textbf{Fuente:} tomado de la Figura 1 de Yoon et al. \cite{Yoon2019}.
+    \label{fig:timegan-externo}
+\end{figure}
+
+
+En el contexto financiero, estos modelos ofrecen la posibilidad de generar escenarios sintéticos del comportamiento del mercado. En esta línea, trabajos como el de Mariani, \cite{Mariani2019} han explorado el uso de modelos generativos en el análisis de carteras, mostrando su potencial como herramienta complementaria para estudiar la incertidumbre y el riesgo.
+
+Paralelamente, la teoría de la información ha comenzado a desempeñar un papel relevante en el análisis financiero, al proporcionar herramientas para cuantificar la incertidumbre y medir la diferencia entre distribuciones probabilísticas. Conceptos como la entropía, la divergencia de Kullback-Leibler o la información mutua permiten analizar las propiedades de las distribuciones de los retornos desde una perspectiva más general que la ofrecida por las medidas tradicionales \cite{Kullback1951}. En particular, estas métricas permiten capturar dependencias no lineales entre variables y evaluar la calidad de modelos probabilísticos, lo que resulta especialmente útil en el contexto de los modelos generativos.
+
+En los últimos años, diversos trabajos han explorado la integración de estas métricas en el proceso de optimización de carteras, proponiendo enfoques que combinan rentabilidad, riesgo e información. En este sentido, el uso de medidas como la entropía o la información mutua permite estudiar relaciones más complejas entre activos \cite{Novais2022}. Este tipo de propuestas refleja una tendencia hacia modelos capaces de representar tanto la incertidumbre como la estructura de dependencia entre variables.
+
+En conjunto, los antecedentes analizados muestran una evolución progresiva en la forma de abordar la optimización de carteras. Desde los modelos clásicos basados en supuestos simplificados hasta los enfoques más recientes fundamentados en aprendizaje automático y teoría de la información, se observa una tendencia clara hacia metodologías más flexibles, capaces de capturar la complejidad del mercado financiero. Esta evolución pone de manifiesto la necesidad de integrar distintas herramientas y enfoques para desarrollar modelos más realistas y robustos, lo que constituye la base sobre la que se plantea el presente trabajo. 
+
+Esta evolución puede resumirse de forma esquemática en la siguiente representación.
 
 \begin{figure}[H]
 \centering
@@ -668,21 +689,13 @@ La normalización se calcula únicamente con la media y la desviación típica d
 
 \subsection{Familias de algoritmos evaluadas}
 
-El experimento compara tres familias de técnicas: baselines clásicos de cartera, un Autoencoder Variacional y TimeGAN. Esta organización permite distinguir entre métodos financieros consolidados y modelos generativos utilizados como generadores de escenarios sintéticos.
+El experimento compara tres familias de técnicas: baselines clásicos de cartera, un Autoencoder Variacional y TimeGAN. No se evalúa una GAN básica como modelo separado; la comparación adversarial se realiza mediante TimeGAN por su orientación específica a series temporales. Esta organización permite distinguir entre métodos financieros consolidados y modelos generativos utilizados como generadores de escenarios sintéticos.
 
 Los baselines clásicos actúan como referencia principal. Se incluyen la cartera equiponderada, la cartera de mínima varianza y una cartera de estilo Markowitz basada en media y covarianza históricas. Estos métodos no se tratan como comparadores débiles, sino como referencias necesarias y exigentes. Precisamente porque son métodos sencillos, conocidos y ampliamente utilizados, permiten valorar si los modelos generativos aportan información adicional o si, por el contrario, introducen complejidad sin una mejora clara.
 
 El VAE se utiliza como modelo generativo probabilístico basado en espacio latente. Su arquitectura combina un encoder, una representación latente, el mecanismo de reparametrización y un decoder. En la implementación utilizada, la dimensión latente es 16, la dimensión oculta es 128, el tamaño de lote es 64, la tasa de aprendizaje es 0,001 y el entrenamiento se limita a 80 épocas con parada temprana de paciencia 10. La función de pérdida incorpora un término de reconstrucción y una regularización KL, ponderada mediante distintos valores de \texttt{beta}. En la configuración experimental se consideran los valores 0,0, 0,00001, 0,0001 y 0,001. Su papel en el estudio consiste en aprender una representación comprimida de las ventanas históricas de retornos y generar nuevas muestras sintéticas a partir de ese espacio latente.
 
 TimeGAN se utiliza como modelo generativo secuencial para series temporales financieras. Su interés dentro del trabajo radica en que, a diferencia de un modelo que trate cada ventana de forma más agregada, está diseñado para generar secuencias y preservar cierta dinámica temporal. En la implementación utilizada, la dimensión oculta es 24, la dimensión del ruido es 10, el tamaño de lote es 64, la tasa de aprendizaje es 0,001 y el entrenamiento se limita a 120 épocas. En el experimento se evalúa con varias semillas, concretamente 42, 43, 44, 45 y 46, ya que el entrenamiento adversarial puede ser sensible a la inicialización y a la propia dinámica estocástica del proceso de aprendizaje. La selección de configuraciones debe apoyarse en métricas de validación y no en el rendimiento final sobre el conjunto de test, evitando así un sesgo por selección a posteriori. En ambos modelos se generan 1000 escenarios sintéticos para cada configuración evaluada.
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=\textwidth]{media/timegan_yoon2019_fig1.png}
-    \caption{Esquema conceptual de TimeGAN como modelo generativo temporal: diagrama de bloques funcionales y esquema de entrenamiento.}
-    \textbf{Fuente:} tomado de la Figura 1 de Yoon et al. \cite{Yoon2019}.
-    \label{fig:timegan-externo}
-\end{figure}
 
 \subsection{Generación de escenarios sintéticos}
 
