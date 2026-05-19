@@ -613,15 +613,17 @@ r_t = \ln \left(\frac{P_t}{P_{t-1}}\right)
 
 Las ventanas temporales tienen una longitud de 30 sesiones bursátiles. Cada muestra utilizada por los modelos generativos representa, por tanto, una secuencia de 30 días para los 10 activos considerados. Esta forma de organizar los datos permite que TimeGAN trabaje con secuencias multivariantes y que el VAE aprenda una representación compacta de ventanas completas de retornos.
 
+La normalización se calcula únicamente con la media y la desviación típica del conjunto de entrenamiento, de forma independiente para cada activo. Esos mismos estadísticos se aplican después a validación y prueba, evitando que la escala de periodos futuros influya en el entrenamiento. Cuando los modelos generan retornos normalizados, se aplica la transformación inversa antes de calcular métricas financieras o comparar distribuciones en la escala original de los retornos.
+
 \subsection{Familias de algoritmos evaluadas}
 
 El experimento compara tres familias de técnicas: baselines clásicos de cartera, un Autoencoder Variacional y TimeGAN. Esta organización permite distinguir entre métodos financieros consolidados y modelos generativos utilizados como generadores de escenarios sintéticos.
 
 Los baselines clásicos actúan como referencia principal. Se incluyen la cartera equiponderada, la cartera de mínima varianza y una cartera de estilo Markowitz basada en media y covarianza históricas. Estos métodos no se tratan como comparadores débiles, sino como referencias necesarias y exigentes. Precisamente porque son métodos sencillos, conocidos y ampliamente utilizados, permiten valorar si los modelos generativos aportan información adicional o si, por el contrario, introducen complejidad sin una mejora clara.
 
-El VAE se utiliza como modelo generativo probabilístico basado en espacio latente. Su arquitectura combina un encoder, una representación latente, el mecanismo de reparametrización y un decoder. La función de pérdida incorpora un término de reconstrucción y una regularización KL, ponderada mediante distintos valores de \texttt{beta}. En la configuración experimental se consideran los valores 0,0, 0,00001, 0,0001 y 0,001. Su papel en el estudio consiste en aprender una representación comprimida de las ventanas históricas de retornos y generar nuevas muestras sintéticas a partir de ese espacio latente.
+El VAE se utiliza como modelo generativo probabilístico basado en espacio latente. Su arquitectura combina un encoder, una representación latente, el mecanismo de reparametrización y un decoder. En la implementación utilizada, la dimensión latente es 16, la dimensión oculta es 128, el tamaño de lote es 64, la tasa de aprendizaje es 0,001 y el entrenamiento se limita a 80 épocas con parada temprana de paciencia 10. La función de pérdida incorpora un término de reconstrucción y una regularización KL, ponderada mediante distintos valores de \texttt{beta}. En la configuración experimental se consideran los valores 0,0, 0,00001, 0,0001 y 0,001. Su papel en el estudio consiste en aprender una representación comprimida de las ventanas históricas de retornos y generar nuevas muestras sintéticas a partir de ese espacio latente.
 
-TimeGAN se utiliza como modelo generativo secuencial para series temporales financieras. Su interés dentro del trabajo radica en que, a diferencia de un modelo que trate cada ventana de forma más agregada, está diseñado para generar secuencias y preservar cierta dinámica temporal. En el experimento se evalúa con varias semillas, concretamente 42, 43, 44, 45 y 46, ya que el entrenamiento adversarial puede ser sensible a la inicialización y a la propia dinámica estocástica del proceso de aprendizaje. La selección de configuraciones debe apoyarse en métricas de validación y no en el rendimiento final sobre el conjunto de test, evitando así un sesgo por selección a posteriori.
+TimeGAN se utiliza como modelo generativo secuencial para series temporales financieras. Su interés dentro del trabajo radica en que, a diferencia de un modelo que trate cada ventana de forma más agregada, está diseñado para generar secuencias y preservar cierta dinámica temporal. En la implementación utilizada, la dimensión oculta es 24, la dimensión del ruido es 10, el tamaño de lote es 64, la tasa de aprendizaje es 0,001 y el entrenamiento se limita a 120 épocas. En el experimento se evalúa con varias semillas, concretamente 42, 43, 44, 45 y 46, ya que el entrenamiento adversarial puede ser sensible a la inicialización y a la propia dinámica estocástica del proceso de aprendizaje. La selección de configuraciones debe apoyarse en métricas de validación y no en el rendimiento final sobre el conjunto de test, evitando así un sesgo por selección a posteriori. En ambos modelos se generan 1000 escenarios sintéticos para cada configuración evaluada.
 
 \begin{figure}[htbp]
     \centering
@@ -644,6 +646,28 @@ La evaluación de escenarios se organiza en varios niveles. En primer lugar, se 
 Junto a estas métricas, se consideran indicadores financieros de riesgo como VaR y CVaR cuando se evalúan carteras o distribuciones de retornos. El VaR resume una pérdida extrema bajo un nivel de confianza determinado, mientras que el CVaR aporta información adicional sobre la severidad esperada de las pérdidas más allá de ese umbral. Además, la divergencia KL y la divergencia de Jensen-Shannon permiten comparar distribuciones desde una perspectiva informacional. La divergencia KL puede ser inestable cuando existen intervalos con probabilidad cero, por lo que se complementa con Jensen-Shannon, que es simétrica y acotada.
 
 Es importante no confundir esta evaluación con la evaluación financiera final. Un modelo puede generar datos que se parezcan razonablemente a los reales en algunas métricas y, aun así, no producir carteras mejores. Del mismo modo, una cartera puede obtener un buen resultado fuera de muestra por una configuración concreta sin que el generador haya capturado de forma robusta toda la estructura estadística del mercado.
+
+Las principales métricas se calculan con definiciones comunes para todos los métodos. La rentabilidad anualizada se estima a partir de retornos diarios usando 252 sesiones bursátiles por año, y la volatilidad anualizada se obtiene multiplicando la desviación típica diaria por $\sqrt{252}$. El ratio de Sharpe se calcula como
+
+\begin{equation}
+S = \frac{\mu_p - r_f}{\sigma_p},
+\end{equation}
+
+donde $\mu_p$ es la rentabilidad anualizada de la cartera, $\sigma_p$ su volatilidad anualizada y $r_f$ la tasa libre de riesgo, que en este experimento se fija en cero para no introducir una fuente adicional de estimación. El máximo drawdown se define como la mayor caída porcentual desde un máximo acumulado previo de la curva de valor de la cartera.
+
+Para el riesgo de cola, el VaR al nivel $\alpha$ se interpreta como el cuantil de pérdidas correspondiente, mientras que el CVaR resume la pérdida media condicionada a superar dicho umbral. En la comparación informacional, la divergencia de Kullback-Leibler entre dos distribuciones discretizadas $P$ y $Q$ se define como
+
+\begin{equation}
+D_{KL}(P\|Q)=\sum_i P(i)\log\frac{P(i)}{Q(i)},
+\end{equation}
+
+y la divergencia de Jensen-Shannon como
+
+\begin{equation}
+D_{JS}(P,Q)=\frac{1}{2}D_{KL}(P\|M)+\frac{1}{2}D_{KL}(Q\|M),\quad M=\frac{1}{2}(P+Q).
+\end{equation}
+
+Los errores de media, volatilidad, correlación y autocorrelación se calculan como diferencias agregadas entre los estadísticos estimados en los datos reales y en los escenarios sintéticos, usando el mismo procedimiento para todos los modelos.
 
 \begin{longtable}{|p{0.22\textwidth}|p{0.18\textwidth}|p{0.28\textwidth}|p{0.22\textwidth}|}
 \caption{Métricas previstas para evaluar los escenarios sintéticos}\label{tab:metricas-escenarios}\\
@@ -676,6 +700,14 @@ Los escenarios sintéticos se emplean para estimar medias, covarianzas o distrib
 
 Las métricas utilizadas incluyen rentabilidad anualizada, volatilidad anualizada, ratio de Sharpe \cite{Sharpe1964}, máximo drawdown, VaR y CVaR. La rentabilidad y la volatilidad resumen el comportamiento medio de la cartera, el Sharpe relaciona rentabilidad y riesgo, el drawdown mide caídas acumuladas desde máximos previos y VaR/CVaR aportan una visión específica del riesgo de cola.
 
+La cartera de mínima varianza se obtiene resolviendo el problema
+
+\begin{equation}
+\min_w w^T \Sigma w \quad \text{s.a.} \quad \sum_i w_i = 1, \quad 0 \leq w_i \leq 1,
+\end{equation}
+
+donde $w$ representa los pesos de cartera y $\Sigma$ la matriz de covarianzas estimada. La cartera de tipo Markowitz utiliza la misma estructura de restricciones, pero incorpora también la estimación de rentabilidad esperada. En las variantes basadas en escenarios sintéticos, $\mu$ y $\Sigma$ se estiman a partir de los retornos generados, mientras que la evaluación final de la cartera se realiza siempre con retornos reales del conjunto de prueba.
+
 \subsection{Herramientas y entorno de desarrollo}
 
 El desarrollo se apoya en Python 3 y en bibliotecas habituales dentro de la ciencia de datos y las finanzas cuantitativas. \texttt{Pandas} y \texttt{NumPy} se utilizan para la manipulación de series temporales y el cálculo numérico. \texttt{yfinance} permite descargar los datos financieros utilizados en el estudio. \texttt{PyTorch} se emplea para implementar y entrenar los modelos VAE y TimeGAN, ya que ofrece control sobre la arquitectura, la función de pérdida y el dispositivo de entrenamiento.
@@ -691,6 +723,8 @@ El protocolo experimental se define antes de la interpretación de resultados. E
 Una vez generados los escenarios, se evalúa su calidad mediante métricas estadísticas, temporales e informacionales. Después se construyen carteras utilizando información empírica o sintética y se evalúan sobre el conjunto de test. Los resultados se guardan en el directorio \texttt{results/}, junto con metadatos de ejecución que permiten identificar la configuración utilizada.
 
 La separación entre entrenamiento, validación y prueba es uno de los puntos metodológicos más importantes del trabajo. Los hiperparámetros y semillas deben seleccionarse usando datos de validación, mientras que el conjunto de test se reserva para la evaluación final. De este modo se evita escoger una configuración porque haya obtenido el mejor resultado en test, lo que produciría una forma de cherry-picking y sobreestimaría la capacidad real del modelo.
+
+En esta versión del experimento, la validación se utiliza para comparar configuraciones generativas antes de observar el rendimiento financiero final en test. En el caso del VAE, la cuadrícula de valores de \texttt{beta} se resume mediante métricas de validación y pérdida de reconstrucción. En el caso de TimeGAN, las distintas semillas se analizan mediante diagnósticos de validación y dispersión entre ejecuciones. Por tanto, los resultados de test deben leerse como evaluación final de configuraciones ya documentadas, no como criterio para escoger retrospectivamente la mejor ejecución.
 
 Para reforzar la reproducibilidad, el pipeline registra información como la revisión de Git, la rama activa, la versión de Python, la plataforma, información de paquetes, disponibilidad de PyTorch, disponibilidad de CUDA, disponibilidad de MPS y estado de compilación de MPS. Estos datos no garantizan por sí solos que dos ejecuciones sean idénticas, especialmente en modelos estocásticos, pero ayudan a explicar diferencias entre resultados y a reconstruir el entorno experimental.
 
