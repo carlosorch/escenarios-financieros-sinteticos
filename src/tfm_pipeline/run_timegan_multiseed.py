@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import numpy as np
@@ -10,6 +11,7 @@ from .data import DatasetSplits, NormalizationStats, denormalize_windows, match_
 from .experiment_data import ExperimentData, prepare_experiment_data
 from .metadata import write_metadata
 from .models.timegan import fit_timegan, sample_timegan
+from .model_selection import score_validation_diagnostics, select_best_seed
 from .synthetic_evaluation import (
     aggregate_by_model,
     diagnostic_summary,
@@ -71,6 +73,7 @@ def _run_timegan_seed(
             variant=variant,
             config=config,
         )
+        portfolio_report.insert(0, "variant", variant)
         distribution_reports.append(distribution_report)
         summary_reports.append(summary_report)
         validation_distribution_reports.append(validation_distribution_report)
@@ -142,10 +145,30 @@ def run(config: ExperimentConfig | None = None, output_dir: Path = Path("results
     portfolios = pd.concat(all_portfolios, ignore_index=True)
     training_history = pd.concat(all_training_history, ignore_index=True)
 
+    scored_validation_diagnostics = score_validation_diagnostics(validation_diagnostics)
+    best_seed = select_best_seed(scored_validation_diagnostics)
+    selected_seed = best_seed["seed"]
+    selected_variant = best_seed["variant"]
+
     diagnostics.to_csv(output_dir / "diagnostic_summary_by_seed.csv", index=False)
     validation_diagnostics.to_csv(output_dir / "validation_diagnostic_summary_by_seed.csv", index=False)
     portfolios.to_csv(output_dir / "portfolio_metrics_by_seed.csv", index=False)
     training_history.to_csv(output_dir / "training_history_by_seed.csv", index=False)
+    scored_validation_diagnostics.to_csv(output_dir / "seed_ranking.csv", index=False)
+
+    best_seed_payload = {
+        "seed": selected_seed,
+        "variant": selected_variant,
+        "validation_score": best_seed["validation_score"],
+        "selection_basis": best_seed["selection_basis"],
+        "metrics_used": best_seed["metrics_used"],
+    }
+    (output_dir / "best_seed.json").write_text(json.dumps(best_seed_payload, indent=2, default=str), encoding="utf-8")
+
+    selected_portfolio_metrics = portfolios[
+        (portfolios["seed"] == selected_seed) & (portfolios["variant"] == selected_variant)
+    ].copy()
+    selected_portfolio_metrics.to_csv(output_dir / "best_seed_portfolio_metrics.csv", index=False)
 
     diagnostic_aggregate = aggregate_by_model(diagnostics, ["variant"])
     validation_diagnostic_aggregate = aggregate_by_model(validation_diagnostics, ["variant"])

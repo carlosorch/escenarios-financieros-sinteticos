@@ -108,3 +108,5 @@ Esta separación evita confundir la calidad de generación de datos con el resul
 La fidelidad distribucional se revisa tanto frente al conjunto de entrenamiento como frente al conjunto de validación. El conjunto de prueba queda reservado para medir el rendimiento financiero de carteras ya definidas.
 
 Para TimeGAN, además de la ejecución de una semilla individual, se calcula una evaluación multi-semilla. Las tablas agregadas reportan media y desviación típica de las métricas para reducir la dependencia de una inicialización concreta, especialmente cuando se entrena con CUDA.
+
+La selección de la semilla o variante final de TimeGAN se hará con un ranking basado solo en diagnósticos de validación distribucionales, temporales e informacionales. Las métricas financieras de prueba quedan reservadas para la evaluación final del modelo ya seleccionado.

@@ -5,6 +5,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from pandas.api.types import is_numeric_dtype
 
 from .config import ExperimentConfig
 from .evaluation import (
@@ -81,7 +82,7 @@ def diagnostic_summary(
 
 def aggregate_by_model(results: pd.DataFrame, id_columns: list[str]) -> pd.DataFrame:
     metric_columns = [column for column in results.columns if column not in id_columns]
-    numeric_metric_columns = [column for column in metric_columns if np.issubdtype(results[column].dtype, np.number)]
+    numeric_metric_columns = [column for column in metric_columns if is_numeric_dtype(results[column])]
     grouped = results.groupby(id_columns, as_index=False)[numeric_metric_columns]
     mean = grouped.mean().add_suffix("_mean")
     std = grouped.std(ddof=1).add_suffix("_std")
