@@ -36,7 +36,7 @@
 \title{Optimización de carteras mediante Modelado Generativo y Teoría de la Información}
 \titulacion{Máster en Inteligencia Artificial}
 \author{Carlos Ortega Chirito, María Dolores Romero Espejo, María José Fuentes Carrasco}
-\date{15 de abril de 2026}
+\date{19 de mayo de 2026}
 \director{Jesús Cigales Canga}
 \nombreciudad{ Logroño, La Rioja}
 
@@ -153,7 +153,7 @@ El documento se organiza de forma progresiva para separar con claridad el marco 
 
 En primer lugar, se introduce el problema de la optimización de carteras y se justifica la relevancia de estudiar técnicas capaces de representar mejor la incertidumbre de los retornos financieros. A continuación, se desarrolla el contexto y el estado del arte, donde se revisan los fundamentos de la teoría moderna de carteras, los modelos generativos, la teoría de la información y las herramientas utilizadas habitualmente en este tipo de estudios.
 
-Después se presentan los objetivos del trabajo y se define el planteamiento metodológico general. El desarrollo específico se estructura en tres capítulos principales. El Capítulo 4 describe con detalle el experimento realizado: datos utilizados, preparación de la información, modelos comparados, métricas, protocolo de evaluación y controles de reproducibilidad. El Capítulo 5 recoge los resultados obtenidos de forma descriptiva, mediante tablas y comparaciones objetivas entre baselines clásicos, VAE y TimeGAN. Finalmente, el Capítulo 6 discute el significado de esos resultados, sus limitaciones y las posibles líneas de trabajo futuro.
+Después se presentan los objetivos del trabajo y se define el planteamiento metodológico general. El Capítulo 4 establece el enfoque metodológico, los criterios generales de evaluación y la lógica de separación entre entrenamiento, validación y prueba. A continuación, el Capítulo 5 desarrolla de forma operativa la contribución: describe el experimento realizado, los datos utilizados, la preparación de la información, los modelos comparados, las métricas, el protocolo de reproducibilidad y los resultados obtenidos. Finalmente, el Capítulo 6 discute el significado de esos resultados, sus limitaciones y las posibles líneas de trabajo futuro.
 
 Esta organización permite mantener una distinción clara entre lo que se ha medido y lo que puede concluirse a partir de dichas mediciones. En particular, la interpretación de los resultados se reserva para la discusión final, evitando presentar como conclusiones generales lo que pueda depender de una configuración concreta, de una semilla de entrenamiento o de un periodo histórico determinado.
 
@@ -526,6 +526,8 @@ A continuación, se presentan los objetivos específicos que guiarán el desarro
 La metodología del trabajo se define como aplicada, experimental y comparativa. Se parte de un problema financiero conocido, la optimización de carteras, y se estudia si los modelos generativos pueden aportar escenarios sintéticos útiles para analizarlo bajo condiciones controladas. Por tanto, el trabajo no se orienta a desarrollar una estrategia de inversión lista para su uso real, sino a construir un procedimiento reproducible que permita comparar resultados y valorar sus limitaciones.
 
 El planteamiento combina técnicas de ciencia de datos, aprendizaje profundo y evaluación financiera. En primer lugar, se trabaja con datos históricos de mercado; después, se preparan retornos y ventanas temporales; posteriormente, se entrenan modelos generativos y se construyen carteras a partir de información empírica o sintética. Finalmente, todas las alternativas se comparan mediante métricas comunes y sobre datos reales fuera de muestra.
+
+Este capítulo cumple una función de encuadre metodológico. La descripción técnica completa del experimento se desarrolla en el Capítulo 5 para mantener separadas la justificación metodológica general, la ejecución concreta del pipeline y la interpretación posterior de los resultados.
 
 \section{Criterios generales de evaluación}
 
