@@ -106,7 +106,7 @@ Salidas principales:
 | `results/baselines/` | Baselines clasicos |
 | `results/vae/` | Escenarios y metricas VAE |
 | `results/timegan/` | Escenarios y metricas TimeGAN |
-| `results/timegan_multiseed/` | Robustez TimeGAN por semilla y ranking de seleccion por validacion |
+| `results/timegan_multiseed/` | Robustez TimeGAN por semilla, ranking de seleccion por validacion y reporte legible |
 | `results/combined_portfolio_metrics.csv` | Comparacion agregada |
 
-En `results/timegan_multiseed/` se generan tambien `seed_ranking.csv`, `best_seed.json` y `best_seed_portfolio_metrics.csv`. La semilla seleccionada se escoge solo con diagnosticos de validacion; las metricas financieras de prueba se consultan despues para reportar el rendimiento final.
+En `results/timegan_multiseed/` se generan tambien `metadata.json`, `seed_ranking.csv`, `best_seed.json`, `best_seed_portfolio_metrics.csv`, `diagnostic_summary_by_seed.csv`, `validation_diagnostic_summary_by_seed.csv`, `portfolio_metrics_by_seed.csv`, `training_history_by_seed.csv` y `report.md`. La semilla seleccionada se escoge solo con diagnosticos de validacion; las metricas financieras de prueba se consultan despues para reportar el rendimiento final.

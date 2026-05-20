@@ -110,3 +110,9 @@ La fidelidad distribucional se revisa tanto frente al conjunto de entrenamiento 
 Para TimeGAN, además de la ejecución de una semilla individual, se calcula una evaluación multi-semilla. Las tablas agregadas reportan media y desviación típica de las métricas para reducir la dependencia de una inicialización concreta, especialmente cuando se entrena con CUDA.
 
 La selección de la semilla o variante final de TimeGAN se hará con un ranking basado solo en diagnósticos de validación distribucionales, temporales e informacionales. Las métricas financieras de prueba quedan reservadas para la evaluación final del modelo ya seleccionado.
+
+## Artefactos multisemilla
+
+La corrida robusta de TimeGAN se guarda en `results/timegan_multiseed/` y deja trazabilidad completa de la selección. Los ficheros principales son `metadata.json`, `seed_ranking.csv`, `best_seed.json`, `best_seed_portfolio_metrics.csv`, `diagnostic_summary_by_seed.csv`, `validation_diagnostic_summary_by_seed.csv`, `portfolio_metrics_by_seed.csv`, `training_history_by_seed.csv` y `report.md`.
+
+La lectura correcta de estos artefactos es la siguiente: `seed_ranking.csv` y `best_seed.json` documentan la selección basada en validación; `diagnostic_summary_by_seed.csv` y `validation_diagnostic_summary_by_seed.csv` guardan los diagnósticos por semilla; `portfolio_metrics_by_seed.csv` conserva las métricas financieras asociadas a cada ejecución; y `report.md` resume todo el contenido en un formato legible.

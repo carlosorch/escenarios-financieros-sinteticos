@@ -10,7 +10,8 @@
 
 
 \numberwithin{equation}{chapter}
-%\usepackage{caption}
+\usepackage{caption}
+\captionsetup[table]{position=bottom}
 \numberwithin{figure}{chapter}
 \hypersetup{hidelinks,pdfborder={0 0 0}}%
 \setlength{\headheight}{26pt}
@@ -425,57 +426,39 @@ A continuación se presenta una tabla resumen con los estudios mencionados, dest
 
 {\small
 \renewcommand{\arraystretch}{1.2}
-\begin{longtable}{|p{2.5cm}|p{5.5cm}|p{5.5cm}|}
-\caption{Resumen de los estudios actuales y su limitación respecto al presente proyecto}\label{tab:estudios_actuales} \\
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{2.5cm}|p{5.5cm}|p{5.5cm}|}
 \hline
 \textbf{Estudio} & \textbf{Aportación principal} & \textbf{Limitación encontrada} \\
 \hline
-\endfirsthead
-
-\hline
-\textbf{Estudio} & \textbf{Aportación principal} & \textbf{Limitación encontrada} \\
-\hline
-\endhead
-
-\hline
-\multicolumn{3}{r}{\textit{Continúa en la siguiente página}} \\
-\endfoot
-
-\hline
-\endlastfoot
-
 Huang et al. (2024) &
 Propone un enfoque en dos etapas para la construcción y optimización de carteras, separando la selección de activos de la optimización final. &
 No emplea modelos generativos ni métricas de teoría de la información. \\
 \hline
-
 Kalina et al. (2024) &
-Genera datos financieros sintéticos a través de modelos variacionales produciendo resultados  más sólidos que no dependen de un único escenario de mercado. &
+Genera datos financieros sintéticos a través de modelos variacionales produciendo resultados más sólidos que no dependen de un único escenario de mercado. &
 No evalúa la calidad de las distribuciones con métricas de teoría de la información. \\
 \hline
-
 FTS-Diffusion (2024) &
 Genera series financieras realistas mediante modelos de difusión. &
 No incorpora evaluación con teoría de la información ni conexión directa con optimización. \\
 \hline
-
 Novais et al. (2022) &
 Utiliza entropía e información mutua para modelar incertidumbre y dependencias entre activos. &
 No combina estas métricas con modelos generativos. \\
 \hline
-
 Gao et al. (2025) &
 Aprende distribuciones condicionales de retorno para optimización de carteras. &
 No valida la calidad de las distribuciones generadas. \\
 \hline
-
 Diffolio (2026) &
 Desarrolla un modelo de difusión multivariante que captura dependencias entre activos y mejora rendimiento de cartera. &
 No integra métricas de teoría de la información para medir la distancia entre distribuciones reales y generadas. \\
 \hline
-
-
-\end{longtable}
+\end{tabular}
+\caption{Resumen de los estudios actuales y su limitación respecto al presente proyecto}\label{tab:estudios_actuales}
+\end{table}
 }
 
 \subsection{Herramientas existentes}
@@ -548,8 +531,9 @@ Este capítulo recoge el marco metodológico general, el diseño del pipeline, l
 
 Como guía general se toma CRISP-DM, por tratarse de un marco ampliamente utilizado en proyectos de ciencia de datos basados en comprensión del problema, preparación de datos, modelado, evaluación y revisión de resultados. En este TFM no se aplica como una metodología empresarial cerrada, sino como una forma ordenada de estructurar un experimento cuantitativo reproducible. Sus fases se adaptan al contexto financiero y experimental de la siguiente forma:
 
-\begin{longtable}{|p{0.28\textwidth}|p{0.62\textwidth}|}
-\caption{Adaptación de CRISP-DM al proyecto}\label{tab:crispdm-adaptacion}\\
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{0.28\textwidth}|p{0.62\textwidth}|}
 \hline
 \textbf{Fase CRISP-DM} & \textbf{Adaptación al TFM} \\
 \hline
@@ -565,7 +549,9 @@ Evaluación & Evaluación estadística, temporal, informacional y financiera de 
 \hline
 Despliegue & Construcción de un prototipo experimental reproducible para análisis académico, sin implicar una puesta en producción financiera inmediata. \\
 \hline
-\end{longtable}
+\end{tabular}
+\caption{Adaptación de CRISP-DM al proyecto}\label{tab:crispdm-adaptacion}
+\end{table}
 
 \section{Diseño técnico del pipeline}
 
@@ -606,8 +592,9 @@ En esta versión del experimento, la validación se utiliza para comparar config
 
 Para reforzar la reproducibilidad, el pipeline registra información como la revisión de Git, la rama activa, la versión de Python, la plataforma, información de paquetes, disponibilidad de PyTorch, disponibilidad de CUDA, disponibilidad de MPS y estado de compilación de MPS. Estos datos no garantizan por sí solos que dos ejecuciones sean idénticas, especialmente en modelos estocásticos, pero ayudan a explicar diferencias entre resultados y a reconstruir el entorno experimental.
 
-\begin{longtable}{|p{0.35\textwidth}|p{0.55\textwidth}|}
-\caption{Decisiones metodológicas previstas}\label{tab:decisiones-metodologicas}\\
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{0.35\textwidth}|p{0.55\textwidth}|}
 \hline
 \textbf{Elemento} & \textbf{Decisión metodológica} \\
 \hline
@@ -633,7 +620,9 @@ Evaluación financiera & Rentabilidad anualizada, volatilidad anualizada, Sharpe
 \hline
 Validación & División temporal entrenamiento/validación/prueba \\
 \hline
-\end{longtable}
+\end{tabular}
+\caption{Decisiones metodológicas previstas}\label{tab:decisiones-metodologicas}
+\end{table}
 
 \chapter{Desarrollo específico de la contribución}
 
@@ -653,27 +642,19 @@ La pregunta metodológica central puede formularse del siguiente modo: ¿hasta q
 
 \subsection{Datos utilizados}
 
-El experimento utiliza datos diarios de mercado obtenidos a través de Yahoo Finance mediante la biblioteca \texttt{yfinance}. Se selecciona un universo inicial de diez activos líquidos y de gran capitalización, pertenecientes a distintos sectores económicos: AAPL, MSFT, GOOGL, AMZN, META, NVDA, JPM, XOM, JNJ y PG. La elección de un universo acotado responde al carácter piloto del estudio, ya que permite analizar un problema multiactivo real manteniendo un tamaño manejable para el entrenamiento de modelos generativos.
+El experimento trabaja con datos diarios de mercado descargados desde Yahoo Finance mediante la biblioteca \texttt{yfinance}. La obtención de la información, la limpieza y la preparación forman parte del mismo protocolo experimental, porque en este tipo de problema la calidad de la fuente y el tratamiento aplicado condicionan directamente la validez del análisis posterior. El universo está formado por diez activos líquidos y de gran capitalización, repartidos entre sectores distintos: AAPL, MSFT, GOOGL, AMZN, META, NVDA, JPM, XOM, JNJ y PG. La selección intenta equilibrar comportamientos heterogéneos, combinando compañías tecnológicas con trayectorias más agresivas y mayor volatilidad, junto con activos defensivos y energéticos cuya evolución suele ser más estable.
 
-El periodo considerado abarca desde el 1 de enero de 2015 hasta el 12 de mayo de 2026. La variable descargada es el precio ajustado de cierre, ya que incorpora ajustes por dividendos y desdoblamientos cuando la fuente los proporciona. A partir de estos precios se calculan retornos logarítmicos diarios, que son la variable finalmente utilizada por los modelos y por las funciones de evaluación.
+El intervalo analizado va del 1 de enero de 2015 al 12 de mayo de 2026. Este horizonte temporal es suficientemente amplio para observar distintos ciclos de mercado, episodios de estrés y fases de crecimiento, y permite estudiar tanto la evolución individual de cada activo como la estructura conjunta del universo. La variable descargada es el precio ajustado de cierre, porque incorpora dividendos y desdoblamientos cuando la fuente los reporta. Esta elección evita distorsiones artificiales que sí aparecerían si se trabajara con precios nominales, y ofrece una representación más fiel de la evolución económica real de cada serie.
 
-La partición temporal se define de antemano. El conjunto de entrenamiento cubre el periodo comprendido hasta el 31 de diciembre de 2022; el conjunto de validación abarca desde el 1 de enero de 2023 hasta el 30 de junio de 2024; y el conjunto de prueba queda reservado para el periodo posterior, desde julio de 2024 hasta el 12 de mayo de 2026. Esta división evita mezclas aleatorias entre pasado y futuro y reproduce de forma más realista la situación en la que un modelo se entrena con información histórica y se evalúa sobre datos posteriores.
+Una vez descargados los datos, se alinean por fecha y por activo para conservar solo las observaciones comunes a todo el universo. Este paso es importante porque el trabajo es multiactivo y cualquier desajuste temporal rompería la comparabilidad entre series. El resultado es una matriz homogénea en la que todos los activos comparten exactamente el mismo calendario de observación, lo que facilita tanto el análisis exploratorio como el entrenamiento posterior de los modelos.
 
 \subsection{Análisis exploratorio de los datos}
 
-Antes del entrenamiento de los modelos se realiza una fase de análisis exploratorio con el objetivo de conocer la estructura de las series financieras utilizadas. Esta fase no tiene como finalidad extraer conclusiones definitivas sobre los activos, sino comprobar la calidad de los datos y describir las características que condicionan el problema de modelado.
+Antes de entrenar los modelos se realiza una fase de análisis exploratorio con un objetivo muy concreto: comprobar que los datos son consistentes, entender su estructura básica y justificar las decisiones metodológicas que vendrán después. No se trata de describir el mercado de forma exhaustiva, sino de examinar las propiedades de las series que afectan de manera directa al modelado.
 
-En particular se llevaron a cabo las siguientes acciones para el análisis y limpieza de los datos.
+El primer control consiste en verificar si existen valores ausentes tras la descarga y el alineamiento. El pipeline aplica una depuración explícita para eliminar cualquier fila incompleta, de modo que las transformaciones posteriores se realicen sobre una matriz sin huecos y sin desajustes entre activos. En la práctica, la pérdida de observaciones es mínima, lo que indica que la descarga desde Yahoo Finance es consistente y que el universo elegido comparte un historial suficientemente continuo para un estudio multiactivo.
 
-En primer lugar, se comprueba la presencia de valores ausentes en el conjunto de datos, añadiendo además la función dropna() para eliminar aquellas filas que contengan valores de este tipo. Tras ejecutar dicha función y consultar los estadísticos confirmamos que no existen valores nulos en la extracción del dataset inicial, al tratarse de series financieras procedentes de una fuente que habitualmente proporciona datos ya alineados y sin huecos. Esto se termina de confirmar tras el uso de la función mencionada, que no eliminó ninguna fila, manteniéndose el mismo número de registros antes y después de su ejecución.
-
-En segundo lugar,  se analiza la evolución temporal de los precios seleccionados durante el periodo de estudio y se analiza la posible presencia de estructura temporal en las series para observar el comportamiento histórico de cada serie y detectar aspectos relevantes antes de transformar los precios.
-
-Como se observa en la figura \ref{fig:eda-precios} se aprecia una tendencia creciente en la mayoría de los activos, aunque con diferencias relevantes entre ellos. En concreto los activos tecnológicos como META,MSFT, GOOGL, AAPL y NVDA, presentan un crecimiento más acusado a los largo del tiempo, especialmente desde 2020. Algunos activos como por ejemplo, META, presentan episodios de inestabilidad y fuertes caídas con una repercusión muy marcada en los años siguientes, lo que demuestra que las series financieras no evolucionan de forma estable o lineal, sino que pueden presentar períodos de grandes cambios. A diferencia de los ya comentados, se puede ver reflejado que activos como JNJ, JPM o XOM muestran una evolución más moderada en términos de precio.
-
-Estas diferencias entre ellos justifican la necesidad de analizar la relación que existe y no sólo la rentabilidad individual ya que la optimización de carteras depende de la estructura conjunta de retornos, volatilidades y correlaciones.
-
-La gráfica también sugiere la posible presencia de estructura temporal en las series, los precios no se mueven de forma aleatoria e independiente, sino que presentan tendencias sostenidas en el tiempo. Esta dependencia se debe tener muy en cuenta a la hora de entrenar los modelos generativos considerados, ya que deben ser capaces de ir más allá de reproducir la distribución de los retornos en un momento dado y capturar también la dinámica con la que estos evolucionan a lo largo del tiempo.
+La evolución temporal de los precios ajustados ofrece la primera lectura visual de la muestra.
 
 \begin{figure}[H]
     \centering
@@ -683,11 +664,9 @@ La gráfica también sugiere la posible presencia de estructura temporal en las 
     \label{fig:eda-precios}
 \end{figure}
 
-En tercer lugar se consideran los precios ajustados descargados directamente de la fuente de datos y los retornos logarítmicos calculados a partir de dichos datos para analizar los estadísticos descriptivos antes de aplicar la limpieza final del pipeline, en este análisis se incluyen datos relevantes como la media de los precios, el precio máximo y mínimo o la asimetría que presentan.
+La Figura~\ref{fig:eda-precios} muestra que los activos tecnológicos presentan, en general, trayectorias más intensas y con mayor amplitud que los activos defensivos o energéticos. Esto no solo confirma que el universo cubre perfiles de riesgo distintos, sino que también anticipa que las dependencias entre activos no serán uniformes. En particular, la visualización permite observar que algunos títulos se mueven con mayor sensibilidad a los cambios de mercado, mientras que otros exhiben patrones más suaves y menos abruptos. Esa heterogeneidad es precisamente la que hace interesante el problema de cartera, porque la diversificación depende de combinar activos con dinámicas complementarias.
 
-Como se muestra en la Tabla~\ref{tab:eda-estadisticos-origen}, las medias de los retornos logarítmicos se sitúan próximas a cero en todos los activos, algo habitual en series financieras diarias ya que la tendencia media de crecimiento esperada en un único día es prácticamente despreciable frente a la volatilidad del mercado. Sin embargo, existen diferencias importantes en la desviación típica con las que se deduce una gran volatilidad, activos como NVDA, META o AMZN presentan una mayor dispersión en sus retornos, mientras que otros como JNJ o PG muestran una variabilidad más reducida.
-
-También resultan relevantes los valores mínimo y máximo de los retornos, ya que permiten identificar la existencia de movimientos diarios extremos y la asimetría y la curtosis que permiten caracterizar la forma de la distribución empírica y apreciar con mayor detalle la probabilidad de observar eventos extremos respecto a una distribución normal .En este contexto se observa que activos como META y NVDA presentan los movimientos diarios más extremos, mientras que NVDA muestra la mayor desviación típica de los retornos, reflejando un comportamiento más volátil.
+El siguiente paso consiste en resumir la información numéricamente. Para ello se calculan estadísticos descriptivos sobre los precios ajustados y sobre los retornos logarítmicos diarios. En los precios, las medias, mínimos, máximos y desviaciones típicas muestran que cada activo opera en una escala distinta, algo esperable en series bursátiles. Sin embargo, cuando se pasa a retornos logarítmicos, las medias se concentran cerca de cero y la dispersión pasa a ser la variable más informativa. Este cambio es importante porque los retornos son la magnitud relevante para medir riesgo y construir carteras, mientras que el nivel del precio en bruto depende más de la escala nominal del activo que de su comportamiento relativo.
 
 \begin{table}[H]
 \centering
@@ -714,45 +693,33 @@ PG    & 107.460645 & 36.431501  & 50.494148 & 172.541000 & 0.000274 & 0.011718 &
 \label{tab:eda-estadisticos-origen}
 \end{table}
 
-Para continuar con el análisis de los datos, en cuarto lugar, se genera la matriz de correlación de los retornos logarítmicos con el objetivo de estudiar la relación existente entre los activos seleccionados.
+La Tabla~\ref{tab:eda-estadisticos-origen} confirma dos ideas clave. La primera es que las medias de los retornos diarios se sitúan muy próximas a cero en todos los activos, algo habitual en series financieras de alta frecuencia. La segunda es que la volatilidad y el comportamiento de cola difieren de forma clara entre activos. NVIDIA, META o AMZN presentan una variabilidad mayor y valores extremos más intensos, mientras que JNJ y PG muestran una dispersión más contenida. Además, las asimetrías y curtosis elevadas en varios casos indican que la distribución empírica no es normal en sentido estricto, sino que incorpora colas pesadas y, en algunos activos, sesgos marcados hacia movimientos extremos.
 
-Como se observa en la Figura~\ref{fig:eda-matriz-correlacion}, todas las correlaciones son positivas, aunque con intensidades diferentes según el tipo de activo.
-
-Se aprecia que los activos tecnológicos presentan correlaciones relativamente elevadas entre sí. Por ejemplo, MSFT, GOOGL, AMZN, META, NVDA y AAPL muestran valores de correlación moderados o altos, lo que indica que tienden a moverse en la misma dirección en muchos periodos del mercado. Este comportamiento resulta coherente, ya que pertenecen a sectores próximos y pueden verse afectados por factores comunes, como expectativas sobre crecimiento tecnológico, tipos de interés o sentimiento general del mercado.
-
-Por otro lado, activos como XOM, JNJ o PG presentan correlaciones más bajas con las grandes tecnológicas. Esto sugiere que aportan cierto grado de diversificación dentro de la cartera, al no comportarse exactamente igual que los activos más orientados al crecimiento. En particular, se observa una relación más intensa entre JNJ y PG, ambos vinculados a sectores más defensivos, y entre JPM y XOM, lo que refleja cierta proximidad en su comportamiento respecto al resto de activos no tecnológicos.
-
-Este análisis es especialmente relevante para nuestro trabajo ya que modelos como mínima varianza y Markowitz dependen directamente de la matriz de covarianzas y una estimación inestable de estas relaciones puede afectar de forma significativa a los pesos finales de la cartera.Es por ello que en el trabajo se incorpora posteriormente el estimador Ledoit-Wolf, con el objetivo de obtener una estimación más robusta de la matriz de covarianzas.
+La estructura de dependencia entre activos se resume en la matriz de correlación de los retornos.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.85\textwidth]{media/eda_matriz_correlación.png}
     \caption{Matriz de correlación de los retornos}
-      \textbf{Fuente:} Elaboración propia.
+    \textbf{Fuente:} Elaboración propia.
     \label{fig:eda-matriz-correlacion}
 \end{figure}
 
-En quinto lugar, se analiza la distribución empírica de los retornos logarítmicos de los activos seleccionados, mediante los correspondientes histogramas, para estudiar si estos siguen una distribución normal o presentan desviaciones relevantes como colas o asimetría. 
+La Figura~\ref{fig:eda-matriz-correlacion} muestra que los activos tecnológicos tienden a presentar correlaciones más elevadas entre sí, mientras que valores como XOM, JNJ o PG están menos alineados con ese bloque. Esta diferencia es relevante porque la correlación determina en gran medida el beneficio potencial de diversificación. Para el problema de optimización de carteras, no basta con conocer la rentabilidad media esperada de cada activo; también es necesario entender cómo se mueven conjuntamente. Por esa razón, más adelante el experimento contempla estimaciones robustas de covarianza, especialmente cuando la estimación muestral puede verse afectada por ruido o por la relación entre número de activos y número de observaciones.
 
-Como se observa en la Figura~\ref{fig:eda-histogramas}, todos los activos presentan distribuciones concentradas alrededor de cero, lo cual es habitual en series financieras diarias debido a que la mayor parte de las variaciones diarias de precio son moderadas, mientras que los movimientos de mayor magnitud aparecen con menor frecuencia.
-
-Aunque los histogramas presentan una forma general similar, existen diferencias relevantes entre activos, ya que META, NVDA o AMZN muestran una mayor dispersión y colas más amplias, lo que refleja una mayor probabilidad de observar variaciones diarias extremas, mientras que JNJ o PG presentan distribuciones más estrechas y concentradas en torno a cero, sugiriendo un comportamiento más estable y defensivo dentro del conjunto analizado. 
-
-La forma de estas distribuciones y la presencia de colas pronunciadas y valores alejados del centro permite apreciar que los retornos financieros no siguen un comportamiento perfectamente normal existiendo episodios de alta volatilidad y movimientos extremos, esto presenta un reto para el actual trabajo ya que si un modelo no reproduce adecuadamente la distribución empírica de los retornos, especialmente en sus extremos, las métricas de riesgo y las decisiones de asignación de pesos podrían verse afectadas.
+El análisis de la forma de la distribución empírica complementa la información anterior.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.95\textwidth]{media/eda_histogramas.png}
     \caption{Distribución empírica de los retornos logarítmicos}
-        \textbf{Fuente:} Elaboración propia.
+    \textbf{Fuente:} Elaboración propia.
     \label{fig:eda-histogramas}
 \end{figure}
 
-Por último, la Figura~\ref{fig:eda-division-temporal} representa la división temporal de los datos en los subconjuntos de entrenamiento, validación y test, partición que se realiza respetando el orden cronológico de las observaciones de forma que el entrenamiento corresponde al primer tramo temporal, la validación a un periodo posterior y el test al tramo final, como ya explicamos en el apartado anterior.
+La Figura~\ref{fig:eda-histogramas} muestra que, aunque los retornos se concentran alrededor de cero, la distribución presenta colas suficientemente anchas como para descartar una normalidad simple. Este comportamiento es especialmente visible en los activos más volátiles, donde aparecen concentraciones más marcadas en los extremos. Desde el punto de vista metodológico, esto es importante porque los modelos generativos no solo deben aproximar el centro de la distribución, sino también su asimetría, su curtosis y la frecuencia de eventos extremos, que son los rasgos más relevantes para las métricas de riesgo.
 
-Esta separación es muy importante en series financieras, ya que una división aleatoria podría introducir fuga de información al permitir que datos futuros influyeran en el entrenamiento o la selección de los modelos, por lo que el uso de una partición temporal permite simular un escenario más realista en el que las estrategias se construyen con información pasada y se evalúan sobre datos posteriores no vistos durante el entrenamiento. 
-
-Además, la figura permite observar que el periodo de test se sitúa en una etapa reciente del mercado caracterizada por un crecimiento acusado y una gran variabilidad, lo que refuerza la necesidad de evaluar los modelos sobre un tramo temporal separado dado que el comportamiento del mercado puede diferir notablemente entre los periodos de entrenamiento, validación y prueba. 
+Por último, la división temporal se revisa de forma explícita para garantizar que no exista fuga de información entre entrenamiento, validación y test.
 
 \begin{figure}[H]
     \centering
@@ -762,21 +729,29 @@ Además, la figura permite observar que el periodo de test se sitúa en una etap
     \label{fig:eda-division-temporal}
 \end{figure}
 
-El análisis llevado a cabo permite es fundamental antes de aplicar cualquier tipo de modelo ya que nos ha permitido obtener una visión completa del comportamiento inicial de los datos financieros utilizados en el trabajo, conociendo su estructura y calidad de forma que permite justificar decisiones posteriores como el uso de retornos logarítmicos, la división temporal en entrenamiento, validación y test o la comparación mediante métricas estadísticas.
+La Figura~\ref{fig:eda-division-temporal} confirma que la partición es estrictamente cronológica: el tramo de entrenamiento se reserva para ajustar los modelos, la validación se utiliza para seleccionar configuraciones y el test queda aislado como evaluación final fuera de muestra. Esta decisión es crítica en finanzas, porque una partición aleatoria mezclaría información futura con información pasada y produciría una evaluación artificialmente optimista. En este trabajo, la separación temporal no es un detalle operativo, sino una condición necesaria para que la comparación entre modelos sea válida.
+
+En conjunto, este análisis exploratorio muestra que los datos son coherentes, están alineados temporalmente y presentan una complejidad suficiente para el problema que se estudia. También justifica las decisiones metodológicas posteriores: trabajar con retornos logarítmicos en lugar de precios, normalizar usando solo entrenamiento y reservar un tramo temporal independiente para la comparación final.
 
 \subsection{Preparación de los datos}
 
-La preparación de datos sigue una secuencia fija: descarga de precios ajustados, alineación temporal de activos, tratamiento de valores faltantes, cálculo de retornos logarítmicos, división temporal de los datos, normalización con estadísticos calculados exclusivamente sobre el conjunto de entrenamiento y construcción de ventanas temporales multiactivo. Mantener esta secuencia fija es importante para que todos los modelos trabajen con la misma información de partida.
+La preparación de los datos sigue una secuencia fija: descarga, alineación, depuración, cálculo de retornos, división temporal, normalización y construcción de ventanas. Esa secuencia no es solo operativa, sino que asegura que todos los modelos partan exactamente de la misma información y que la escala de entrada no dependa de observaciones futuras.
 
-Los retornos se calcularán como:
+El paso central es la transformación de precios a retornos logarítmicos diarios:
 
 \begin{equation}
-r_t = \ln \left(\frac{P_t}{P_{t-1}}\right)
+r_t = \ln\left(\frac{P_t}{P_{t-1}}\right)
 \end{equation}
 
-Las ventanas temporales tienen una longitud de 30 sesiones bursátiles. Cada muestra utilizada por los modelos generativos representa, por tanto, una secuencia de 30 días para los 10 activos considerados. Esta forma de organizar los datos permite que TimeGAN trabaje con secuencias multivariantes y que el VAE aprenda una representación compacta de ventanas completas de retornos.
+Con esta transformación, el análisis deja de depender del nivel nominal del activo y pasa a centrarse en variaciones relativas, que son las que realmente importan para medir riesgo, dependencia y comportamiento de cartera. Además, los retornos homogeneizan la escala entre activos con precios muy distintos.
 
-La normalización se calcula únicamente con la media y la desviación típica del conjunto de entrenamiento, de forma independiente para cada activo. Esos mismos estadísticos se aplican después a validación y prueba, evitando que la escala de periodos futuros influya en el entrenamiento. Cuando los modelos generan retornos normalizados, se aplica la transformación inversa antes de calcular métricas financieras o comparar distribuciones en la escala original de los retornos.
+Una vez calculados los retornos, el conjunto se divide cronológicamente en entrenamiento, validación y prueba. La partición temporal es fija porque, en finanzas, mezclar pasado y futuro introduciría fuga de información y haría la evaluación artificialmente optimista. El tramo de entrenamiento se usa para ajustar los modelos, el de validación para seleccionar configuraciones y el de prueba para la evaluación final.
+
+La normalización se ajusta exclusivamente con el conjunto de entrenamiento y después se aplica sin cambios a validación y prueba. De ese modo, cada activo queda estandarizado con su propia media y desviación típica históricas, evitando que el comportamiento de periodos posteriores altere la escala de entrada.
+
+Después, los retornos normalizados se agrupan en ventanas de 30 sesiones bursátiles. Cada ventana representa una secuencia multiactivo corta pero completa, suficiente para capturar dinámica temporal y relaciones cruzadas entre activos. Esta es la unidad de entrada que usan los modelos generativos: VAE aprende una representación comprimida de la ventana y TimeGAN trabaja directamente sobre la secuencia.
+
+Cuando los modelos generan retornos en el espacio normalizado, se aplica la transformación inversa antes de calcular métricas financieras o comparar distribuciones. Así, todas las conclusiones se interpretan en la escala original de los retornos y no en una escala artificial producida por la estandarización.
 
 \subsection{Familias de algoritmos evaluadas}
 
@@ -796,17 +771,19 @@ TimeGAN se utiliza como modelo generativo secuencial para series temporales fina
 
 \subsection{Generación de escenarios sintéticos}
 
-Los modelos no generan precios directamente, sino retornos sintéticos. La salida esperada tiene la forma \texttt{N escenarios x T días x M activos}; por ejemplo, múltiples escenarios de 30 días para los 10 activos del universo experimental. Trabajar con retornos evita tener que reconstruir trayectorias de precios y centra el análisis en la variable utilizada realmente para estimar riesgo y construir carteras.
+Los modelos generan escenarios de retornos, no precios. La salida se organiza como \texttt{N escenarios x T días x M activos}, de modo que cada ejecución produce varias secuencias de 30 días para los 10 activos del universo.
 
-Estos escenarios se emplean con dos finalidades. La primera es diagnóstica: comparar distribuciones reales y sintéticas para comprobar si se preservan propiedades relevantes. La segunda es financiera: utilizar los escenarios generados para estimar información de media, covarianza o distribución y construir carteras que después se evalúan sobre datos reales del conjunto de prueba.
+Trabajar directamente con retornos evita reconstruir trayectorias completas de precios y permite concentrar el análisis en la variable que realmente se usa para medir riesgo y construir carteras. Además, la estructura multiactivo de la salida conserva la relación conjunta entre activos, que es una parte esencial del problema.
+
+Estos escenarios se usan con dos objetivos distintos. El primero es diagnóstico: comparar la distribución real y la sintética para ver si el modelo preserva forma, escala, colas y dependencia. El segundo es operativo: estimar medias, covarianzas o distribuciones a partir de los escenarios generados y construir carteras que luego se evalúan sobre retornos reales fuera de muestra.
 
 \subsection{Evaluación de los escenarios sintéticos}
 
-La evaluación de escenarios se organiza en varios niveles. En primer lugar, se comparan momentos y propiedades básicas de los retornos, como la media y la desviación típica. En segundo lugar, se analizan dependencias entre activos mediante el error de correlación. En tercer lugar, se estudia la estructura temporal mediante errores de autocorrelación de retornos y de retornos absolutos. Esta última medida resulta especialmente útil porque la autocorrelación de retornos absolutos puede dar información sobre agrupación de volatilidad, un rasgo frecuente en series financieras.
+La evaluación de escenarios se divide en cuatro niveles. El primero mide las propiedades marginales de los retornos, como media, volatilidad, asimetría, curtosis y percentiles. El segundo analiza la dependencia entre activos, sobre todo mediante matrices de correlación. El tercero revisa la estructura temporal con autocorrelación de retornos y de retornos absolutos. El cuarto compara distribuciones con medidas informacionales.
 
-Junto a estas métricas, se consideran indicadores financieros de riesgo como VaR y CVaR cuando se evalúan carteras o distribuciones de retornos. El VaR resume una pérdida extrema bajo un nivel de confianza determinado, mientras que el CVaR aporta información adicional sobre la severidad esperada de las pérdidas más allá de ese umbral. Además, la divergencia KL y la divergencia de Jensen-Shannon permiten comparar distribuciones desde una perspectiva informacional. La divergencia KL puede ser inestable cuando existen intervalos con probabilidad cero, por lo que se complementa con Jensen-Shannon, que es simétrica y acotada.
+En esa comparación informacional se utilizan la divergencia KL, la divergencia de Jensen-Shannon y la distancia de Wasserstein. KL es útil para cuantificar pérdida de información respecto a la distribución real, pero puede volverse inestable si aparecen celdas vacías. Jensen-Shannon sirve como complemento porque es simétrica y acotada. Wasserstein aporta una lectura más geométrica de la distancia entre distribuciones.
 
-Es importante no confundir esta evaluación con la evaluación financiera final. Un modelo puede generar datos que se parezcan razonablemente a los reales en algunas métricas y, aun así, no producir carteras mejores. Del mismo modo, una cartera puede obtener un buen resultado fuera de muestra por una configuración concreta sin que el generador haya capturado de forma robusta toda la estructura estadística del mercado.
+La lectura de estas métricas no debe mezclarse con la evaluación financiera final. Un escenario puede parecer estadísticamente similar al real y, aun así, no mejorar una cartera; del mismo modo, una cartera puede rendir bien en una configuración concreta sin que el generador haya aprendido de forma robusta la estructura del mercado. Por eso la evaluación distribucional mide fidelidad estadística y la evaluación de cartera mide utilidad aplicada.
 
 Las principales métricas se calculan con definiciones comunes para todos los métodos. La rentabilidad anualizada se estima a partir de retornos diarios usando 252 sesiones bursátiles por año, y la volatilidad anualizada se obtiene multiplicando la desviación típica diaria por $\sqrt{252}$. El ratio de Sharpe se calcula como
 
@@ -830,39 +807,68 @@ D_{JS}(P,Q)=\frac{1}{2}D_{KL}(P\|M)+\frac{1}{2}D_{KL}(Q\|M),\quad M=\frac{1}{2}(
 
 Los errores de media, volatilidad, correlación y autocorrelación se calculan como diferencias agregadas entre los estadísticos estimados en los datos reales y en los escenarios sintéticos, usando el mismo procedimiento para todos los modelos.
 
-{\small
-\setlength{\tabcolsep}{3pt}
+{\footnotesize
+\renewcommand{\arraystretch}{1.2}
+\setlength{\tabcolsep}{4pt}
+
 \begin{longtable}{|p{0.20\textwidth}|p{0.15\textwidth}|p{0.27\textwidth}|p{0.20\textwidth}|}
-\caption{Métricas previstas para evaluar los escenarios sintéticos}\label{tab:metricas-escenarios}\\
+
 \hline
 \textbf{Nivel de evaluación} & \textbf{Métrica} & \textbf{Qué compara} & \textbf{Finalidad} \\
 \hline
+\endfirsthead
+
+\hline
+\textbf{Nivel de evaluación} & \textbf{Métrica} & \textbf{Qué compara} & \textbf{Finalidad} \\
+\hline
+\endhead
+
+\hline
+\multicolumn{4}{r}{\textit{Continúa en la siguiente página}} \\
+\endfoot
+
+\hline
+\endlastfoot
+
 Estadístico & Media y volatilidad & Momentos básicos de retornos reales y sintéticos & Comprobar si los escenarios reproducen nivel medio y dispersión. \\
 \hline
+
 Estadístico & Asimetría, curtosis y percentiles & Forma de la distribución y comportamiento de colas & Evaluar si se preservan colas pesadas, asimetrías y eventos extremos. \\
 \hline
+
 Temporal y dependencia & Correlaciones & Matriz de correlación real frente a matriz sintética & Analizar si se mantienen relaciones multiactivo relevantes para diversificación. \\
 \hline
+
 Temporal y dependencia & Autocorrelación & Dependencia temporal de retornos y retornos absolutos & Comprobar si los escenarios capturan estructura temporal y agrupación de volatilidad. \\
 \hline
+
 Informacional & Divergencia KL & Diferencia entre distribución real y distribución generada & Medir pérdida de información al aproximar los retornos reales mediante escenarios sintéticos. \\
 \hline
+
 Informacional & Divergencia Jensen-Shannon & Distancia simétrica y acotada entre distribuciones real y sintética & Complementar KL con una medida más estable e interpretable. \\
 \hline
+
 Informacional & Entropía & Grado de dispersión o incertidumbre de las distribuciones & Valorar si los escenarios reducen o amplifican artificialmente la variabilidad observada. \\
 \hline
+
 Complementario & Wasserstein & Distancia entre distribuciones considerando su geometría & Evaluar diferencias globales de forma y desplazamiento entre distribuciones. \\
 \hline
+
+\caption{Métricas previstas para evaluar los escenarios sintéticos}
+\label{tab:metricas-escenarios}
+
 \end{longtable}
 }
 
 \subsection{Optimización y evaluación de carteras}
 
-Los baselines financieros son la cartera equiponderada, Markowitz media-varianza con datos históricos reales y la cartera de mínima varianza. Frente a ellos se comparan carteras construidas a partir de escenarios VAE y TimeGAN. En todos los casos se mantiene una restricción long-only, con pesos entre 0 y 1 y suma total igual a 1. Por tanto, no se permiten ventas en corto ni apalancamiento dentro del experimento.
+La optimización compara carteras construidas con información real frente a carteras construidas con información sintética. En el grupo de referencia están la cartera equiponderada, la cartera de mínima varianza y la cartera de Markowitz. En el grupo sintético están las carteras construidas a partir de escenarios VAE y TimeGAN.
 
-Los escenarios sintéticos se emplean para estimar medias, covarianzas o distribuciones de retornos y construir carteras optimizadas. Sin embargo, la comparación de rendimiento se realiza siempre sobre retornos reales del conjunto de prueba. Esta decisión es clave para que el resultado financiero no dependa de evaluar una cartera sobre los mismos datos artificiales que han servido para construirla.
+Todas las carteras se calculan con una restricción long-only: los pesos deben sumar uno y cada activo queda acotado entre 0 y 1. Así se evita introducir ventas en corto o apalancamiento y la comparación se centra en la calidad de la estimación, no en la flexibilidad de las restricciones.
 
-Las métricas utilizadas incluyen rentabilidad anualizada, volatilidad anualizada, ratio de Sharpe \cite{Sharpe1964}, máximo drawdown, VaR y CVaR. La rentabilidad y la volatilidad resumen el comportamiento medio de la cartera, el Sharpe relaciona rentabilidad y riesgo, el drawdown mide caídas acumuladas desde máximos previos y VaR/CVaR aportan una visión específica del riesgo de cola.
+Los escenarios sintéticos se usan para estimar medias, covarianzas o distribuciones de retorno, pero la evaluación final siempre se hace sobre retornos reales del conjunto de prueba. Esa separación es importante porque impide valorar una cartera sobre los mismos datos artificiales que sirvieron para construirla.
+
+Las métricas financieras empleadas son rentabilidad anualizada, volatilidad anualizada, ratio de Sharpe \cite{Sharpe1964}, máximo drawdown, VaR y CVaR. La rentabilidad y la volatilidad resumen el comportamiento medio; Sharpe combina ambas; drawdown captura caídas acumuladas; y VaR/CVaR describen el riesgo de cola.
 
 La cartera de mínima varianza se obtiene resolviendo el problema
 
@@ -870,22 +876,18 @@ La cartera de mínima varianza se obtiene resolviendo el problema
 \min_w w^T \Sigma w \quad \text{s.a.} \quad \sum_i w_i = 1, \quad 0 \leq w_i \leq 1,
 \end{equation}
 
-donde $w$ representa los pesos de cartera y $\Sigma$ la matriz de covarianzas estimada. La cartera de tipo Markowitz utiliza la misma estructura de restricciones, pero incorpora también la estimación de rentabilidad esperada. En las variantes basadas en escenarios sintéticos, $\mu$ y $\Sigma$ se estiman a partir de los retornos generados, mientras que la evaluación final de la cartera se realiza siempre con retornos reales del conjunto de prueba.
+donde $w$ representa los pesos de cartera y $\Sigma$ la matriz de covarianzas estimada. La cartera de Markowitz utiliza la misma estructura de restricciones, pero añade la estimación de rentabilidad esperada. En las variantes sintéticas, $\mu$ y $\Sigma$ se obtienen a partir de los retornos generados; en la evaluación final, en cambio, siempre se usan retornos reales fuera de muestra.
 
-En las variantes robustas incorporadas en este trabajo, la matriz $\Sigma$ no se estima mediante la covarianza muestral histórica sino mediante el estimador Ledoit-Wolf \cite{LedoitWolf2004}, que aplica un proceso de regularización sobre la matriz de covarianzas con el objetivo de obtener una estimación mejor condicionada y menos sensible al ruido de los datos históricos. 
+Las variantes robustas sustituyen la covarianza muestral por el estimador Ledoit-Wolf \cite{LedoitWolf2004}. Ese estimador regulariza la matriz combinando la covarianza observada con una matriz objetivo más estable, lo que reduce la sensibilidad al ruido cuando el problema tiene muchos activos y pocas observaciones relativas.
 
-La idea de este estimador consiste en combinar la covarianza muestral con una matriz objetivo más estable, ponderando ambas mediante un coeficiente de contracción estimado de forma óptima y reduciendo la influencia de los valores extremos presentes en la muestra. 
+Las carteras \texttt{ledoit\_wolf\_minimum\_variance} y \texttt{ledoit\_wolf\_markowitz} mantienen las mismas restricciones que sus equivalentes clásicos, pero parten de una estimación del riesgo conjunto mejor condicionada. Su función en el experimento es obligar a que las carteras sintéticas compitan no solo frente a baselines simples, sino también frente a referencias clásicas más robustas.
+{\footnotesize
+\renewcommand{\arraystretch}{1.2}
+\setlength{\tabcolsep}{4pt}
 
-El objetivo del mismo se cumple si se obtiene una matriz que tiende a ser más estable cuando el número de activos es elevado en relación con el número de observaciones disponibles, una situación que resulta común en problemas de optimización de carteras.
-
-Las carteras \texttt{ledoit\_wolf\_minimum\_variance} y \texttt{ledoit\_wolf\_markowitz} mantienen las mismas restricciones de optimización que sus equivalentes clásicos, pero parten de esta estimación más robusta del riesgo conjunto entre activos. Esta distinción resulta relevante porque una matriz de covarianzas inestable puede generar pesos excesivamente sensibles a pequeñas variaciones en los retornos históricos, comprometiendo el comportamiento de la cartera fuera de muestra. 
-
-La incorporación de estas variantes permite así reforzar los baselines financieros y plantear una comparación más exigente frente a las carteras basadas en escenarios sintéticos, ya que no basta con superar versiones clásicas potencialmente frágiles, sino también métodos que incorporan una gestión más cuidadosa de la estimación del riesgo.
-
-{\small
-\setlength{\tabcolsep}{3pt}
-\begin{longtable}{|p{0.14\textwidth}|p{0.16\textwidth}|p{0.17\textwidth}|p{0.16\textwidth}|p{0.14\textwidth}|}
-\caption{Modelos comparados}\label{tab:modelos-comparados}\\
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{0.15\textwidth}|p{0.17\textwidth}|p{0.19\textwidth}|p{0.17\textwidth}|p{0.17\textwidth}|}
 \hline
 \textbf{Modelo} & \textbf{Tipo} & \textbf{Entrada} & \textbf{Salida} & \textbf{Papel} \\
 \hline
@@ -903,29 +905,105 @@ Ledoit-Wolf mínima varianza & Optimización robusta & Covarianza Ledoit-Wolf & 
 \hline
 Ledoit-Wolf Markowitz & Optimización robusta & Media histórica y covarianza Ledoit-Wolf & Pesos de cartera & Baseline financiero robusto \\
 \hline
-\end{longtable}
+\end{tabular}
+\caption{Modelos comparados}
+\label{tab:modelos-comparados}
+\end{table}
 }
 
 \section{Descripción de los resultados}
 
-Este capítulo presenta los resultados disponibles en la fase actual del experimento de forma descriptiva. La interpretación de sus implicaciones se desarrolla posteriormente en la discusión, por lo que aquí se evita extraer conclusiones generales a partir de una única métrica o de una configuración concreta. El objetivo es mostrar qué se ha ejecutado, qué valores se han observado y qué bloques de evaluación deben completarse antes de la versión final del trabajo.
+Este capítulo resume los resultados disponibles en la fase actual del experimento. La intención no es cerrar todavía la interpretación, sino mostrar de forma ordenada qué se ha ejecutado, qué valores se han observado y qué partes siguen pendientes para completar la comparación.
 
 \subsection{Ejecución del pipeline experimental}
 
-Tras definir el protocolo metodológico, se implementó una primera versión reproducible del pipeline experimental en Python. El flujo descarga precios ajustados desde Yahoo Finance, calcula retornos logarítmicos diarios, aplica la partición temporal definida en la metodología y permite entrenar modelos generativos VAE y TimeGAN sobre ventanas multiactivo de 30 días. La evaluación financiera se realiza siempre sobre retornos reales del conjunto de prueba, mientras que los escenarios sintéticos se utilizan para estimar información de media, covarianza o distribución antes de construir las carteras.
+Se implementó un pipeline reproducible que descarga precios ajustados desde Yahoo Finance, los transforma en retornos logarítmicos diarios, aplica la partición temporal definida en la metodología y entrena modelos VAE y TimeGAN sobre ventanas multiactivo de 30 días. La evaluación financiera se realiza siempre sobre retornos reales del conjunto de prueba; los escenarios sintéticos solo se usan para estimar medias, covarianzas o distribuciones antes de construir las carteras.
 
-Para evitar interpretar resultados dependientes de una única inicialización, TimeGAN se evaluó también con cinco semillas distintas. Además de la variante sin calibrar, se incluyó una variante calibrada a la media y volatilidad del conjunto de entrenamiento. Esta calibración debe entenderse como un post-procesado diagnóstico, no como evidencia de que el modelo haya aprendido por sí mismo esos momentos de forma exacta.
+Para reducir la dependencia de una sola inicialización, TimeGAN se evaluó inicialmente con cinco semillas distintas y, posteriormente, se amplió la corrida a ocho semillas para comprobar la estabilidad del ranking. El conjunto final de semillas evaluadas fue 42, 43, 44, 45, 46, 47, 48 y 49. Además, se consideró una variante calibrada a la media y a la volatilidad del conjunto de entrenamiento. Esa calibración debe entenderse como un ajuste diagnóstico sobre la salida generada, no como evidencia de que el modelo reproduzca automáticamente esos momentos con exactitud.
 
-En esta versión del documento, los resultados numéricos incorporados se centran en los baselines clásicos y en la evaluación multi-semilla de TimeGAN. La ejecución cuantitativa completa del VAE, así como la incorporación sistemática de VaR, CVaR y tablas distribucionales completas, queda identificada como trabajo pendiente para la versión final. Esta aclaración evita interpretar el capítulo como una comparación cerrada entre todas las familias de modelos.
+En esta versión del documento, la evidencia cuantitativa completa del VAE todavía no se incorpora de forma homogénea. Por eso, la comparación actual se apoya sobre todo en los baselines clásicos, la evaluación multi-semilla de TimeGAN y los diagnósticos distribucionales disponibles. La Tabla~\ref{tab:resumen-timegan-multisemilla} resume la configuración y la decisión final de esa evaluación.
+
+{\small
+\renewcommand{\arraystretch}{1.2}
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{0.33\textwidth}|p{0.57\textwidth}|}
+\hline
+\textbf{Elemento} & \textbf{Resumen} \\
+\hline
+Semillas evaluadas & 42, 43, 44, 45, 46, 47, 48 y 49 \\
+\hline
+Variante con mejor validación & \texttt{timegan\_raw} \\
+\hline
+Semilla seleccionada & 44 \\
+\hline
+Criterio de selección & Métricas de validación distribucionales, temporales e informacionales \\
+\hline
+Lectura metodológica & La selección se realiza sin consultar el rendimiento financiero de test \\
+\hline
+\end{tabular}
+\caption{Resumen de la evaluación multi-semilla de TimeGAN}
+\label{tab:resumen-timegan-multisemilla}
+\end{table}
+}
+
+La decisión no se tomó porque la semilla 44 fuese la mejor en todas las métricas por separado, sino porque obtuvo el menor \emph{validation score} conjunto al combinar las métricas de validación consideradas. La Tabla~\ref{tab:ranking-timegan-validacion} muestra cómo se comportaron las primeras configuraciones del ranking y por qué la semilla 44 quedó por delante del resto.
+
+{\small
+\renewcommand{\arraystretch}{1.15}
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\textbf{Rank} & \textbf{Semilla} & \textbf{Variante} & \textbf{JS} & \textbf{Wasserstein} & \textbf{Score} \\
+\hline
+1 & 44 & \texttt{timegan\_raw} & 0,0545 & 0,00494 & 5,923 \\
+\hline
+2 & 47 & \texttt{timegan\_raw} & 0,0355 & 0,00378 & 6,011 \\
+\hline
+3 & 44 & \texttt{timegan\_mean\_vol\_calibrated} & 0,0602 & 0,00537 & 6,038 \\
+\hline
+4 & 43 & \texttt{timegan\_raw} & 0,0425 & 0,00423 & 6,131 \\
+\hline
+5 & 42 & \texttt{timegan\_raw} & 0,0428 & 0,00393 & 6,181 \\
+\hline
+\end{tabular}
+\caption{Ranking de validación de las configuraciones TimeGAN más competitivas}
+\label{tab:ranking-timegan-validacion}
+\end{table}
+}
+
+Para interpretar mejor ese resultado, la Tabla~\ref{tab:comparacion-timegan-metricas} compara la configuración ganadora con la principal alternativa del ranking. La semilla 47 mejora ligeramente en divergencia de Jensen-Shannon y distancia de Wasserstein, pero la 44 compensa ese punto con un error de correlación menor y un mejor equilibrio global en el resto de criterios, lo que reduce el \emph{validation score} final.
+
+{\small
+\renewcommand{\arraystretch}{1.15}
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{0.17\textwidth}|p{0.14\textwidth}|p{0.14\textwidth}|p{0.14\textwidth}|p{0.12\textwidth}|p{0.13\textwidth}|p{0.12\textwidth}|}
+\hline
+\textbf{Semilla} & \textbf{JS} & \textbf{Wasserstein} & \textbf{Corr. err.} & \textbf{Autocorr.} & \textbf{Autocorr. abs.} & \textbf{Score} \\
+\hline
+44 & 0,0545 & 0,00494 & 3,1328 & 0,2572 & 0,1044 & 5,923 \\
+\hline
+47 & 0,0355 & 0,00378 & 3,9071 & 0,3988 & 0,1196 & 6,011 \\
+\hline
+43 & 0,0425 & 0,00423 & 5,5086 & 0,2901 & 0,0852 & 6,131 \\
+\hline
+\end{tabular}
+\caption{Comparación de las métricas de validación más relevantes para las principales configuraciones TimeGAN}
+\label{tab:comparacion-timegan-metricas}
+\end{table}
+}
 
 \subsection{Resultados financieros fuera de muestra}
 
-La Tabla~\ref{tab:resultados-baselines} resume los principales baselines clásicos evaluados sobre el periodo de prueba. La cartera equiponderada obtuvo un ratio de Sharpe de 1,14, mientras que la cartera de mínima varianza alcanzó 1,05 con menor volatilidad y menor drawdown. El modelo de Markowitz histórico obtuvo mayor rentabilidad anualizada, pero con una volatilidad sustancialmente superior y un Sharpe inferior. En esta tabla se muestran las métricas disponibles en la fase actual; las métricas de cola se incorporarán en la comparación completa.
+La Tabla~\ref{tab:resultados-baselines} resume el comportamiento de los baselines clásicos sobre el conjunto de prueba. La cartera equiponderada ofrece un equilibrio razonable entre simplicidad y rendimiento ajustado al riesgo, la cartera de mínima varianza reduce la volatilidad y el drawdown, y la cartera de Markowitz maximiza rentabilidad bruta a costa de una variabilidad mucho mayor.
 
 {\small
 \setlength{\tabcolsep}{3pt}
-\begin{longtable}{|p{0.23\textwidth}|p{0.14\textwidth}|p{0.14\textwidth}|p{0.10\textwidth}|p{0.14\textwidth}|}
-\caption{Resultados fuera de muestra de los baselines clásicos}\label{tab:resultados-baselines}\\
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{0.23\textwidth}|p{0.14\textwidth}|p{0.14\textwidth}|p{0.10\textwidth}|p{0.14\textwidth}|}
 \hline
 \textbf{Modelo} & \textbf{Rent. anual.} & \textbf{Vol. anual.} & \textbf{Sharpe} & \textbf{Drawdown} \\
 \hline
@@ -935,15 +1013,18 @@ Mínima varianza & 13,50\% & 12,81\% & 1,05 & -10,52\% \\
 \hline
 Markowitz histórico & 22,94\% & 38,21\% & 0,60 & -31,34\% \\
 \hline
-\end{longtable}
+\end{tabular}
+\caption{Resultados fuera de muestra de los baselines clásicos}\label{tab:resultados-baselines}
+\end{table}
 }
 
 En la evaluación multi-semilla de TimeGAN, los resultados muestran un comportamiento competitivo en algunas configuraciones, aunque con una variabilidad importante entre ejecuciones. La variante TimeGAN sin calibrar usada para mínima varianza obtuvo un Sharpe medio de 1,22 con desviación típica de 0,55. La variante calibrada a media y volatilidad para mínima varianza obtuvo un Sharpe medio de 1,09 con desviación típica de 0,57. Por su parte, la cartera con media histórica contraída y covarianza sintética calibrada obtuvo un Sharpe medio de 1,13 con desviación típica de 0,66. Estos valores describen un comportamiento sensible a la semilla de entrenamiento, por lo que deben leerse junto con la dispersión indicada y no solo a partir de la media.
 
 {\small
 \setlength{\tabcolsep}{3pt}
-\begin{longtable}{|p{0.29\textwidth}|p{0.15\textwidth}|p{0.15\textwidth}|p{0.15\textwidth}|}
-\caption{Resultados multi-semilla de carteras basadas en TimeGAN}\label{tab:resultados-timegan-multisemilla}\\
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{0.29\textwidth}|p{0.15\textwidth}|p{0.15\textwidth}|p{0.15\textwidth}|}
 \hline
 \textbf{Cartera TimeGAN} & \textbf{Rent. anual. media} & \textbf{Vol. anual. media} & \textbf{Sharpe medio} \\
 \hline
@@ -957,33 +1038,30 @@ Calibrada mínima varianza & 14,95\% & 14,13\% & 1,09 $\pm$ 0,57 \\
 \hline
 Calibrada media contraída y covarianza sintética & 21,87\% & 19,90\% & 1,13 $\pm$ 0,66 \\
 \hline
-\end{longtable}
+\end{tabular}
+\caption{Resultados multi-semilla de carteras basadas en TimeGAN}\label{tab:resultados-timegan-multisemilla}
+\end{table}
 }
 
-La comparación con la cartera equiponderada es especialmente relevante: aunque algunas variantes TimeGAN alcanzan un Sharpe medio similar o ligeramente superior, la desviación típica entre semillas es alta. Por tanto, los resultados no deben presentarse como una superioridad robusta de TimeGAN frente a los enfoques clásicos, sino como una evidencia descriptiva de que determinadas configuraciones pueden comportarse de forma competitiva bajo este periodo y este universo de activos.
+La comparación con la cartera equiponderada es especialmente relevante: aunque algunas variantes TimeGAN alcanzan un Sharpe medio similar o ligeramente superior, la desviación típica entre semillas es alta. Por tanto, los resultados no deben presentarse como una superioridad robusta de TimeGAN frente a los enfoques clásicos, sino como una evidencia descriptiva de que determinadas configuraciones pueden comportarse de forma competitiva bajo este periodo y este universo de activos. En el caso concreto de la semilla 44, la ventaja no aparece por ganar en cada métrica individual, sino por ofrecer el mejor equilibrio global en validación, con el menor \emph{validation score} del ranking.
+
+La comparación con TimeGAN es especialmente útil porque fija una referencia clara: algunas configuraciones alcanzan un Sharpe medio similar o ligeramente superior al de la cartera equiponderada, pero la variabilidad entre semillas sigue siendo alta. En consecuencia, los resultados describen competitividad puntual, no superioridad robusta.
 
 \subsection{Resultados de los baselines robustos con Ledoit-Wolf}
 
-Como ya hemos comentado anteriormente, además de los baselines clásicos iniciales, se incorporaron dos variantes robustas basadas en la estimación de covarianza Ledoit-Wolf \cite{LedoitWolf2004}, en concreto \texttt{ledoit\_wolf\_minimum\_variance} y \texttt{ledoit\_wolf\_markowitz}. con el objetivo de reforzar la comparación financiera mediante una estimación más estable de la matriz de covarianzas, manteniendo las mismas restricciones del experimento.
+Además de los baselines clásicos, se incorporaron dos variantes robustas basadas en Ledoit-Wolf \cite{LedoitWolf2004}: \texttt{ledoit\_wolf\_minimum\_variance} y \texttt{ledoit\_wolf\_markowitz}. Su objetivo es comprobar si una estimación de covarianza mejor condicionada cambia de forma material el comportamiento financiero.
 
-La Tabla~\ref{tab:resultados-ledoit-wolf} muestra la comparación entre los modelos clásicos basados en covarianza muestral y sus equivalentes robustos con Ledoit-Wolf.
+La Tabla~\ref{tab:resultados-ledoit-wolf} compara las versiones clásicas con esas variantes robustas.
 
 {\small
 \setlength{\tabcolsep}{3pt}
 \renewcommand{\arraystretch}{1.2}
-\begin{longtable}{|p{0.31\textwidth}|p{0.13\textwidth}|p{0.13\textwidth}|p{0.10\textwidth}|p{0.14\textwidth}|}
-\caption{Comparación de baselines clásicos y variantes robustas con Ledoit-Wolf}
-\label{tab:resultados-ledoit-wolf}\\
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{0.31\textwidth}|p{0.13\textwidth}|p{0.13\textwidth}|p{0.10\textwidth}|p{0.14\textwidth}|}
 \hline
 \textbf{Modelo} & \textbf{Rent. anual.} & \textbf{Vol. anual.} & \textbf{Sharpe} & \textbf{Drawdown} \\
 \hline
-\endfirsthead
-
-\hline
-\textbf{Modelo} & \textbf{Rent. anual.} & \textbf{Vol. anual.} & \textbf{Sharpe} & \textbf{Drawdown} \\
-\hline
-\endhead
-
 Mínima varianza & 13,50\% & 12,81\% & 1,05 & -10,52\% \\
 \hline
 Ledoit-Wolf mínima varianza & 13,62\% & 12,73\% & 1,07 & -10,53\% \\
@@ -992,61 +1070,51 @@ Markowitz histórico & 22,94\% & 38,21\% & 0,60 & -31,34\% \\
 \hline
 Ledoit-Wolf Markowitz & 23,20\% & 38,36\% & 0,60 & -31,42\% \\
 \hline
-
-\end{longtable}
+\end{tabular}
+\caption{Comparación de baselines clásicos y variantes robustas con Ledoit-Wolf}
+\label{tab:resultados-ledoit-wolf}
+\end{table}
 }
 
-Los resultados muestran que la variante Ledoit-Wolf de mínima varianza mejora ligeramente a la cartera de mínima varianza clásica, con un aumento de la rentabilidad anualizada de 13,50\% a 13,62\%, una reducción de la volatilidad de 12,81\% a 12,73\% y una mejora del ratio de Sharpe de 1,05 a 1,07.
+La variante Ledoit-Wolf de mínima varianza mejora ligeramente a la cartera clásica, con algo más de rentabilidad, algo menos de volatilidad y un Sharpe superior. En Markowitz el impacto es mucho menor: la rentabilidad sube de forma marginal, pero el perfil de riesgo casi no cambia. Eso indica que la regularización de la covarianza ayuda, aunque no resuelve por sí sola la sensibilidad del modelo cuando la estimación de retornos esperados permanece inalterada.
 
-Las diferencias no son muy elevadas, lo cual era esperable ya que cuando la muestra histórica es suficientemente larga y los activos no son demasiado numerosos, la covarianza muestral ya ofrece una estimación razonablemente estable, dejando poco margen para que la introducir mejoras. 
-
-En el caso de Markowitz, el efecto es más limitado. La variante robusta obtiene una rentabilidad anualizada algo superior, pasando de 22,94\% a 23,20\%, pero mantiene una volatilidad y un drawdown prácticamente iguales a los del modelo clásico. Esto sugiere que, en esta configuración experimental, la sensibilidad de Markowitz no depende únicamente de la matriz de covarianzas sino también de la estimación de los retornos esperados, que permanece inalterada en ambas variantes. 
-
-Por tanto, la incorporación de Ledoit-Wolf no pretende transformar de forma radical los baselines, sino reforzar la comparación metodológica de forma los modelos generativos deban medirse no sólo frente a versiones clásicas , sino también frente a variantes que incorporan una estimación más cuidadosa del riesgo.
+En conjunto, estas variantes no buscan reemplazar los baselines clásicos, sino obligar a que la comparación con carteras sintéticas se haga frente a referencias más robustas.
 
 \subsection{Fidelidad distribucional observada}
 
-Los diagnósticos distribucionales muestran que la generación de escenarios financieros sigue siendo una tarea difícil. En validación, el error medio de la matriz de correlación de TimeGAN se situó alrededor de 4,01, lo que indica que la estructura de dependencia multiactivo no se reproduce de forma completamente satisfactoria. Del mismo modo, el error medio de curtosis fue aproximadamente 6,01, señal de que el modelo tiende a suavizar las colas y reproduce con dificultad eventos extremos.
+Los diagnósticos distribucionales muestran que generar escenarios financieros fieles sigue siendo difícil. En validación, TimeGAN mantiene un error de correlación todavía apreciable y tiende a suavizar las colas, lo que sugiere que le cuesta capturar simultáneamente dependencia cruzada y eventos extremos. Ese comportamiento es coherente con la dificultad general de los modelos compactos cuando trabajan con retornos financieros.
 
-Estos resultados son coherentes con una limitación habitual de modelos generativos compactos aplicados a retornos financieros: pueden capturar parte de la escala y de la forma central de las distribuciones, especialmente tras calibración, pero tienen más dificultad para preservar simultáneamente colas pesadas, asimetrías y relaciones de dependencia entre activos. En consecuencia, los resultados deben interpretarse como evidencia preliminar de viabilidad del pipeline, no como demostración concluyente de superioridad financiera.
-
-Para que esta sección sea completa en la versión final, será necesario incorporar una tabla de fidelidad distribucional que compare al menos VAE, TimeGAN y los datos reales mediante errores de media, volatilidad, correlación, autocorrelación, autocorrelación absoluta y métricas informacionales. Sin esa tabla, la evidencia distribucional debe considerarse parcial.
+Por eso, esta parte del trabajo debe leerse como una validación parcial del pipeline: muestra que el sistema funciona y que produce escenarios útiles para análisis, pero todavía no prueba una fidelidad distribucional completa.
 
 \subsection{Síntesis descriptiva de resultados}
 
-En conjunto, los resultados disponibles muestran que el pipeline técnico permite comparar baselines clásicos y variantes basadas en TimeGAN bajo un mismo protocolo de datos y evaluación. Las carteras clásicas ofrecen referencias sólidas, especialmente la cartera equiponderada y la de mínima varianza. Algunas variantes basadas en TimeGAN obtienen valores de Sharpe competitivos, pero muestran dispersión entre semillas. Por su parte, los diagnósticos de fidelidad distribucional disponibles indican que la generación de retornos financieros sigue presentando dificultades, en particular al reproducir correlaciones, colas y ciertos rasgos temporales de las series. La comparación cuantitativa con VAE deberá incorporarse antes de presentar estos resultados como una evaluación completa de las dos familias generativas.
+En conjunto, los resultados muestran que el pipeline permite comparar carteras clásicas, variantes robustas y carteras derivadas de escenarios sintéticos bajo un mismo protocolo. Las referencias clásicas siguen siendo sólidas, TimeGAN ofrece resultados competitivos en algunas configuraciones y la parte distribucional todavía deja margen claro de mejora. La comparación completa con VAE y una tabla distribucional más amplia siguen siendo necesarias para cerrar el análisis con una visión realmente completa.
 
-Esta síntesis no debe interpretarse como una conclusión definitiva sobre la superioridad de una familia de modelos, sino como una descripción ordenada de los resultados observados hasta este punto del experimento. La valoración metodológica de estas evidencias se desarrolla en el capítulo siguiente.
+Esta síntesis es descriptiva, no concluyente. La valoración metodológica de estas evidencias se desarrolla en el capítulo siguiente.
 
 \chapter{Discusión}
 
-Los resultados disponibles permiten analizar de forma preliminar el papel de los modelos generativos dentro del problema de optimización de carteras desde una perspectiva prudente. El experimento no muestra que VAE o TimeGAN deban sustituir a los enfoques clásicos, pero sí permite estudiar qué riesgos aparecen cuando se utilizan escenarios sintéticos en series financieras y qué evidencia adicional será necesaria para completar la comparación.
+Los resultados permiten una conclusión prudente: los modelos generativos son prometedores como generadores de escenarios, pero todavía no justifican sustituir a los métodos clásicos de optimización de carteras. En este experimento, las carteras equiponderada y de mínima varianza siguen ofreciendo referencias muy sólidas con una complejidad mucho menor, lo que obliga a exigir a cualquier alternativa generativa una mejora clara y estable para poder considerarla ventajosa.
 
-Una primera observación relevante es que los baselines clásicos mantienen un comportamiento sólido. La cartera equiponderada y la cartera de mínima varianza ofrecen resultados competitivos con una complejidad mucho menor que la requerida por los modelos generativos. Esto refuerza la importancia de no tratar estos métodos como simples comparadores básicos, sino como referencias exigentes. En un problema financiero real, una técnica más compleja solo resulta interesante si aporta una mejora suficientemente estable o una información adicional que justifique su coste metodológico.
+La lectura de TimeGAN es especialmente relevante. El modelo consigue, en algunas configuraciones, carteras competitivas y métricas financieras razonables, pero su comportamiento depende de forma apreciable de la semilla de entrenamiento. Esa sensibilidad no invalida el enfoque, pero sí impide presentarlo como una mejora robusta. En un contexto financiero, una ejecución aislada favorable no basta: si la selección de configuración se hiciera mirando el test, se introduciría sesgo de selección y la comparación dejaría de ser válida. Por eso la validación temporal y multi-semilla es una parte central del diseño experimental.
 
-En el caso de los modelos generativos, los resultados sugieren una lectura más matizada. TimeGAN puede generar escenarios que, utilizados para estimar determinadas estructuras de riesgo, dan lugar a carteras competitivas en algunas configuraciones. Sin embargo, la sensibilidad a la semilla de entrenamiento impide interpretar estos resultados como una mejora robusta. Esta variabilidad es especialmente importante porque, si se eligiera la mejor ejecución mirando el conjunto de test, se estaría introduciendo un sesgo de selección. Por ello, cualquier selección de semilla o configuración debe realizarse con métricas de validación y reservar el test exclusivamente para la evaluación final.
+El VAE cumple una función complementaria dentro del estudio. Su valor está en ofrecer un generador probabilístico más estable y más sencillo de interpretar, pero la versión actual del trabajo aún no incorpora una comparación cuantitativa tan completa como la de TimeGAN. En consecuencia, la discusión sobre su superioridad o inferioridad debe mantenerse abierta hasta disponer de todos los resultados homogéneos. Lo importante, por ahora, es que ambas familias de modelos se evalúan bajo el mismo protocolo y con la misma lógica de separación temporal.
 
-El VAE, por su parte, cumple el papel de modelo generativo probabilístico basado en una representación latente dentro del diseño experimental. Su interés está en proporcionar una forma relativamente estable de generar escenarios sintéticos, aunque la versión actual del documento todavía no incluye la tabla cuantitativa completa necesaria para valorar su comportamiento frente a TimeGAN. Por ello, cualquier comparación definitiva entre ambos modelos debe posponerse hasta incorporar esos resultados.
+Los diagnósticos distribucionales muestran además que la calidad de una cartera no puede juzgarse únicamente por el Sharpe final. Preservar la estructura de correlaciones es esencial porque la diversificación depende precisamente de cómo se relacionan los activos entre sí. Del mismo modo, las colas de la distribución, el VaR, el CVaR y la autocorrelación aportan información que las métricas medias no capturan. Esto explica por qué un escenario puede parecer plausible a simple vista y, sin embargo, no ser suficientemente fiel para apoyar decisiones de asignación de capital.
 
-Los diagnósticos distribucionales muestran que no basta con obtener una cartera con buen Sharpe para considerar que el modelo generativo funciona correctamente. En optimización de carteras, la preservación de la matriz de correlaciones es fundamental, ya que afecta directamente a la diversificación y a la estimación del riesgo conjunto. Del mismo modo, las colas de la distribución y las medidas como VaR y CVaR son necesarias para valorar pérdidas extremas que pueden no quedar reflejadas en métricas medias. La autocorrelación de retornos y, especialmente, la autocorrelación de retornos absolutos también aportan información sobre estructura temporal y agrupación de volatilidad.
+En ese sentido, el valor metodológico del trabajo está más en el protocolo que en una cifra aislada. Separar entrenamiento, validación y prueba, registrar metadatos de ejecución, comparar varias semillas y evaluar frente a baselines clásicos robustos reduce la probabilidad de sobreinterpretar un resultado puntual. En modelos generativos aplicados a finanzas, esta disciplina experimental no es opcional: es la única forma razonable de distinguir una mejora real de un buen resultado circunstancial.
 
-Desde el punto de vista metodológico, el principal valor del trabajo está en el protocolo de evaluación más que en una única cifra de rendimiento. Separar entrenamiento, validación y prueba, registrar metadatos de ejecución, evaluar varias semillas y comparar contra baselines clásicos permite reducir el riesgo de sobreinterpretar resultados puntuales. En modelos generativos aplicados a finanzas, esta disciplina experimental es especialmente importante porque las mejoras aparentes pueden depender de una inicialización concreta, de un periodo histórico favorable o de una métrica que no capture adecuadamente el riesgo.
+También conviene subrayar las limitaciones del piloto. El universo analizado es reducido, la frecuencia es diaria, el periodo histórico es único y no se incluyen costes de transacción, impacto de mercado ni validación en un entorno real de decisión. Estas restricciones no invalidan el estudio, pero sí acotan su alcance. La conclusión correcta no es que el enfoque generativo falle, sino que todavía necesita más evidencia para competir con garantías frente a métodos clásicos robustos.
 
-También deben reconocerse varias limitaciones. El universo de inversión está formado únicamente por diez activos, todos ellos de gran capitalización. La frecuencia de los datos es diaria y el análisis se limita a un único periodo histórico. Además, el experimento no incorpora una validación en mercado real, ni debe interpretarse como una propuesta lista para producción. Salvo que se incorpore explícitamente en fases posteriores, tampoco se consideran costes de transacción, impacto de mercado, restricciones operativas adicionales ni aspectos regulatorios. Estas limitaciones no invalidan el piloto, pero sí acotan el alcance de las conclusiones.
-
-En consecuencia, la conclusión más razonable es que los modelos generativos pueden ser herramientas prometedoras para la generación de escenarios financieros, pero su utilidad depende de una validación estricta. No basta con generar datos visualmente plausibles ni con obtener un buen resultado financiero en una ejecución concreta. Para que estos modelos sean útiles en optimización de carteras, deben preservar propiedades relevantes de los retornos, mostrar estabilidad entre semillas y demostrar valor frente a baselines clásicos robustos.
-
-Como línea futura, podría plantearse una propuesta preliminar de puesta en producción, aunque siempre condicionada a validaciones adicionales. Una versión más cercana a un entorno operativo requeriría ingesta automática de datos, reentrenamiento programado, validación previa al despliegue, monitorización de deriva de datos, control continuo del riesgo de cartera, versionado de modelos, seguimiento reproducible de experimentos, backtesting con costes de transacción y revisión humana antes de utilizar cualquier cartera generada. Además, sería necesario ampliar el universo de activos, incorporar pruebas de estrés y revisar posibles implicaciones regulatorias y operativas.
-
-Por tanto, el trabajo no justifica reemplazar los métodos clásicos de optimización de carteras por modelos generativos. Su aportación debe entenderse de forma más acotada: proporciona un marco experimental reproducible para evaluar VAE y TimeGAN como generadores de escenarios sintéticos y para estudiar si dichos escenarios pueden complementar, bajo ciertas condiciones, el análisis clásico de riesgo y asignación de activos.
+Por tanto, la aportación principal del trabajo es proporcionar un marco experimental reproducible para estudiar si VAE y TimeGAN preservan suficiente información del mercado como para ser útiles en optimización de carteras. A día de hoy, la evidencia apunta a que pueden complementar el análisis clásico, pero no reemplazarlo.
 
 \chapter{Propuesta de puesta en producción}
 
-Aunque el sistema desarrollado en este trabajo tiene un carácter experimental resulta conveniente plantear cómo podría evolucionar y avanzar hacia una versión más accesible por parte de los distintos usuarios interesados en él. En esta línea, se plantea como posible propuesta el desarrollo de una web que permita ejecutar el pipeline desarrollado de forma controlada, visualizar los resultados obtenidos y facilitar la comparación de modelos clásicos, robustos y generativos sin necesidad de interactuar directamente con el código.
+Aunque el sistema desarrollado en este trabajo tiene un carácter experimental, es razonable describir una evolución futura que lo acerque a un prototipo utilizable por otros investigadores o usuarios internos. La idea no es automatizar decisiones de inversión, sino convertir el pipeline en una aplicación que permita ejecutar experimentos de forma controlada, revisar datos, comparar modelos y conservar trazabilidad sobre cada ejecución.
 
-La idea principal consiste en transformar el pipeline actual, consistente en distintos scripts de Python, en una plataforma web sencilla que permita centralizar en una interfaz única las principales fases de nuestro trabajo: la descarga de datos, el análisis exploratorio, la generación de escenarios sintéticos, la evaluación y optimización de carteras y una comparación final de resultados. De esta forma, se obtiene una interfaz donde un usuario puede seleccionar un conjunto de activos, definir un periodo temporal, ejecutar el análisis y consultar los resultados obtenidos.
+La propuesta más natural es una interfaz web que centralice las fases principales del flujo: descarga de datos, análisis exploratorio, preparación de retornos, generación de escenarios sintéticos, evaluación distribucional y comparación de carteras. De ese modo, el usuario podría seleccionar activos, definir un periodo, lanzar el experimento y consultar los resultados sin interactuar directamente con los scripts del proyecto.
 
-Desde el punto de vista funcional, la aplicación podría organizarse como un panel web dividido en varias secciones o módulos que quedan resumidas a continuación en forma de tabla:
+Funcionalmente, la aplicación podría dividirse en los módulos siguientes:
 
 \begin{itemize}
 \item Módulo de ingesta de datos: encargado de descargar precios ajustados desde Yahoo Finance mediante \texttt{yfinance}, validar que existen datos suficientes y almacenar una copia local de los datos utilizados en cada ejecución.
@@ -1064,15 +1132,15 @@ Desde el punto de vista funcional, la aplicación podría organizarse como un pa
 \end{itemize}
 
 
-La arquitectura técnica propuesta sería sencilla y modular, con un backend desarrollado en FastAPI por su capacidad para exponer endpoints REST de forma clara y su buena integración con código Python existente, y un frontend que nos permita construir paneles interactivos rápidamente reutilizando los gráficos y resultados generados por el pipeline sin necesidad de desarrollar una capa de presentación desde cero. 
+La arquitectura técnica podría mantenerse deliberadamente simple: un backend en FastAPI para exponer endpoints de ejecución y consulta, y un frontend web para mostrar resultados y gráficas sin tener que reconstruir la lógica científica del proyecto. Esa separación es útil porque permite reutilizar el código existente, aislar el motor experimental de la interfaz y facilitar futuras extensiones sin reescribir el pipeline.
 
-El flujo de uso sería sencillo: el usuario seleccionaría los activos y el periodo de análisis, tras lo cual el sistema descargaría automáticamente los precios ajustados, verificaría la calidad de los datos y calcularía los retornos logarítmicos mostrando el análisis exploratorio correspondiente. Una vez revisada esta fase, el usuario podría lanzar la comparación de baselines, obteniendo los pesos de cada cartera, su evaluación sobre el conjunto de test y una tabla comparativa con las métricas principales.
+El flujo de uso sería lineal. El usuario seleccionaría el universo de activos y el intervalo temporal; el sistema descargaría los precios ajustados, validaría la consistencia de las series y generaría el análisis exploratorio; después se lanzarían los modelos generativos y los baselines; por último, se mostrarían las métricas financieras, distribucionales e informacionales junto con las carteras resultantes. En una primera versión, este proceso podría ejecutarse en local o en un servidor sencillo, sin requerir una infraestructura compleja.
 
-En una versión inicial, la aplicación podría ejecutarse localmente o desplegarse en un servidor sencillo, como una máquina virtual o un servicio cloud básico,  sin necesidad de una infraestructura compleja.
+Si esta propuesta evolucionara a una herramienta más madura, habría tres requisitos que sí deberían incorporarse desde el inicio: registro de configuraciones y semillas, almacenamiento de resultados y artefactos, y control de versiones de datos y modelos. Sin esos elementos, la plataforma sería útil como demostrador, pero no como entorno serio de experimentación reproducible.
 
-Por último, esta propuesta debe mantenerse alineada con el carácter experimental del trabajo, el objetivo no es automatizar decisiones de inversión sino ofrecer una herramienta que permita ejecutar el pipeline, revisar los datos y comparar estrategias bajo criterios controlados.
+En una fase posterior, podrían añadirse mejoras como nuevas fuentes de datos, actualización periódica, monitorización de ejecuciones, comparación entre múltiples configuraciones y exportación estructurada de resultados. También sería razonable incluir controles adicionales de seguridad y acceso si la aplicación se compartiera fuera del entorno de investigación.
 
-No obstante, esta propuesta debe entenderse como una primera aproximación orientada a hacer el pipeline más accesible y reproducible con el objetivo principal de transformar el trabajo desarrollado en un prototipo utilizable desde el que ejecutar experimentos, visualizar resultados y comparar modelos de forma ordenada. De cara al futuro se podría desarrollar otra versión que contenga mejoras notables como incorporar fuentes de datos adicionales y mecanismos de actualización periódica o añadir una gestión más completa de los modelos entrenados que permitiera almacenar configuraciones, registrar semillas y repetir experimentos anteriores de forma exacta.
+En síntesis, la propuesta de puesta en producción debe entenderse como una continuación natural del trabajo: no como un sistema de inversión automático, sino como un prototipo web reproducible para ejecutar el pipeline, revisar resultados y comparar enfoques de forma ordenada.
 
 %\begin{thebibliography}{a}
 %\bibitem{etiqueta} \textsc{Autores},
