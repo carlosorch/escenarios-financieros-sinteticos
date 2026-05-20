@@ -10,6 +10,10 @@ from tfm_pipeline.optimization import (
     mean_variance_weights_from_estimates,
     minimum_variance_weights,
     portfolio_returns,
+    ledoit_wolf_covariance,
+    minimum_variance_weights_from_covariance,
+    ledoit_wolf_minimum_variance_weights,
+    ledoit_wolf_mean_variance_weights,
 )
 
 
@@ -82,3 +86,74 @@ class TestMeanVarianceWeightsFromEstimates:
         cov = np.array([[0.04, 0.01, 0.01], [0.01, 0.03, 0.01], [0.01, 0.01, 0.02]])
         w = mean_variance_weights_from_estimates(mean, cov, risk_aversion=1.0)
         assert (w >= -1e-8).all()
+
+
+class TestLedoitWolfCovariance:
+    def test_shape(self) -> None:
+        returns = pd.DataFrame(np.random.default_rng(0).normal(0, 0.02, size=(200, 4)), columns=list("abcd"))
+        cov = ledoit_wolf_covariance(returns, periods_per_year=252)
+        assert cov.shape == (4, 4)
+
+    def test_no_nan(self) -> None:
+        returns = pd.DataFrame(np.random.default_rng(0).normal(0, 0.02, size=(200, 4)), columns=list("abcd"))
+        cov = ledoit_wolf_covariance(returns, periods_per_year=252)
+        assert not np.isnan(cov).any()
+
+    def test_annualization(self) -> None:
+        # Returns with small scale
+        returns = pd.DataFrame(np.random.default_rng(0).normal(0.0001, 0.001, size=(200, 4)), columns=list("abcd"))
+        cov_daily = ledoit_wolf_covariance(returns, periods_per_year=1)
+        cov_annual = ledoit_wolf_covariance(returns, periods_per_year=252)
+        # Annual should be roughly 252x the daily (approximately)
+        assert np.allclose(cov_annual, cov_daily * 252, rtol=0.05, atol=0.0)
+
+
+class TestMinimumVarianceWeightsFromCovariance:
+    def test_sum_to_one(self) -> None:
+        cov = np.array([[0.04, 0.01, 0.01], [0.01, 0.03, 0.01], [0.01, 0.01, 0.02]])
+        w = minimum_variance_weights_from_covariance(cov)
+        assert pytest.approx(w.sum()) == 1.0
+
+    def test_long_only(self) -> None:
+        cov = np.array([[0.04, 0.01, 0.01], [0.01, 0.03, 0.01], [0.01, 0.01, 0.02]])
+        w = minimum_variance_weights_from_covariance(cov)
+        assert (w >= -1e-8).all()
+
+    def test_bounds(self) -> None:
+        cov = np.array([[0.04, 0.01, 0.01], [0.01, 0.03, 0.01], [0.01, 0.01, 0.02]])
+        w = minimum_variance_weights_from_covariance(cov)
+        assert (w <= 1.0 + 1e-8).all()
+
+
+class TestLedoitWolfMinimumVarianceWeights:
+    def test_sum_to_one(self) -> None:
+        returns = pd.DataFrame(np.random.default_rng(0).normal(0, 0.02, size=(200, 4)), columns=list("abcd"))
+        w = ledoit_wolf_minimum_variance_weights(returns, periods_per_year=252)
+        assert pytest.approx(w.sum()) == 1.0
+
+    def test_long_only(self) -> None:
+        returns = pd.DataFrame(np.random.default_rng(0).normal(0, 0.02, size=(200, 4)), columns=list("abcd"))
+        w = ledoit_wolf_minimum_variance_weights(returns, periods_per_year=252)
+        assert (w >= -1e-8).all()
+
+    def test_bounds(self) -> None:
+        returns = pd.DataFrame(np.random.default_rng(0).normal(0, 0.02, size=(200, 4)), columns=list("abcd"))
+        w = ledoit_wolf_minimum_variance_weights(returns, periods_per_year=252)
+        assert (w <= 1.0 + 1e-8).all()
+
+
+class TestLedoitWolfMeanVarianceWeights:
+    def test_sum_to_one(self) -> None:
+        returns = pd.DataFrame(np.random.default_rng(0).normal(0.0005, 0.02, size=(200, 4)), columns=list("abcd"))
+        w = ledoit_wolf_mean_variance_weights(returns, risk_aversion=1.0, periods_per_year=252)
+        assert pytest.approx(w.sum()) == 1.0
+
+    def test_long_only(self) -> None:
+        returns = pd.DataFrame(np.random.default_rng(0).normal(0.0005, 0.02, size=(200, 4)), columns=list("abcd"))
+        w = ledoit_wolf_mean_variance_weights(returns, risk_aversion=1.0, periods_per_year=252)
+        assert (w >= -1e-8).all()
+
+    def test_bounds(self) -> None:
+        returns = pd.DataFrame(np.random.default_rng(0).normal(0.0005, 0.02, size=(200, 4)), columns=list("abcd"))
+        w = ledoit_wolf_mean_variance_weights(returns, risk_aversion=1.0, periods_per_year=252)
+        assert (w <= 1.0 + 1e-8).all()

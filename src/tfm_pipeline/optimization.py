@@ -3,6 +3,7 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 from scipy.optimize import minimize
+from sklearn.covariance import LedoitWolf
 
 
 def equal_weights(n_assets: int) -> np.ndarray:
@@ -89,3 +90,44 @@ def mean_variance_weights_from_estimates(
     if not result.success:
         raise RuntimeError(f"Mean-variance optimization failed: {result.message}")
     return result.x
+
+
+def ledoit_wolf_covariance(returns: pd.DataFrame, periods_per_year: int = 252) -> np.ndarray:
+    lw = LedoitWolf()
+    lw.fit(returns.to_numpy())
+    annualized_cov = lw.covariance_ * periods_per_year
+    return annualized_cov
+
+
+def minimum_variance_weights_from_covariance(cov: np.ndarray) -> np.ndarray:
+    n_assets = cov.shape[0]
+    initial = equal_weights(n_assets)
+    constraints = {"type": "eq", "fun": lambda weights: np.sum(weights) - 1.0}
+    bounds = [(0.0, 1.0)] * n_assets
+
+    result = minimize(
+        lambda weights: float(weights.T @ cov @ weights),
+        initial,
+        method="SLSQP",
+        bounds=bounds,
+        constraints=constraints,
+        options={"ftol": 1e-12, "maxiter": 1000},
+    )
+    if not result.success:
+        raise RuntimeError(f"Minimum variance optimization failed: {result.message}")
+    return result.x
+
+
+def ledoit_wolf_minimum_variance_weights(returns: pd.DataFrame, periods_per_year: int = 252) -> np.ndarray:
+    cov = ledoit_wolf_covariance(returns, periods_per_year)
+    return minimum_variance_weights_from_covariance(cov)
+
+
+def ledoit_wolf_mean_variance_weights(
+    returns: pd.DataFrame,
+    risk_aversion: float = 1.0,
+    periods_per_year: int = 252,
+) -> np.ndarray:
+    mean = returns.mean().to_numpy() * periods_per_year
+    cov = ledoit_wolf_covariance(returns, periods_per_year)
+    return mean_variance_weights_from_estimates(mean, cov, risk_aversion)
