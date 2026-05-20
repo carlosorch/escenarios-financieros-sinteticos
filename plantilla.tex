@@ -94,7 +94,7 @@ En particular, mediante el enfoque media-varianza, Markowitz estableció que el 
 
 No obstante, a pesar de su relevancia teórica, la aplicación de estos enfoques a datos financieros reales presenta limitaciones importantes. En la práctica, los retornos de los activos no suelen ajustarse a distribuciones normales, sino que muestran asimetrías, colas pesadas y episodios de volatilidad agrupada. Asimismo, las relaciones entre activos pueden ser no lineales y variar a lo largo del tiempo, especialmente en contextos de inestabilidad o crisis financieras. Estas características dificultan la estimación precisa de los parámetros necesarios para el modelo y pueden dar lugar a soluciones inestables o poco robustas, evidenciando la necesidad de desarrollar metodologías más flexibles capaces de capturar la complejidad inherente a los mercados financieros.
 
-En este contexto, el presente trabajo se sitúa en la intersección entre finanzas cuantitativas, inteligencia artificial y teoría de la información. En concreto, se propone estudiar si el uso de modelos generativos, como TimeGAN y los Autoencoders Variacionales, junto con medidas informacionales como la divergencia de Kullback-Leibler \cite{Kullback1951}, puede aportar una representación más rica del riesgo y de las distribuciones de retorno. De este modo, el trabajo pretende explorar una alternativa metodológica a los enfoques clásicos, incorporando herramientas capaces de modelar distribuciones complejas de retornos y dependencias más realistas entre activos.
+En este contexto, el presente trabajo se sitúa en la intersección entre finanzas cuantitativas, inteligencia artificial y teoría de la información. En concreto, se propone estudiar si el uso de modelos generativos, como TimeGAN y los Autoencoders Variacionales, junto con medidas informacionales como la divergencia de Kullback-Leibler \cite{Kullback1951}, puede aportar una representación más rica del riesgo y de las distribuciones de retorno. 
 
 La relevancia de este problema no es únicamente teórica. En la práctica, una cartera se construye a partir de estimaciones sobre el comportamiento futuro de los activos, por lo que cualquier error en la representación de sus retornos puede trasladarse directamente a la asignación de pesos. Si dichas estimaciones simplifican en exceso la realidad del mercado, por ejemplo asumiendo normalidad o relaciones de dependencia estables, el resultado puede ser una cartera aparentemente eficiente en términos históricos pero vulnerable cuando cambia el entorno financiero. En consecuencia, mejorar la forma en que se representan los retornos no es una cuestión secundaria, sino un elemento central para reforzar la calidad del proceso de decisión.
 
@@ -170,11 +170,11 @@ El proceso de toma de decisiones en los mercados financieros se caracteriza por 
 
 Antes de comenzar a analizar el estado del arte y las investigaciones más relevantes dentro del contexto del presente trabajo, es necesario desarrollar el marco teórico sobre el que se fundamenta, de forma que se construya una base conceptual sólida que permita comprender tanto el vocabulario utilizado como las decisiones metodológicas tomadas durante el estudio. En este apartado definiremos los principales conceptos relacionados con la inteligencia artificial, el aprendizaje automático, la optimización de carteras, los modelos generativos y la teoría de la información, finalizando con las métricas empleadas posteriormente en la evaluación del modelo propuesto.
 
-Según \cite{IBM2024}, la Inteligencia Artificial (IA) es una tecnología que permite a las computadoras y máquinas simular el aprendizaje humano, la comprensión, la resolución de problemas, la toma de decisiones, la creatividad y la autonomía. Dentro de ella podemos encontrar numerosas áreas orientadas al desarrollo de sistemas capaces de aprender y tomar decisiones, entre las que destacamos el aprendizaje automático o machine learning y el aprendizaje profundo o Deep learning.
+Según \citeA{IBM2024}, la Inteligencia Artificial (IA) es una tecnología que permite a las computadoras y máquinas simular el aprendizaje humano, la comprensión, la resolución de problemas, la toma de decisiones, la creatividad y la autonomía. Dentro de ella podemos encontrar numerosas áreas orientadas al desarrollo de sistemas capaces de aprender y tomar decisiones, entre las que destacamos el aprendizaje automático o machine learning y el aprendizaje profundo o Deep learning.
 
 Se define el aprendizaje automático como una disciplina de la inteligencia artificial centrada en el desarrollo de algoritmos y modelos capaces de identificar patrones y aprender a partir de datos, permitiendo realizar predicciones o tomar decisiones sin necesidad de ser programados explícitamente para cada tarea \cite{Bishop2006}. El aprendizaje profundo es una subárea del aprendizaje automático basada en redes neuronales artificiales capaces de aprender representaciones jerárquicas y complejas de los datos mediante múltiples capas de procesamiento \cite{Goodfellow2016}.
 
-Dentro del aprendizaje profundo han surgido en los últimos años distintas arquitecturas orientadas al aprendizaje probabilístico y a la generación de datos sintéticos, conocidas como modelos generativos. Según \cite{BanosIzquierdo2022}, los modelos generativos son arquitecturas diseñadas para aprender la distribución probabilística de un conjunto de datos con el objetivo de generar nuevas muestras sintéticas similares a las originales. Esta definición conecta directamente con el objetivo del presente trabajo, centrado en la generación y evaluación de escenarios financieros sintéticos.
+Dentro del aprendizaje profundo han surgido en los últimos años distintas arquitecturas orientadas al aprendizaje probabilístico y a la generación de datos sintéticos, conocidas como modelos generativos. Según \citeA{BanosIzquierdo2022}, los modelos generativos son arquitecturas diseñadas para aprender la distribución probabilística de un conjunto de datos con el objetivo de generar nuevas muestras sintéticas similares a las originales. Esta definición conecta directamente con el objetivo del presente trabajo, centrado en la generación y evaluación de escenarios financieros sintéticos.
 
 Entre las arquitecturas generativas más relevantes destacan los Autoencoders Variacionales (VAE) y las Redes Adversarias Generativas (GAN). En este trabajo, la familia VAE se utiliza de forma directa, mientras que el enfoque adversarial se concreta posteriormente en TimeGAN, una variante diseñada para series temporales. Por tanto, la GAN estándar se presenta aquí como antecedente conceptual del mecanismo adversarial, no como un modelo experimental independiente.
 
@@ -204,21 +204,13 @@ En el caso de datos financieros temporales, una GAN básica no resulta suficient
 
 Una vez presentados los conceptos fundamentales de la inteligencia artificial y los modelos generativos, se introduce el otro pilar del trabajo: la optimización de carteras y la teoría moderna de carteras. Este ámbito resulta esencial para entender cómo los escenarios sintéticos generados pueden trasladarse posteriormente a un problema de asignación de activos. 
 
-Según \cite{Zhao2025}, la modernización por parte del consumidor y la creciente demanda de inversión han puesto la gestión de carteras en primer plano, siendo una base fundamental para la optimización de las mismas.
+Según \citeA{Zhao2025}, la modernización por parte del consumidor y la creciente demanda de inversión han puesto la gestión de carteras en primer plano, siendo una base fundamental para la optimización de las mismas.
 
-Dentro de este ámbito, el enfoque propuesto por \cite{Markowitz1952}, conocido como teoría moderna de carteras, constituye uno de los pilares fundamentales ya que plantea que una cartera no debe valorarse únicamente por la rentabilidad que puede generar, sino también por el riesgo que implica asumir dicha inversión.
+Dentro de este ámbito, el enfoque propuesto por \citeA{Markowitz1952}, conocido como teoría moderna de carteras, constituye uno de los pilares fundamentales ya que plantea que una cartera no debe valorarse únicamente por la rentabilidad que puede generar, sino también por el riesgo que implica asumir dicha inversión.
 
 En este artículo se define la teoría moderna de carteras como un enfoque financiero que permite construir carteras eficientes teniendo en cuenta la relación entre rentabilidad esperada y riesgo. Esta idea se encuentra directamente vinculada con el concepto de optimización de carteras, ya que optimizar una cartera implica seleccionar y asignar pesos a diferentes activos con el objetivo de alcanzar el mejor equilibrio posible entre el rendimiento esperado y el nivel de riesgo asumido.
 
-De la idea de \cite{Markowitz1952} nace otro concepto muy importante relacionado con la optimización, la frontera eficiente. Esta representa las carteras que ofrecen mayor rentabilidad para un nivel de riesgo dado, de forma que una cartera situada sobre la frontera eficiente se considera óptima porque no existe otra combinación de activos que proporcione una mayor rentabilidad esperada para el mismo nivel de riesgo.
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.75\linewidth]{media/FronteraEficiente.jpg}
-\caption{Representación de la frontera eficiente y la frontera de mínima varianza.}
-\textbf{Fuente:} tomado de \citeA[p.~1563, Fig.~1]{Hu2022}.
-\label{fig:frontera-eficiente-minima-varianza}
-\end{figure}
+De la idea de \citeA{Markowitz1952} nace otro concepto muy importante relacionado con la optimización: la frontera eficiente. Esta representa las carteras que ofrecen mayor rentabilidad para un nivel de riesgo dado, de forma que una cartera situada sobre dicha frontera se considera óptima porque no existe otra combinación de activos que proporcione una mayor rentabilidad esperada para el mismo nivel de riesgo.
 
 Con el fin de medir la distancia entre las distribuciones de retorno reales y las generadas se recurrirá a técnicas basadas en la teoría de la información, la cual ha quedado correctamente definida por \cite{Shannon1948} como una teoría matemática representada mediante un esquema general de comunicación que permite cuantificar la información generada por una fuente a partir de la incertidumbre asociada a sus posibles mensajes.
 
@@ -256,7 +248,7 @@ La Figura\ref{fig:kullback-leibler} muestra visualmente dos distribuciones y có
 \label{fig:kullback-leibler}
 \end{figure}
 
-Por último, \cite{AlvarezChaves2024} define la información mutua como una métrica que permite medir la dependencia existente entre dos variables aleatorias, cuantificando la reducción media de incertidumbre sobre una variable X cuando se conoce otra variable Y. Esto la convierte en una herramienta esencial para el presente trabajo, ya que permite estudiar si el modelo es capaz de guardar las relaciones existentes entre los activos financieros incluyendo aquellas dependencias que otros enfoques podrían pasar por alto.
+Por último, \citeA{AlvarezChaves2024} define la información mutua como una métrica que permite medir la dependencia existente entre dos variables aleatorias, cuantificando la reducción media de incertidumbre sobre una variable X cuando se conoce otra variable Y. Esto la convierte en una herramienta esencial para el presente trabajo, ya que permite estudiar si el modelo es capaz de guardar las relaciones existentes entre los activos financieros incluyendo aquellas dependencias que otros enfoques podrían pasar por alto.
 
 En este contexto, la combinación de modelado generativo y teoría de la información se presenta como una línea de investigación prometedora para abordar el problema de la optimización de carteras desde una perspectiva más flexible y realista. Este enfoque permite no solo generar escenarios plausibles del mercado, sino también evaluar su calidad y utilidad en la toma de decisiones, lo que constituye la base sobre la que se desarrolla el presente trabajo.
 
@@ -269,11 +261,11 @@ La optimización de carteras ha evolucionado desde modelos clásicos basados en 
 \centering
 \includegraphics[width=0.7\linewidth]{media/relacion riesgo-rentabilidad.jpg}
 \caption{Representación de la frontera eficiente en el marco de la teoría moderna de carteras.}
-\textbf{Fuente:} tomado de Gómez y Jiménez (2020), basado en Markowitz (1952).
+\textbf{Fuente:} tomado de \citeA{Gomez2020}, basado en \citeA{Markowitz1952}.
 \label{fig:frontera_eficiente}
 \end{figure}
 
-Como se observa en la Figura~\ref{fig:frontera_eficiente}, la frontera eficiente representa las carteras que ofrecen la mayor rentabilidad esperada para cada nivel de riesgo, mientras que las combinaciones situadas por debajo de ella se consideran ineficientes.
+La Figura~\ref{fig:frontera_eficiente} ilustra esta relación entre riesgo y retorno esperado. La curva superior recoge las combinaciones eficientes, mientras que las carteras situadas por debajo quedan dominadas por alternativas con mejor equilibrio entre rentabilidad y riesgo. De este modo, la figura permite visualizar el criterio de decisión del enfoque media-varianza sin repetir la definición ya introducida.
 
 La diversificación constituye uno de los principales aportes de este enfoque, ya que permite disminuir el riesgo específico de la cartera mediante la incorporación de activos con comportamientos diferentes.
 
@@ -281,7 +273,7 @@ La diversificación constituye uno de los principales aportes de este enfoque, y
 \centering
 \includegraphics[width=0.7\linewidth]{media/diversificación en la reducción del riesgo.jpg}
 \caption{Efecto de la diversificación en la reducción del riesgo de una cartera.}
-\textbf{Fuente:} tomado de Schoenmaker y Schramade (2023), adaptado de Statman (2004).
+\textbf{Fuente:} tomado de \citeA{Schoenmaker2023}, adaptado de \citeA{Statman2004}.
 \label{fig:diversificacion}
 \end{figure}
 
@@ -297,12 +289,12 @@ Más recientemente, los modelos generativos han adquirido una relevancia crecien
     \centering
     \includegraphics[width=\textwidth]{media/timegan_yoon2019_fig1.png}
     \caption{Esquema conceptual de TimeGAN como modelo generativo temporal: diagrama de bloques funcionales y esquema de entrenamiento.}
-    \textbf{Fuente:} tomado de la Figura 1 de Yoon et al. \cite{Yoon2019}.
+    \textbf{Fuente:} tomado de \citeA[Fig.~1]{Yoon2019}.
     \label{fig:timegan-externo}
 \end{figure}
 
 
-En el contexto financiero, estos modelos ofrecen la posibilidad de generar escenarios sintéticos del comportamiento del mercado. En esta línea, trabajos como el de Mariani, \cite{Mariani2019} han explorado el uso de modelos generativos en el análisis de carteras, mostrando su potencial como herramienta complementaria para estudiar la incertidumbre y el riesgo.
+En el contexto financiero, estos modelos ofrecen la posibilidad de generar escenarios sintéticos del comportamiento del mercado. En esta línea, trabajos como el de \citeA{Mariani2019} han explorado el uso de modelos generativos en el análisis de carteras, mostrando su potencial como herramienta complementaria para estudiar la incertidumbre y el riesgo.
 
 Paralelamente, la teoría de la información ha comenzado a desempeñar un papel relevante en el análisis financiero, al proporcionar herramientas para cuantificar la incertidumbre y medir la diferencia entre distribuciones probabilísticas. Conceptos como la entropía, la divergencia de Kullback-Leibler o la información mutua permiten analizar las propiedades de las distribuciones de los retornos desde una perspectiva más general que la ofrecida por las medidas tradicionales \cite{Kullback1951}. En particular, estas métricas permiten capturar dependencias no lineales entre variables y evaluar la calidad de modelos probabilísticos, lo que resulta especialmente útil en el contexto de los modelos generativos.
 
@@ -316,7 +308,7 @@ Esta evolución puede resumirse de forma esquemática en la siguiente representa
 \centering
 \includegraphics[width=0.7\linewidth]{media/evolucion-modelos.jpg}
 \caption{Evolución de los enfoques de optimización de carteras desde modelos clásicos hasta técnicas avanzadas.}
-\textbf{Fuente:} tomado de Kheria (2025).
+\textbf{Fuente:} tomado de \citeA{Kheria2025}.
 \label{fig:evolucion}
 \end{figure}
 
@@ -336,7 +328,7 @@ La diferencia entre el supuesto teórico de normalidad y el comportamiento real 
 \centering
 \includegraphics[width=0.65\linewidth]{media/distribucion normal-distribucion cola.jpg}
 \caption{Comparación entre una distribución normal y una distribución de retornos financieros con colas pesadas.}
-\textbf{Fuente:} tomado de SAS (2015).
+\textbf{Fuente:} tomado de \citeA{SAS2015}.
 \label{fig:distribucion}
 \end{figure}
 
@@ -396,7 +388,7 @@ En este trabajo, los autores parten de la idea de que las series financieras pre
 Este estudio resulta relevante para nuestro proyecto ya que emplea modelos de difusión, que actualmente pueden suponer un avance respecto a modelos clásicos al aportar una mayor estabilidad en el entrenamiento y una mejor capacidad para generar muestras de mayor calidad. Sin embargo, este enfoque se centra sobre todo en la generación de datos y su aplicación en tareas concretas, sin incluir métricas basadas en teoría de la información que permitan evaluar la calidad de los resultados obtenidos, por lo que nuestro proyecto introduce una aportación diferente: combinar el uso de modelos generativos con medidas basadas en teoría de la información, lo que permite no solo generar escenarios posibles del mercado, sino también medir de forma explícita la distancia entre las distribuciones reales y las generadas antes de utilizarlas para la optimización de carteras.
 
 
-En una línea diferente y volviendo un poco hacía atrás en el tiempo, \cite{Novais2022} ha propuesto un modelo de optimización de cartera que integra la media, la entropía y la información mutua. Este modelo busca representar de forma más completa la incertidumbre y las dependencias entre los activos financieros mediante el uso de métricas informacionales en lugar de la varianza y la covarianza tradicionales, de forma que permitan capturar relaciones más complejas entre los activos. Los resultados indican que estos modelos no siempre logran superar en rentabilidad a enfoques como el de media-varianza o a algunas técnicas robustas, pero sí muestran ventajas en cuanto a estabilidad y diversidad en la asignación de pesos, aspecto importante en este tipo de contextos.
+En una línea diferente y volviendo un poco hacía atrás en el tiempo, \citeA{Novais2022} ha propuesto un modelo de optimización de cartera que integra la media, la entropía y la información mutua. Este modelo busca representar de forma más completa la incertidumbre y las dependencias entre los activos financieros mediante el uso de métricas informacionales en lugar de la varianza y la covarianza tradicionales, de forma que permitan capturar relaciones más complejas entre los activos. Los resultados indican que estos modelos no siempre logran superar en rentabilidad a enfoques como el de media-varianza o a algunas técnicas robustas, pero sí muestran ventajas en cuanto a estabilidad y diversidad en la asignación de pesos, aspecto importante en este tipo de contextos.
 
 
 Este trabajo resulta especialmente útil porque aborda una forma alternativa de medir la incertidumbre y las relaciones entre activos que no depende únicamente de las correlaciones lineales clásicas. La propuesta muestra que métricas como la entropía o la información mutua pueden desempeñar un papel relevante en la construcción y optimización de carteras, mientras que otros enfoques se centran principalmente en reproducir trayectorias o mejorar la capacidad predictiva de los modelos. Además, el estudio refuerza una de las ideas sobre las que se apoya este trabajo: las medidas de teoría de la información no son solo herramientas matemáticas para comparar distribuciones, sino que también pueden tener una interpretación financiera concreta.
@@ -1089,9 +1081,9 @@ Por eso, esta parte del trabajo debe leerse como una validación parcial del pip
 
 En conjunto, los resultados muestran que el pipeline permite comparar carteras clásicas, variantes robustas y carteras derivadas de escenarios sintéticos bajo un mismo protocolo. Las referencias clásicas siguen siendo sólidas, TimeGAN ofrece resultados competitivos en algunas configuraciones y la parte distribucional todavía deja margen claro de mejora. La comparación completa con VAE y una tabla distribucional más amplia siguen siendo necesarias para cerrar el análisis con una visión realmente completa.
 
-Esta síntesis es descriptiva, no concluyente. La valoración metodológica de estas evidencias se desarrolla en el capítulo siguiente.
+Esta síntesis es descriptiva, no concluyente. La valoración metodológica de estas evidencias se desarrolla en la sección siguiente.
 
-\chapter{Discusión}
+\section{Discusión}
 
 Los resultados permiten una conclusión prudente: los modelos generativos son prometedores como generadores de escenarios, pero todavía no justifican sustituir a los métodos clásicos de optimización de carteras. En este experimento, las carteras equiponderada y de mínima varianza siguen ofreciendo referencias muy sólidas con una complejidad mucho menor. Esto refuerza la importancia de no tratar estos métodos como simples comparadores básicos, sino como referencias exigentes. En un problema financiero real, una técnica más compleja solo resulta interesante si aporta una mejora suficientemente estable o información adicional que justifique su coste metodológico.
 
@@ -1107,7 +1099,7 @@ También conviene subrayar las limitaciones del piloto. El universo de inversió
 
 Por tanto, la aportación principal del trabajo es proporcionar un marco experimental reproducible para estudiar si VAE y TimeGAN preservan suficiente información del mercado como para ser útiles en optimización de carteras. A día de hoy, la evidencia apunta a que pueden complementar el análisis clásico, pero no reemplazarlo.
 
-\chapter{Propuesta de puesta en producción}
+\section{Propuesta de puesta en producción}
 
 Aunque el sistema desarrollado en este trabajo tiene un carácter experimental, resulta conveniente plantear como línea futura una evolución que lo acerque a un prototipo utilizable por otros investigadores o usuarios internos. Esta propuesta debe entenderse siempre condicionada a validaciones adicionales: la idea no es automatizar decisiones de inversión, sino convertir el pipeline en una aplicación que permita ejecutar experimentos de forma controlada, revisar datos, comparar modelos y conservar trazabilidad sobre cada ejecución.
 
@@ -1131,7 +1123,7 @@ Funcionalmente, la aplicación podría dividirse en los módulos siguientes:
 \end{itemize}
 
 
-La arquitectura técnica podría mantenerse deliberadamente simple: un backend en FastAPI para exponer endpoints de ejecución y consulta, y un frontend web para mostrar resultados y gráficas sin tener que reconstruir la lógica científica del proyecto. Esa separación es útil porque permite reutilizar el código existente, aislar el motor experimental de la interfaz y facilitar futuras extensiones sin reescribir el pipeline.
+La arquitectura técnica podría mantenerse deliberadamente simple: un backend en FastAPI para exponer endpoints de ejecución y consulta, y un frontend web desarrollado en React para mostrar resultados y gráficas sin tener que reconstruir la lógica científica del proyecto. Esa separación es útil porque permite reutilizar el código existente, aislar el motor experimental de la interfaz y facilitar futuras extensiones sin reescribir el pipeline.
 
 El flujo de uso sería lineal. El usuario seleccionaría el universo de activos y el intervalo temporal; el sistema descargaría los precios ajustados, validaría la consistencia de las series y generaría el análisis exploratorio; después se lanzarían los modelos generativos y los baselines; por último, se mostrarían las métricas financieras, distribucionales e informacionales junto con las carteras resultantes. En una primera versión, este proceso podría ejecutarse en local o en un servidor sencillo, sin requerir una infraestructura compleja.
 
