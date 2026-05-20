@@ -23,14 +23,14 @@ La optimización de estos modelos dependía de la covarianza muestral de retorno
 En `src/tfm_pipeline/optimization.py` se añadió:
 
 - `ledoit_wolf_covariance(returns, periods_per_year=252)`
-  Esta función recibe los retornos de los activos y calcula una matriz de covarianzas utilizando sklearn.covariance.LedoitWolf,luego anualiza esa matriz según los periodos de mercado por año y conserva el mismo orden de activos que tienen las columnas del DataFrame.
+  Esta función recibe los retornos de los activos y calcula una matriz de covarianzas utilizando `sklearn.covariance.LedoitWolf`, luego anualiza esa matriz según los periodos de mercado por año y conserva el mismo orden de activos que tienen las columnas del DataFrame.
 
 ### 3.2 Portafolios con covarianza shrinkage
 A partir de esta nueva matriz de covarianzas, también se han incorporado nuevas funciones para calcular carteras optimizadas.
 
 - `minimum_variance_weights_from_covariance(cov)`: función genérica para obtener pesos de mínima varianza a partir de una matriz de covarianzas ya calculada
-- `ledoit_wolf_minimum_variance_weights(returns, periods_per_year=252)`: primero estima la covarianza con Ledoit-Wolf a partir de los retornos y uego utiliza esa covarianza para obtener la cartera de mínima varianza.
-- `ledoit_wolf_mean_variance_weights(returns, risk_aversion=1.0, periods_per_year=252)`:estima la covarianza con Ledoit-Wolf, pero construye una cartera mean-variance (Markowitz) considerando retorno esperado y riesgo.
+- `ledoit_wolf_minimum_variance_weights(returns, periods_per_year=252)`: primero estima la covarianza con Ledoit-Wolf a partir de los retornos y luego utiliza esa covarianza para obtener la cartera de mínima varianza.
+- `ledoit_wolf_mean_variance_weights(returns, risk_aversion=1.0, periods_per_year=252)`: estima la covarianza con Ledoit-Wolf, pero construye una cartera mean-variance (Markowitz) considerando retorno esperado y riesgo.
 
 Estas heredan las restricciones existentes: long-only, pesos entre 0 y 1, y suma igual a 1. Si la optimización falla, lanzan un `RuntimeError` con mensaje claro.
 

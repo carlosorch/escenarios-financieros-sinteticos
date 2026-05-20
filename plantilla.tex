@@ -767,7 +767,7 @@ Cuando dicha estimación es inestable, los pesos resultantes pueden variar de fo
 
 El VAE se utiliza como modelo generativo probabilístico basado en espacio latente. Su arquitectura combina un encoder, una representación latente, el mecanismo de reparametrización y un decoder. En la implementación utilizada, la dimensión latente es 16, la dimensión oculta es 128, el tamaño de lote es 64, la tasa de aprendizaje es 0,001 y el entrenamiento se limita a 80 épocas con parada temprana de paciencia 10. La función de pérdida incorpora un término de reconstrucción y una regularización KL, ponderada mediante distintos valores de \texttt{beta}. En la configuración experimental se consideran los valores 0,0, 0,00001, 0,0001 y 0,001. Su papel en el estudio consiste en aprender una representación comprimida de las ventanas históricas de retornos y generar nuevas muestras sintéticas a partir de ese espacio latente.
 
-TimeGAN se utiliza como modelo generativo secuencial para series temporales financieras. Su interés dentro del trabajo radica en que, a diferencia de un modelo que trate cada ventana de forma más agregada, está diseñado para generar secuencias y preservar cierta dinámica temporal. En la implementación utilizada, la dimensión oculta es 24, la dimensión del ruido es 10, el tamaño de lote es 64, la tasa de aprendizaje es 0,001 y el entrenamiento se limita a 120 épocas. En el experimento se evalúa con varias semillas, concretamente 42, 43, 44, 45 y 46, ya que el entrenamiento adversarial puede ser sensible a la inicialización y a la propia dinámica estocástica del proceso de aprendizaje. La selección de configuraciones debe apoyarse en métricas de validación y no en el rendimiento final sobre el conjunto de test, evitando así un sesgo por selección a posteriori. En ambos modelos se generan 1000 escenarios sintéticos para cada configuración evaluada.
+TimeGAN se utiliza como modelo generativo secuencial para series temporales financieras. Su interés dentro del trabajo radica en que, a diferencia de un modelo que trate cada ventana de forma más agregada, está diseñado para generar secuencias y preservar cierta dinámica temporal. En la implementación utilizada, la dimensión oculta es 24, la dimensión del ruido es 10, el tamaño de lote es 64, la tasa de aprendizaje es 0,001 y el entrenamiento se limita a 120 épocas. En el experimento se evalúa con varias semillas, concretamente 42, 43, 44, 45, 46, 47, 48 y 49, ya que el entrenamiento adversarial puede ser sensible a la inicialización y a la propia dinámica estocástica del proceso de aprendizaje. La selección de configuraciones debe apoyarse en métricas de validación y no en el rendimiento final sobre el conjunto de test, evitando así un sesgo por selección a posteriori. En ambos modelos se generan 1000 escenarios sintéticos para cada configuración evaluada.
 
 \subsection{Generación de escenarios sintéticos}
 
@@ -979,9 +979,10 @@ Para interpretar mejor ese resultado, la Tabla~\ref{tab:comparacion-timegan-metr
 \renewcommand{\arraystretch}{1.15}
 \begin{table}[H]
 \centering
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{|p{0.17\textwidth}|p{0.14\textwidth}|p{0.14\textwidth}|p{0.14\textwidth}|p{0.12\textwidth}|p{0.13\textwidth}|p{0.12\textwidth}|}
 \hline
-\textbf{Semilla} & \textbf{JS} & \textbf{Wasserstein} & \textbf{Corr. err.} & \textbf{Autocorr.} & \textbf{Autocorr. abs.} & \textbf{Score} \\
+\textbf{Semilla} & \textbf{JS} & \textbf{Wass.} & \textbf{Corr. err.} & \textbf{Autocorr.} & \textbf{Autocorr. abs.} & \textbf{Score} \\
 \hline
 44 & 0,0545 & 0,00494 & 3,1328 & 0,2572 & 0,1044 & 5,923 \\
 \hline
@@ -990,6 +991,7 @@ Para interpretar mejor ese resultado, la Tabla~\ref{tab:comparacion-timegan-metr
 43 & 0,0425 & 0,00423 & 5,5086 & 0,2901 & 0,0852 & 6,131 \\
 \hline
 \end{tabular}
+}
 \caption{Comparación de las métricas de validación más relevantes para las principales configuraciones TimeGAN}
 \label{tab:comparacion-timegan-metricas}
 \end{table}
@@ -1043,13 +1045,11 @@ Calibrada media contraída y covarianza sintética & 21,87\% & 19,90\% & 1,13 $\
 \end{table}
 }
 
-La comparación con la cartera equiponderada es especialmente relevante: aunque algunas variantes TimeGAN alcanzan un Sharpe medio similar o ligeramente superior, la desviación típica entre semillas es alta. Por tanto, los resultados no deben presentarse como una superioridad robusta de TimeGAN frente a los enfoques clásicos, sino como una evidencia descriptiva de que determinadas configuraciones pueden comportarse de forma competitiva bajo este periodo y este universo de activos. En el caso concreto de la semilla 44, la ventaja no aparece por ganar en cada métrica individual, sino por ofrecer el mejor equilibrio global en validación, con el menor \emph{validation score} del ranking.
-
-La comparación con TimeGAN es especialmente útil porque fija una referencia clara: algunas configuraciones alcanzan un Sharpe medio similar o ligeramente superior al de la cartera equiponderada, pero la variabilidad entre semillas sigue siendo alta. En consecuencia, los resultados describen competitividad puntual, no superioridad robusta.
+La comparación con la cartera equiponderada es especialmente relevante: aunque algunas variantes TimeGAN alcanzan un Sharpe medio similar o ligeramente superior, la desviación típica entre semillas es alta. Por tanto, los resultados no deben presentarse como una superioridad robusta de TimeGAN frente a los enfoques clásicos, sino como una evidencia descriptiva de competitividad puntual bajo este periodo y este universo de activos. En el caso concreto de la semilla 44, la ventaja no aparece por ganar en cada métrica individual, sino por ofrecer el mejor equilibrio global en validación, con el menor \emph{validation score} del ranking.
 
 \subsection{Resultados de los baselines robustos con Ledoit-Wolf}
 
-Además de los baselines clásicos, se incorporaron dos variantes robustas basadas en Ledoit-Wolf \cite{LedoitWolf2004}: \texttt{ledoit\_wolf\_minimum\_variance} y \texttt{ledoit\_wolf\_markowitz}. Su objetivo es comprobar si una estimación de covarianza mejor condicionada cambia de forma material el comportamiento financiero.
+Además de los baselines clásicos, se incorporaron dos variantes robustas basadas en Ledoit-Wolf \cite{LedoitWolf2004}: mínima varianza con covarianza Ledoit-Wolf y Markowitz con covarianza Ledoit-Wolf. Su objetivo es comprobar si una estimación de covarianza mejor condicionada cambia de forma material el comportamiento financiero.
 
 La Tabla~\ref{tab:resultados-ledoit-wolf} compara las versiones clásicas con esas variantes robustas.
 
