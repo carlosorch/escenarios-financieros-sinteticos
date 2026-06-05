@@ -27,15 +27,51 @@ foreach ($bin in $perlBins) {
   }
 }
 
-if (-not (Get-Command latexmk -ErrorAction SilentlyContinue)) {
-  Write-Error "[compile][error] No se encontro latexmk. Ejecuta primero la task 'Setup local thesis environment'."
+if (-not (Get-Command pdflatex -ErrorAction SilentlyContinue)) {
+  Write-Error "[compile][error] No se encontro pdflatex. Ejecuta primero la task 'Setup local thesis environment'."
 }
 
-if (-not (Get-Command perl -ErrorAction SilentlyContinue)) {
-  Write-Error "[compile][error] latexmk necesita Perl. Ejecuta primero la task 'Setup local thesis environment'."
+if (-not (Get-Command bibtex -ErrorAction SilentlyContinue)) {
+  Write-Error "[compile][error] No se encontro bibtex. Ejecuta primero la task 'Setup local thesis environment'."
 }
 
 New-Item -ItemType Directory -Force -Path "PDF" | Out-Null
 
-& latexmk -pdf -interaction=nonstopmode -file-line-error -outdir=PDF plantilla.tex
-exit $LASTEXITCODE
+$texFile = "plantilla.tex"
+$baseName = [System.IO.Path]::GetFileNameWithoutExtension($texFile)
+$pdfTarget = Join-Path "PDF" "$baseName.pdf"
+
+if (Test-Path $pdfTarget) {
+  Remove-Item $pdfTarget -Force
+}
+
+Write-Host "[compile] Ejecutando pdflatex (pasada 1)..."
+& pdflatex -interaction=nonstopmode -file-line-error $texFile
+if ($LASTEXITCODE -ne 0) {
+  exit $LASTEXITCODE
+}
+
+Write-Host "[compile] Ejecutando bibtex..."
+& bibtex $baseName
+if ($LASTEXITCODE -ne 0) {
+  exit $LASTEXITCODE
+}
+
+Write-Host "[compile] Ejecutando pdflatex (pasada 2)..."
+& pdflatex -interaction=nonstopmode -file-line-error $texFile
+if ($LASTEXITCODE -ne 0) {
+  exit $LASTEXITCODE
+}
+
+Write-Host "[compile] Ejecutando pdflatex (pasada 3)..."
+& pdflatex -interaction=nonstopmode -file-line-error $texFile
+if ($LASTEXITCODE -ne 0) {
+  exit $LASTEXITCODE
+}
+
+if (-not (Test-Path "$baseName.pdf")) {
+  Write-Error "[compile][error] No se genero $baseName.pdf en la raiz del proyecto."
+}
+
+Copy-Item "$baseName.pdf" $pdfTarget -Force
+Write-Host "[compile] PDF generado en $pdfTarget"
