@@ -761,6 +761,16 @@ El VAE se utiliza como modelo generativo probabilístico basado en espacio laten
 
 TimeGAN se utiliza como modelo generativo secuencial para series temporales financieras. Su interés dentro del trabajo radica en que, a diferencia de un modelo que trate cada ventana de forma más agregada, está diseñado para generar secuencias y preservar cierta dinámica temporal. En la implementación utilizada, la dimensión oculta es 24, la dimensión del ruido es 10, el tamaño de lote es 64, la tasa de aprendizaje es 0,001 y el entrenamiento se limita a 120 épocas. En el experimento se evalúa con varias semillas, concretamente 42, 43, 44, 45, 46, 47, 48 y 49, ya que el entrenamiento adversarial puede ser sensible a la inicialización y a la propia dinámica estocástica del proceso de aprendizaje. La selección de configuraciones debe apoyarse en métricas de validación y no en el rendimiento final sobre el conjunto de test, evitando así un sesgo por selección a posteriori. En ambos modelos se generan 1000 escenarios sintéticos para cada configuración evaluada.
 
+La Figura~\ref{fig:evolucion-modelos} resume visualmente la lógica experimental seguida para pasar de los baselines clásicos a los modelos generativos y a sus variantes de validación. Esta representación ayuda a interpretar que la comparación no se limita a una única ejecución, sino que incorpora selección de configuración, evaluación multi-semilla y contraste posterior frente a carteras clásicas y robustas.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{media/evolucion-modelos.jpg}
+    \caption{Evolución de los modelos evaluados dentro del experimento.}
+    \textbf{Fuente:} Elaboración propia.
+    \label{fig:evolucion-modelos}
+\end{figure}
+
 \subsection{Generación de escenarios sintéticos}
 
 Los modelos generan escenarios de retornos, no precios. La salida se organiza como \texttt{N escenarios x T días x M activos}, de modo que cada ejecución produce varias secuencias de 30 días para los 10 activos del universo.
@@ -964,6 +974,16 @@ La decisión no se tomó porque la semilla 44 fuese la mejor en todas las métri
 \end{table}
 }
 
+La misma comparación se muestra de forma visual en la Figura~\ref{fig:timegan-validation-score}. La diferencia entre las primeras configuraciones es reducida, lo que refuerza la necesidad de no seleccionar el modelo a partir de una única métrica aislada ni del resultado financiero de test.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{media/result_timegan_validation_score.png}
+    \caption{Ranking visual del \emph{validation score} de las configuraciones TimeGAN más competitivas.}
+    \textbf{Fuente:} Elaboración propia.
+    \label{fig:timegan-validation-score}
+\end{figure}
+
 Para interpretar mejor ese resultado, la Tabla~\ref{tab:comparacion-timegan-metricas} compara la configuración ganadora con la principal alternativa del ranking. La semilla 47 mejora ligeramente en divergencia de Jensen-Shannon y distancia de Wasserstein, pero la 44 compensa ese punto con un error de correlación menor y un mejor equilibrio global en el resto de criterios, lo que reduce el \emph{validation score} final.
 
 {\small
@@ -988,6 +1008,34 @@ Para interpretar mejor ese resultado, la Tabla~\ref{tab:comparacion-timegan-metr
 \end{table}
 }
 
+\subsection{Comparación visual entre datos reales y sintéticos}
+
+La selección de TimeGAN no se apoya solo en el \emph{validation score} agregado. También se revisa, por separado, hasta qué punto los retornos sintéticos se parecen a los retornos reales. Esta comprobación es necesaria porque, en este trabajo, generar muestras no basta: las muestras tienen que conservar propiedades que después afectan directamente a la cartera, como la forma de la distribución, la dependencia entre activos y cierta estructura temporal.
+
+La Figura~\ref{fig:timegan-real-synthetic-distances} recoge tres diagnósticos de validación para las configuraciones TimeGAN más competitivas: divergencia de Jensen-Shannon, distancia de Wasserstein y error de matriz de correlación. Las dos primeras métricas resumen diferencias distribucionales. La tercera mira otra cuestión, más financiera: si el escenario sintético mantiene razonablemente la relación conjunta entre activos.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{media/result_timegan_real_synthetic_distances.png}
+    \caption{Distancias entre retornos reales y sintéticos en las principales configuraciones TimeGAN de validación.}
+    \textbf{Fuente:} Elaboración propia a partir de los diagnósticos del pipeline experimental.
+    \label{fig:timegan-real-synthetic-distances}
+\end{figure}
+
+La figura muestra un compromiso bastante claro. La semilla 47 obtiene mejores valores de Jensen-Shannon y Wasserstein, pero la semilla 44 reduce más el error de correlación. Para optimización de carteras, esta diferencia no es menor: una distribución marginal parecida puede ser insuficiente si no reproduce bien las relaciones cruzadas que permiten diversificar.
+
+La Figura~\ref{fig:timegan-real-synthetic-metrics} presenta el mismo diagnóstico en forma de mapa de calor. Como las métricas no comparten escala, el color se normaliza por columna y debe leerse solo como comparación relativa dentro de cada métrica. Para evitar una lectura demasiado ordinal, los valores originales se mantienen dentro de cada celda. En todos los casos, un valor menor indica mayor cercanía entre datos reales y sintéticos.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{media/result_timegan_real_synthetic_metrics.png}
+    \caption{Comparación de métricas real-sintético para las principales configuraciones TimeGAN. El color se normaliza dentro de cada métrica y no representa una escala absoluta común.}
+    \textbf{Fuente:} Elaboración propia a partir de los diagnósticos del pipeline experimental.
+    \label{fig:timegan-real-synthetic-metrics}
+\end{figure}
+
+Esta comparación ayuda a justificar una decisión prudente: no elegir el modelo por una única distancia distribucional. La configuración seleccionada no minimiza todas las métricas, pero ofrece un equilibrio razonable entre fidelidad distribucional, dependencia multiactivo y estructura temporal. Los errores observados, aun así, dejan una lectura clara: generar escenarios financieros fieles sigue siendo difícil, sobre todo cuando se quieren capturar a la vez colas, correlaciones y dinámica temporal.
+
 \subsection{Resultados financieros fuera de muestra}
 
 La Tabla~\ref{tab:resultados-baselines} resume el comportamiento de los baselines clásicos sobre el conjunto de prueba. La cartera equiponderada ofrece un equilibrio razonable entre simplicidad y rendimiento ajustado al riesgo, la cartera de mínima varianza reduce la volatilidad y el drawdown, y la cartera de Markowitz maximiza rentabilidad bruta a costa de una variabilidad mucho mayor.
@@ -1011,7 +1059,17 @@ Markowitz histórico & 22,94\% & 38,21\% & 0,60 & -31,34\% \\
 \end{table}
 }
 
-En la evaluación multi-semilla de TimeGAN, los resultados muestran un comportamiento competitivo en algunas configuraciones, aunque con una variabilidad importante entre ejecuciones. La variante TimeGAN sin calibrar usada para mínima varianza obtuvo un Sharpe medio de 1,22 con desviación típica de 0,55. La variante calibrada a media y volatilidad para mínima varianza obtuvo un Sharpe medio de 1,09 con desviación típica de 0,57. Por su parte, la cartera con media histórica contraída y covarianza sintética calibrada obtuvo un Sharpe medio de 1,13 con desviación típica de 0,66. Estos valores describen un comportamiento sensible a la semilla de entrenamiento, por lo que deben leerse junto con la dispersión indicada y no solo a partir de la media.
+La Figura~\ref{fig:baselines-oos} complementa la tabla anterior y hace más visible la diferencia entre rentabilidad, volatilidad y Sharpe. Markowitz consigue la mayor rentabilidad anualizada, pero a cambio asume una volatilidad mucho más alta, lo que penaliza su rendimiento ajustado al riesgo. La cartera equiponderada y la de mínima varianza quedan en una zona menos llamativa, pero más equilibrada.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{media/result_baselines_oos.png}
+    \caption{Comparación visual de rentabilidad, volatilidad y Sharpe de los baselines clásicos fuera de muestra.}
+    \textbf{Fuente:} Elaboración propia.
+    \label{fig:baselines-oos}
+\end{figure}
+
+En la evaluación multi-semilla, TimeGAN muestra resultados competitivos en algunas configuraciones, pero también una variabilidad apreciable entre ejecuciones. La variante sin calibrar usada para mínima varianza alcanza un Sharpe medio de 1,22, con desviación típica de 0,55. La variante calibrada a media y volatilidad para mínima varianza obtiene un Sharpe medio de 1,09, con desviación típica de 0,57. La cartera con media histórica contraída y covarianza sintética calibrada llega a 1,13, con desviación típica de 0,66. Por tanto, estos valores no deberían leerse solo por la media: la dispersión forma parte del resultado.
 
 {\small
 \setlength{\tabcolsep}{3pt}
@@ -1036,11 +1094,21 @@ Calibrada media contraída y covarianza sintética & 21,87\% & 19,90\% & 1,13 $\
 \end{table}
 }
 
-La comparación con la cartera equiponderada es especialmente relevante: aunque algunas variantes TimeGAN alcanzan un Sharpe medio similar o ligeramente superior, la desviación típica entre semillas es alta. Por tanto, los resultados no deben presentarse como una superioridad robusta de TimeGAN frente a los enfoques clásicos, sino como una evidencia descriptiva de competitividad puntual bajo este periodo y este universo de activos. En el caso concreto de la semilla 44, la ventaja no aparece por ganar en cada métrica individual, sino por ofrecer el mejor equilibrio global en validación, con el menor \emph{validation score} del ranking.
+La comparación con la cartera equiponderada es especialmente útil como control. Algunas variantes TimeGAN alcanzan un Sharpe medio similar o ligeramente superior, pero la desviación típica entre semillas es alta. Por eso no sería correcto presentar estos resultados como una superioridad robusta frente a los enfoques clásicos. Son, más bien, una evidencia descriptiva de competitividad puntual para este periodo y este universo de activos. En la semilla 44, además, la ventaja no viene de ganar cada métrica por separado, sino de ofrecer el mejor equilibrio global en validación, con el menor \emph{validation score} del ranking.
+
+La Figura~\ref{fig:timegan-sharpe-multiseed} representa esta variabilidad mediante barras de error. El solapamiento con la referencia equiponderada es visible en varias variantes, lo que impide defender una mejora estable. Sí permite, en cambio, situar algunas configuraciones TimeGAN en una zona competitiva.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{media/result_timegan_sharpe_multiseed.png}
+    \caption{Sharpe medio y desviación típica de las carteras TimeGAN evaluadas con varias semillas.}
+    \textbf{Fuente:} Elaboración propia.
+    \label{fig:timegan-sharpe-multiseed}
+\end{figure}
 
 \subsection{Resultados de los baselines robustos con Ledoit-Wolf}
 
-Además de los baselines clásicos, se incorporaron dos variantes robustas basadas en Ledoit-Wolf \cite{LedoitWolf2004}: mínima varianza con covarianza Ledoit-Wolf y Markowitz con covarianza Ledoit-Wolf. Su objetivo es comprobar si una estimación de covarianza mejor condicionada cambia de forma material el comportamiento financiero.
+Además de los baselines clásicos, se incorporaron dos variantes basadas en Ledoit-Wolf \cite{LedoitWolf2004}: mínima varianza con covarianza Ledoit-Wolf y Markowitz con covarianza Ledoit-Wolf. La intención era sencilla: comprobar si una estimación de covarianza mejor condicionada cambiaba de forma material el comportamiento financiero.
 
 La Tabla~\ref{tab:resultados-ledoit-wolf} compara las versiones clásicas con esas variantes robustas.
 
@@ -1067,21 +1135,31 @@ Ledoit-Wolf Markowitz & 23,20\% & 38,36\% & 0,60 & -31,42\% \\
 \end{table}
 }
 
-La variante Ledoit-Wolf de mínima varianza mejora ligeramente a la cartera clásica, con algo más de rentabilidad, algo menos de volatilidad y un Sharpe superior. En Markowitz el impacto es mucho menor: la rentabilidad sube de forma marginal, pero el perfil de riesgo casi no cambia. Eso indica que la regularización de la covarianza ayuda, aunque no resuelve por sí sola la sensibilidad del modelo cuando la estimación de retornos esperados permanece inalterada.
+La variante Ledoit-Wolf de mínima varianza mejora ligeramente a la cartera clásica: algo más de rentabilidad, algo menos de volatilidad y un Sharpe superior. En Markowitz, sin embargo, el impacto es mucho más limitado. La rentabilidad sube de forma marginal, pero el perfil de riesgo apenas cambia. Esto sugiere que regularizar la covarianza ayuda en algunos casos, aunque no corrige por sí sola la sensibilidad del modelo cuando la estimación de retornos esperados permanece igual.
 
-En conjunto, estas variantes no buscan reemplazar los baselines clásicos, sino obligar a que la comparación con carteras sintéticas se haga frente a referencias más robustas.
+Para que el efecto específico del estimador no quede oculto por la comparación entre estrategias, la Figura~\ref{fig:ledoit-wolf-comparison} muestra solo el cambio incremental de cada variante Ledoit-Wolf frente a su baseline clásico equivalente. La lectura principal es sobria: el efecto existe en mínima varianza, pero es pequeño; en Markowitz resulta prácticamente residual.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{media/result_ledoit_wolf_comparison.png}
+    \caption{Impacto incremental de Ledoit-Wolf frente al baseline clásico equivalente. Los valores representan Ledoit-Wolf menos baseline clásico.}
+    \textbf{Fuente:} Elaboración propia.
+    \label{fig:ledoit-wolf-comparison}
+\end{figure}
+
+En conjunto, estas variantes no pretenden reemplazar los baselines clásicos ni demostrar por sí solas una mejora material. Su papel es más modesto, pero útil: hacer que las carteras sintéticas se comparen también contra referencias clásicas mejor condicionadas.
 
 \subsection{Fidelidad distribucional observada}
 
-Los diagnósticos distribucionales muestran que generar escenarios financieros fieles sigue siendo difícil. En validación, TimeGAN mantiene un error de correlación todavía apreciable y tiende a suavizar las colas, lo que sugiere que le cuesta capturar simultáneamente dependencia cruzada y eventos extremos. Ese comportamiento es coherente con la dificultad general de los modelos compactos cuando trabajan con retornos financieros.
+Los diagnósticos distribucionales apuntan a una limitación importante: generar escenarios financieros fieles sigue siendo difícil. En validación, TimeGAN conserva un error de correlación apreciable y tiende a suavizar las colas. Esto sugiere que el modelo tiene problemas para capturar, al mismo tiempo, dependencia cruzada y eventos extremos. No es un resultado sorprendente; los retornos financieros son una señal ruidosa y exigente para modelos compactos.
 
-Por eso, esta parte del trabajo debe leerse como una validación parcial del pipeline: muestra que el sistema funciona y que produce escenarios útiles para análisis, pero todavía no prueba una fidelidad distribucional completa.
+Por esa razón, esta parte del trabajo debe leerse como una validación parcial del pipeline. El sistema funciona y produce escenarios útiles para análisis, pero todavía no demuestra una fidelidad distribucional completa.
 
 \subsection{Síntesis descriptiva de resultados}
 
-En conjunto, los resultados muestran que el pipeline permite comparar carteras clásicas, variantes robustas y carteras derivadas de escenarios sintéticos bajo un mismo protocolo. Las referencias clásicas siguen siendo sólidas, TimeGAN ofrece resultados competitivos en algunas configuraciones y la parte distribucional todavía deja margen claro de mejora. La comparación completa con VAE y una tabla distribucional más amplia siguen siendo necesarias para cerrar el análisis con una visión realmente completa.
+En conjunto, los resultados muestran que el pipeline permite comparar carteras clásicas, variantes robustas y carteras derivadas de escenarios sintéticos bajo un mismo protocolo. Las referencias clásicas siguen siendo sólidas. TimeGAN alcanza resultados competitivos en algunas configuraciones, pero la parte distribucional todavía deja margen claro de mejora. Para cerrar el análisis con una visión más completa, sigue siendo necesaria una comparación homogénea con VAE y una tabla distribucional más amplia.
 
-Esta síntesis es descriptiva, no concluyente. La valoración metodológica de estas evidencias se desarrolla en la sección siguiente.
+Esta síntesis debe entenderse como descriptiva, no concluyente. La valoración metodológica de estas evidencias se desarrolla en la sección siguiente.
 
 \section{Discusión}
 
