@@ -1,0 +1,71 @@
+name: Python Tests
+
+on:
+  push:
+    paths:
+      - "src/**"
+      - "tests/**"
+      - "pyproject.toml"
+      - "requirements*.txt"
+      - ".github/workflows/python-tests.yml"
+  pull_request:
+    paths:
+      - "src/**"
+      - "tests/**"
+      - "pyproject.toml"
+      - "requirements*.txt"
+      - ".github/workflows/python-tests.yml"
+  workflow_dispatch:
+  schedule:
+    # Daily at 06:00 UTC. The job below only runs tests if commits exist in the last 24 hours.
+    - cron: "0 6 * * *"
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for commits in the last 24 hours
+        id: recent_commits
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" != "schedule" ]; then
+            echo "should_run=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          count=$(git log --since="24 hours ago" --format=oneline | wc -l | tr -d ' ')
+          echo "Recent commits: $count"
+          if [ "$count" -gt 0 ]; then
+            echo "should_run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "should_run=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: No recent commits; skip tests
+        if: steps.recent_commits.outputs.should_run == 'false'
+        run: echo "No commits in the last 24 hours; skipping Python tests."
+
+      - name: Set up Python
+        if: steps.recent_commits.outputs.should_run == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install uv
+        if: steps.recent_commits.outputs.should_run == 'true'
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        if: steps.recent_commits.outputs.should_run == 'true'
+        run: uv sync --extra dev
+
+      - name: Run unit tests
+        if: steps.recent_commits.outputs.should_run == 'true'
+        run: uv run pytest
