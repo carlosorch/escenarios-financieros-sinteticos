@@ -1,4 +1,4 @@
-name: Build Thesis PDF
+name: Build Thesis PDF on demand
 
 on:
   workflow_dispatch:
