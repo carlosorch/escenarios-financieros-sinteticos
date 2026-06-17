@@ -12,12 +12,20 @@ Usamos `python3` porque en macOS y Linux suele ser el comando correcto. Si tu eq
 
 ## Instalacion rapida
 
+Opcion recomendada con `uv`:
+
+```bash
+uv sync --extra dev
+```
+
+Si no tienes `uv`, instala el paquete en modo editable con `pip`:
+
 ```bash
 python3 -m pip install --upgrade pip
 python3 -m pip install -e ".[dev]"
 ```
 
-Si aparece un error de permisos:
+Si aparece un error de permisos con `pip`:
 
 ```bash
 python3 -m pip install --user -e ".[dev]"
@@ -56,24 +64,37 @@ python3 -c "import torch; print(torch.__version__); print(torch.cuda.is_availabl
 
 Antes de lanzar experimentos largos:
 
+Con `uv`:
+
+```bash
+uv run python -c "import tfm_pipeline; print('tfm_pipeline OK')"
+uv run pytest
+```
+
+Con el entorno instalado por `pip`:
+
 ```bash
 python3 -c "import tfm_pipeline; print('tfm_pipeline OK')"
-python3 -m pytest tests/unit
+python3 -m pytest
 ```
 
-Si aparece `ModuleNotFoundError: No module named 'tfm_pipeline'`, usa temporalmente:
-
-```bash
-PYTHONPATH=src python3 -m pytest tests/unit
-```
+La configuracion de `pytest` ya apunta a `src/`, por lo que no hace falta exportar `PYTHONPATH` manualmente.
 
 ## Para la tarea de Lola
 
 Lola solo necesita comprobar tests y ejecutar baselines. No hace falta ejecutar VAE ni TimeGAN.
 
 ```bash
+uv sync --extra dev
+uv run pytest
+uv run python -m tfm_pipeline.run_baselines
+```
+
+Equivalente con `pip`:
+
+```bash
 python3 -m pip install -e ".[dev]"
-python3 -m pytest tests/unit
+python3 -m pytest
 python3 -m tfm_pipeline.run_baselines
 ```
 
@@ -92,12 +113,16 @@ Salidas principales:
 Ejecutar en este orden:
 
 ```bash
-python3 -m tfm_pipeline.run_baselines
-python3 -m tfm_pipeline.run_vae
-python3 -m tfm_pipeline.run_timegan
-python3 -m tfm_pipeline.run_timegan_multiseed
-python3 -m tfm_pipeline.compare_results
+uv run python -m tfm_pipeline.run_baselines
+uv run python -m tfm_pipeline.run_vae
+uv run python -m tfm_pipeline.run_timegan
+uv run python -m tfm_pipeline.run_timegan_multiseed
+uv run python -m tfm_pipeline.report_timegan_multiseed
+uv run python -m tfm_pipeline.compare_results
+uv run python scripts/generate-result-figures.py
 ```
+
+Si usas un entorno instalado con `pip`, sustituye `uv run python` por `python3`.
 
 Salidas principales:
 
@@ -108,5 +133,10 @@ Salidas principales:
 | `results/timegan/` | Escenarios y metricas TimeGAN |
 | `results/timegan_multiseed/` | Robustez TimeGAN por semilla, ranking de seleccion por validacion y reporte legible |
 | `results/combined_portfolio_metrics.csv` | Comparacion agregada |
+| `media/result_*.png` | Figuras actualizadas para el documento LaTeX |
 
 En `results/timegan_multiseed/` se generan tambien `metadata.json`, `seed_ranking.csv`, `best_seed.json`, `best_seed_portfolio_metrics.csv`, `diagnostic_summary_by_seed.csv`, `validation_diagnostic_summary_by_seed.csv`, `portfolio_metrics_by_seed.csv`, `training_history_by_seed.csv` y `report.md`. La semilla seleccionada se escoge solo con diagnosticos de validacion; las metricas financieras de prueba se consultan despues para reportar el rendimiento final.
+
+## Integracion continua Python
+
+El workflow `.github/workflows/python-tests.yml` ejecuta los tests unitarios con `uv` cuando cambian `src/`, `tests/`, `pyproject.toml`, `requirements*.txt` o el propio workflow. Tambien se puede lanzar manualmente desde GitHub Actions.

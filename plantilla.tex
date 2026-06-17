@@ -922,7 +922,7 @@ Se implementó un pipeline reproducible que descarga precios ajustados desde Yah
 
 Para reducir la dependencia de una sola inicialización, TimeGAN se evaluó inicialmente con cinco semillas distintas y, posteriormente, se amplió la corrida a ocho semillas para comprobar la estabilidad del ranking. El conjunto final de semillas evaluadas fue 42, 43, 44, 45, 46, 47, 48 y 49. Además, se consideró una variante calibrada a la media y a la volatilidad del conjunto de entrenamiento. Esa calibración debe entenderse como un ajuste diagnóstico sobre la salida generada, no como evidencia de que el modelo reproduzca automáticamente esos momentos con exactitud.
 
-En esta versión del documento, la evidencia cuantitativa completa del VAE todavía no se incorpora de forma homogénea. Por eso, la comparación actual se apoya sobre todo en los baselines clásicos, la evaluación multi-semilla de TimeGAN y los diagnósticos distribucionales disponibles. La Tabla~\ref{tab:resumen-timegan-multisemilla} resume la configuración y la decisión final de esa evaluación.
+En esta versión del documento, el VAE se incorpora como baseline generativo complementario mediante una pequeña rejilla sobre el parámetro $\beta$. Aun así, la evaluación más robusta se mantiene en TimeGAN, porque es el modelo sometido a análisis multi-semilla y selección explícita por validación. La Tabla~\ref{tab:resumen-timegan-multisemilla} resume la configuración y la decisión final de esa evaluación.
 
 {\small
 \renewcommand{\arraystretch}{1.2}
@@ -936,7 +936,7 @@ Semillas evaluadas & 42, 43, 44, 45, 46, 47, 48 y 49 \\
 \hline
 Variante con mejor validación & \texttt{timegan\_raw} \\
 \hline
-Semilla seleccionada & 44 \\
+Semilla seleccionada & 43 \\
 \hline
 Criterio de selección & Métricas de validación distribucionales, temporales e informacionales \\
 \hline
@@ -948,7 +948,7 @@ Lectura metodológica & La selección se realiza sin consultar el rendimiento fi
 \end{table}
 }
 
-La decisión no se tomó porque la semilla 44 fuese la mejor en todas las métricas por separado, sino porque obtuvo el menor \emph{validation score} conjunto al combinar las métricas de validación consideradas. La Tabla~\ref{tab:ranking-timegan-validacion} muestra cómo se comportaron las primeras configuraciones del ranking y por qué la semilla 44 quedó por delante del resto.
+La decisión no se tomó porque la semilla 43 fuese la mejor en todas las métricas por separado, sino porque obtuvo el menor \emph{validation score} conjunto al combinar las métricas de validación consideradas. La Tabla~\ref{tab:ranking-timegan-validacion} muestra cómo se comportaron las primeras configuraciones del ranking y por qué la semilla 43 quedó por delante del resto.
 
 {\small
 \renewcommand{\arraystretch}{1.15}
@@ -958,15 +958,15 @@ La decisión no se tomó porque la semilla 44 fuese la mejor en todas las métri
 \hline
 \textbf{Rank} & \textbf{Semilla} & \textbf{Variante} & \textbf{JS} & \textbf{Wasserstein} & \textbf{Score} \\
 \hline
-1 & 44 & \texttt{timegan\_raw} & 0,0545 & 0,00494 & 5,923 \\
+1 & 43 & \texttt{timegan\_raw} & 0,0364 & 0,00362 & 5,201 \\
 \hline
-2 & 47 & \texttt{timegan\_raw} & 0,0355 & 0,00378 & 6,011 \\
+2 & 43 & \texttt{timegan\_mean\_vol\_calibrated} & 0,0401 & 0,00412 & 5,433 \\
 \hline
-3 & 44 & \texttt{timegan\_mean\_vol\_calibrated} & 0,0602 & 0,00537 & 6,038 \\
+3 & 44 & \texttt{timegan\_raw} & 0,0410 & 0,00407 & 5,518 \\
 \hline
-4 & 43 & \texttt{timegan\_raw} & 0,0425 & 0,00423 & 6,131 \\
+4 & 44 & \texttt{timegan\_mean\_vol\_calibrated} & 0,0469 & 0,00438 & 5,863 \\
 \hline
-5 & 42 & \texttt{timegan\_raw} & 0,0428 & 0,00393 & 6,181 \\
+5 & 46 & \texttt{timegan\_raw} & 0,0410 & 0,00421 & 6,152 \\
 \hline
 \end{tabular}
 \caption{Ranking de validación de las configuraciones TimeGAN más competitivas}
@@ -984,7 +984,7 @@ La misma comparación se muestra de forma visual en la Figura~\ref{fig:timegan-v
     \label{fig:timegan-validation-score}
 \end{figure}
 
-Para interpretar mejor ese resultado, la Tabla~\ref{tab:comparacion-timegan-metricas} compara la configuración ganadora con la principal alternativa del ranking. La semilla 47 mejora ligeramente en divergencia de Jensen-Shannon y distancia de Wasserstein, pero la 44 compensa ese punto con un error de correlación menor y un mejor equilibrio global en el resto de criterios, lo que reduce el \emph{validation score} final.
+Para interpretar mejor ese resultado, la Tabla~\ref{tab:comparacion-timegan-metricas} compara la configuración ganadora con las principales alternativas del ranking. La semilla 44 mejora en error de correlación y autocorrelación, pero la 43 obtiene mejores distancias distribucionales, menor autocorrelación absoluta y menor error de curtosis. Ese equilibrio reduce el \emph{validation score} final de la semilla 43.
 
 {\small
 \renewcommand{\arraystretch}{1.15}
@@ -995,11 +995,11 @@ Para interpretar mejor ese resultado, la Tabla~\ref{tab:comparacion-timegan-metr
 \hline
 \textbf{Semilla} & \textbf{JS} & \textbf{Wass.} & \textbf{Corr. err.} & \textbf{Autocorr.} & \textbf{Autocorr. abs.} & \textbf{Score} \\
 \hline
-44 & 0,0545 & 0,00494 & 3,1328 & 0,2572 & 0,1044 & 5,923 \\
+43 & 0,0364 & 0,00362 & 3,6669 & 0,1534 & 0,0641 & 5,201 \\
 \hline
-47 & 0,0355 & 0,00378 & 3,9071 & 0,3988 & 0,1196 & 6,011 \\
+44 & 0,0410 & 0,00407 & 3,0846 & 0,1461 & 0,0894 & 5,518 \\
 \hline
-43 & 0,0425 & 0,00423 & 5,5086 & 0,2901 & 0,0852 & 6,131 \\
+46 & 0,0410 & 0,00421 & 4,3832 & 0,1431 & 0,1127 & 6,152 \\
 \hline
 \end{tabular}
 }
@@ -1022,7 +1022,7 @@ La Figura~\ref{fig:timegan-real-synthetic-distances} recoge tres diagnósticos d
     \label{fig:timegan-real-synthetic-distances}
 \end{figure}
 
-La figura muestra un compromiso bastante claro. La semilla 47 obtiene mejores valores de Jensen-Shannon y Wasserstein, pero la semilla 44 reduce más el error de correlación. Para optimización de carteras, esta diferencia no es menor: una distribución marginal parecida puede ser insuficiente si no reproduce bien las relaciones cruzadas que permiten diversificar.
+La figura muestra un compromiso bastante claro. La semilla 43 obtiene mejores valores de Jensen-Shannon y Wasserstein, mientras que la semilla 44 reduce más el error de correlación. Para optimización de carteras, esta diferencia no es menor: una distribución marginal parecida puede ser insuficiente si no reproduce bien las relaciones cruzadas que permiten diversificar.
 
 La Figura~\ref{fig:timegan-real-synthetic-metrics} presenta el mismo diagnóstico en forma de mapa de calor. Como las métricas no comparten escala, el color se normaliza por columna y debe leerse solo como comparación relativa dentro de cada métrica. Para evitar una lectura demasiado ordinal, los valores originales se mantienen dentro de cada celda. En todos los casos, un valor menor indica mayor cercanía entre datos reales y sintéticos.
 
@@ -1069,7 +1069,7 @@ La Figura~\ref{fig:baselines-oos} complementa la tabla anterior y hace más visi
     \label{fig:baselines-oos}
 \end{figure}
 
-En la evaluación multi-semilla, TimeGAN muestra resultados competitivos en algunas configuraciones, pero también una variabilidad apreciable entre ejecuciones. La variante sin calibrar usada para mínima varianza alcanza un Sharpe medio de 1,22, con desviación típica de 0,55. La variante calibrada a media y volatilidad para mínima varianza obtiene un Sharpe medio de 1,09, con desviación típica de 0,57. La cartera con media histórica contraída y covarianza sintética calibrada llega a 1,13, con desviación típica de 0,66. Por tanto, estos valores no deberían leerse solo por la media: la dispersión forma parte del resultado.
+En la evaluación multi-semilla, TimeGAN muestra resultados competitivos en algunas configuraciones, pero también una variabilidad apreciable entre ejecuciones. La variante sin calibrar usada para mínima varianza alcanza un Sharpe medio de 1,31, con desviación típica de 0,40. La variante calibrada a media y volatilidad para mínima varianza obtiene un Sharpe medio de 1,28, con desviación típica de 0,54. La cartera con media contraída y covarianza sintética calibrada llega a 1,27, con desviación típica de 0,55. Por tanto, estos valores no deberían leerse solo por la media: la dispersión forma parte del resultado.
 
 {\small
 \setlength{\tabcolsep}{3pt}
@@ -1079,22 +1079,22 @@ En la evaluación multi-semilla, TimeGAN muestra resultados competitivos en algu
 \hline
 \textbf{Cartera TimeGAN} & \textbf{Rent. anual. media} & \textbf{Vol. anual. media} & \textbf{Sharpe medio} \\
 \hline
-Raw mínima varianza & 16,99\% & 14,26\% & 1,22 $\pm$ 0,55 \\
+Raw mínima varianza & 19,15\% & 14,50\% & 1,31 $\pm$ 0,40 \\
 \hline
-Raw media histórica y covarianza sintética & 31,47\% & 38,26\% & 0,83 $\pm$ 0,13 \\
+Raw media histórica y covarianza sintética & 31,67\% & 38,60\% & 0,82 $\pm$ 0,09 \\
 \hline
-Raw media contraída y covarianza sintética & 22,16\% & 21,18\% & 1,05 $\pm$ 0,57 \\
+Raw media contraída y covarianza sintética & 22,65\% & 18,56\% & 1,27 $\pm$ 0,55 \\
 \hline
-Calibrada mínima varianza & 14,95\% & 14,13\% & 1,09 $\pm$ 0,57 \\
+Calibrada mínima varianza & 18,46\% & 14,57\% & 1,28 $\pm$ 0,54 \\
 \hline
-Calibrada media contraída y covarianza sintética & 21,87\% & 19,90\% & 1,13 $\pm$ 0,66 \\
+Calibrada media contraída y covarianza sintética & 22,17\% & 17,81\% & 1,27 $\pm$ 0,55 \\
 \hline
 \end{tabular}
 \caption{Resultados multi-semilla de carteras basadas en TimeGAN}\label{tab:resultados-timegan-multisemilla}
 \end{table}
 }
 
-La comparación con la cartera equiponderada es especialmente útil como control. Algunas variantes TimeGAN alcanzan un Sharpe medio similar o ligeramente superior, pero la desviación típica entre semillas es alta. Por eso no sería correcto presentar estos resultados como una superioridad robusta frente a los enfoques clásicos. Son, más bien, una evidencia descriptiva de competitividad puntual para este periodo y este universo de activos. En la semilla 44, además, la ventaja no viene de ganar cada métrica por separado, sino de ofrecer el mejor equilibrio global en validación, con el menor \emph{validation score} del ranking.
+La comparación con la cartera equiponderada es especialmente útil como control. Algunas variantes TimeGAN alcanzan un Sharpe medio similar o ligeramente superior, pero la desviación típica entre semillas es alta. Por eso no sería correcto presentar estos resultados como una superioridad robusta frente a los enfoques clásicos. Son, más bien, una evidencia descriptiva de competitividad puntual para este periodo y este universo de activos. En la semilla 43, además, la ventaja no viene de ganar cada métrica por separado, sino de ofrecer el mejor equilibrio global en validación, con el menor \emph{validation score} del ranking.
 
 La Figura~\ref{fig:timegan-sharpe-multiseed} representa esta variabilidad mediante barras de error. El solapamiento con la referencia equiponderada es visible en varias variantes, lo que impide defender una mejora estable. Sí permite, en cambio, situar algunas configuraciones TimeGAN en una zona competitiva.
 
@@ -1105,6 +1105,39 @@ La Figura~\ref{fig:timegan-sharpe-multiseed} representa esta variabilidad median
     \textbf{Fuente:} Elaboración propia.
     \label{fig:timegan-sharpe-multiseed}
 \end{figure}
+
+\subsection{Resultados del VAE}
+
+El VAE se evaluó como baseline generativo probabilístico mediante una rejilla reducida del parámetro $\beta$: 0, $10^{-5}$, $10^{-4}$ y $10^{-3}$. La mejor pérdida de validación se obtuvo con $\beta=10^{-4}$, con un valor de 0,6407. Esta selección no implica necesariamente el mejor resultado financiero, pero sirve para comprobar si una arquitectura generativa más simple que TimeGAN aporta escenarios útiles bajo el mismo protocolo.
+
+La Tabla~\ref{tab:resultados-vae} resume varias carteras representativas. El mejor Sharpe observado dentro del VAE aparece en la cartera de mínima varianza con $\beta=0$, aunque la configuración seleccionada por validación, $\beta=10^{-4}$, mantiene resultados razonables. Las variantes Markowitz basadas en VAE tienden a concentrar mucho los pesos y elevan de forma clara la volatilidad, por lo que no ofrecen una mejora ajustada al riesgo frente a los baselines clásicos.
+
+{\small
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{0.34\textwidth}|p{0.13\textwidth}|p{0.13\textwidth}|p{0.10\textwidth}|p{0.14\textwidth}|}
+\hline
+\textbf{Cartera VAE} & \textbf{Rent. anual.} & \textbf{Vol. anual.} & \textbf{Sharpe} & \textbf{Drawdown} \\
+\hline
+Raw $\beta=0$ mínima varianza & 16,74\% & 15,71\% & 1,07 & -13,12\% \\
+\hline
+Raw $\beta=10^{-4}$ mínima varianza & 14,78\% & 15,56\% & 0,95 & -12,89\% \\
+\hline
+Calibrada $\beta=10^{-4}$ mínima varianza & 14,92\% & 15,56\% & 0,96 & -12,90\% \\
+\hline
+Calibrada $\beta=10^{-4}$ media contraída y covarianza sintética & 12,55\% & 12,63\% & 0,99 & -10,91\% \\
+\hline
+Raw $\beta=10^{-4}$ Markowitz & 36,38\% & 48,19\% & 0,75 & -36,88\% \\
+\hline
+\end{tabular}
+\caption{Resultados fuera de muestra de carteras representativas basadas en VAE}
+\label{tab:resultados-vae}
+\end{table}
+}
+
+En términos distribucionales, la calibración de volatilidad reduce mucho las distancias marginales del VAE, pero debe interpretarse con cautela porque es un post-procesado impuesto con estadísticos de entrenamiento. El error de correlación permanece alrededor de 3,87 para la configuración $\beta=10^{-4}$, lo que confirma que el VAE funciona como referencia generativa útil, pero no resuelve por sí solo la preservación de dependencias multiactivo.
 
 \subsection{Resultados de los baselines robustos con Ledoit-Wolf}
 
@@ -1157,7 +1190,7 @@ Por esa razón, esta parte del trabajo debe leerse como una validación parcial 
 
 \subsection{Síntesis descriptiva de resultados}
 
-En conjunto, los resultados muestran que el pipeline permite comparar carteras clásicas, variantes robustas y carteras derivadas de escenarios sintéticos bajo un mismo protocolo. Las referencias clásicas siguen siendo sólidas. TimeGAN alcanza resultados competitivos en algunas configuraciones, pero la parte distribucional todavía deja margen claro de mejora. Para cerrar el análisis con una visión más completa, sigue siendo necesaria una comparación homogénea con VAE y una tabla distribucional más amplia.
+En conjunto, los resultados muestran que el pipeline permite comparar carteras clásicas, variantes robustas y carteras derivadas de escenarios sintéticos bajo un mismo protocolo. Las referencias clásicas siguen siendo sólidas. TimeGAN alcanza resultados competitivos en algunas configuraciones, y el VAE aporta una referencia generativa complementaria, aunque sin superar de forma robusta a los baselines clásicos. La parte distribucional todavía deja margen claro de mejora, especialmente en la preservación de dependencias entre activos.
 
 Esta síntesis debe entenderse como descriptiva, no concluyente. La valoración metodológica de estas evidencias se desarrolla en la sección siguiente.
 
@@ -1167,7 +1200,7 @@ Los resultados permiten una conclusión prudente: los modelos generativos son pr
 
 La lectura de TimeGAN es especialmente relevante. El modelo consigue, en algunas configuraciones, carteras competitivas y métricas financieras razonables, pero su comportamiento depende de forma apreciable de la semilla de entrenamiento. Esa sensibilidad no invalida el enfoque, pero sí impide presentarlo como una mejora robusta. En un contexto financiero, una ejecución aislada favorable no basta: si la selección de configuración se hiciera mirando el test, se introduciría sesgo de selección y la comparación dejaría de ser válida. Por eso la validación temporal y multi-semilla es una parte central del diseño experimental.
 
-El VAE cumple una función complementaria dentro del estudio. Su valor está en ofrecer un generador probabilístico más estable y más sencillo de interpretar, pero la versión actual del trabajo aún no incorpora una comparación cuantitativa tan completa como la de TimeGAN. En consecuencia, la discusión sobre su superioridad o inferioridad debe mantenerse abierta hasta disponer de todos los resultados homogéneos. Lo importante, por ahora, es que ambas familias de modelos se evalúan bajo el mismo protocolo y con la misma lógica de separación temporal.
+El VAE cumple una función complementaria dentro del estudio. Su valor está en ofrecer un generador probabilístico más simple y más sencillo de interpretar que TimeGAN. En los resultados observados, algunas carteras VAE son razonables en términos de riesgo, pero las variantes más agresivas tienden a concentrarse y aumentar mucho la volatilidad. Por tanto, el VAE sirve como referencia generativa útil, aunque no aporta evidencia suficiente para defender una superioridad robusta frente a los métodos clásicos.
 
 Los diagnósticos distribucionales muestran además que la calidad de una cartera no puede juzgarse únicamente por el Sharpe final. Preservar la estructura de correlaciones es esencial porque la diversificación y la estimación del riesgo conjunto dependen precisamente de cómo se relacionan los activos entre sí. Del mismo modo, las colas de la distribución y las medidas como VaR y CVaR son necesarias para valorar pérdidas extremas que pueden no quedar reflejadas en métricas medias. La autocorrelación de retornos y, especialmente, la autocorrelación de retornos absolutos también aportan información sobre estructura temporal y agrupación de volatilidad. Esto explica por qué un escenario puede parecer plausible a simple vista y, sin embargo, no ser suficientemente fiel para apoyar decisiones de asignación de capital.
 

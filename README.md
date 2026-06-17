@@ -10,6 +10,7 @@ Este repositorio esta preparado para trabajar la tesis en local con VS Code, LaT
 - LaTeX Workshop configurado para usar `latexmk_local` como receta recomendada.
 - Docker queda solo como fallback opcional, no como flujo principal.
 - Workflow manual de GitHub Actions para generar el PDF cuando se necesite.
+- Workflow de tests Python para validar el pipeline experimental cuando cambia el codigo.
 
 ## Inicio rapido
 
