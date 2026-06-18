@@ -1315,6 +1315,28 @@ En una fase posterior, podrían añadirse mejoras como nuevas fuentes de datos, 
 
 En síntesis, la propuesta de puesta en producción debe entenderse como una continuación natural y preliminar del trabajo: no como un sistema de inversión automático ni como una solución lista para uso operativo, sino como un prototipo web reproducible para ejecutar el pipeline, revisar resultados y comparar enfoques de forma ordenada bajo criterios controlados.
 
+\chapter{Conclusiones y trabajo futuro}
+
+\section{Conclusiones}
+
+\section{Líneas de trabajo futuro}
+El trabajo desarrollado sugiere varias líneas de continuación que permitirían reforzar las conclusiones obtenidas y ampliar el alcance del enfoque propuesto.
+
+Los avances que comentaremos a continuación no deben entenderse como correcciones a un planteamiento incompleto, sino como extensiones de un protocolo que se ha mantenido acotado para favorecer la reproducibilidad y la interpretación controlada de los resultados.
+
+Una primera vía de mejora sería ampliar el universo de inversión ya que el experimento se ha limitado a diez activos de gran capitalización, lo cual facilita el control del experimento, pero también reduce la variedad de comportamientos que el modelo tiene que aprender. Incluir más activos, compañías de menor capitalización, otras clases de activos como renta fija, materias primas o divisas, e incluso mercados internacionales, permitiría comprobar si la calidad de los escenarios sintéticos y la utilidad de las carteras se sostienen cuando la estructura de dependencia es más compleja. Esta ampliación es bastante útil porque el potencial de diversificación depende, en gran medida, de la heterogeneidad del universo que se considera.
+
+
+Contando con que el análisis se ha realizado sobre datos diarios y un único intervalo histórico, lo que limita la generalización de las conclusiones a otros periodos de mercado, sería útil diversificar también la dimensión temporal del estudio, siguiendo con la línea comentada anteriormente. Se podrían explorar otras frecuencias de muestreo, como datos semanales o intradiarios, y adoptar una evaluación mediante ventana deslizante o walk-forward, en la que el modelo se reentrene y evalúe de forma sucesiva a lo largo del tiempo. Esto nos permitiría comprobar si la competitividad observada en TimeGAN se mantiene ante distintos regímenes de mercado y reduciría la dependencia de los resultados respecto a un periodo concreto.
+
+Otra línea de interés se centra en la exploración de nuevas arquitecturas generativas. Los resultados obtenidos han puesto de manifiesto que generar escenarios financieros fieles sigue siendo un reto, en este sentido los modelos de difusión revisados en el estado del arte, como FTS-Diffusion o Diffolio, representan una alternativa ya muy buena, pero resultaría óptimo avanzar hacia esquemas de generación condicional, donde la distribución de los retornos futuros se aprenda en función del contexto de mercado. Este enfoque propuesto conectaría el modelado generativo con la noción de cambio de régimen y permitiría obtener escenarios más adaptados a la situación observada.
+
+En el plano de la optimización, se podría complementar el criterio media-varianza con funciones objetivo orientadas al riesgo de cola, como la minimización del CVaR, que aprovecharían mejor la información sobre eventos extremos contenida en los escenarios generados. Igualmente, integrar los escenarios sintéticos en marcos como el de Black-Litterman, empleando las distribuciones aprendidas como vistas probabilísticas, ofrecería una conexión más directa entre modelado generativo y construcción de carteras.
+
+Por último, aproximar el trabajo a un entorno realista exigiría incluir costes de transacción, impacto de mercado, restricciones operativas, esquemas de rebalanceo periódico y consideraciones regulatorias para evaluar la propuesta en condiciones más cercanas a las de un proceso de inversión real. Estas extensiones encajarían con la evolución del prototipo hacia la herramienta web descrita durante el trabajo, que podría servir como plataforma para ejecutar de forma reproducible las nuevas configuraciones, comparar modelos y mantener la trazabilidad de cada experimento.
+
+En definitiva, las líneas de trabajo futuro apuntan en una misma dirección, ampliar la evidencia disponible y someter el enfoque generativo a condiciones más exigentes antes de afirmar que puede competir con garantías frente a los métodos clásicos robustos.
+
 %\begin{thebibliography}{a}
 %\bibitem{etiqueta} \textsc{Autores},
 %\textit{nombre referencia.}
