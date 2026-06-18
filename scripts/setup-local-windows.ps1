@@ -40,6 +40,52 @@ function Test-PerlCommand {
   return $null -ne (Get-Command perl -ErrorAction SilentlyContinue)
 }
 
+function Invoke-WindowsPdfBuild {
+  param(
+    [string] $TexFile = "plantilla.tex",
+    [string] $OutputDir = "PDF"
+  )
+
+  $baseName = [System.IO.Path]::GetFileNameWithoutExtension($TexFile)
+  $pdfTarget = Join-Path $OutputDir "$baseName.pdf"
+
+  New-Item -ItemType Directory -Force -Path $OutputDir | Out-Null
+
+  if (Test-Path $pdfTarget) {
+    Remove-Item $pdfTarget -Force
+  }
+
+  Write-Host "[setup] Ejecutando pdflatex (pasada 1)..."
+  & pdflatex -interaction=nonstopmode -file-line-error $TexFile | Out-Host
+  if ($LASTEXITCODE -ne 0) {
+    Write-Error "[setup][error] Fallo pdflatex en la primera pasada."
+  }
+
+  Write-Host "[setup] Ejecutando bibtex..."
+  & bibtex $baseName | Out-Host
+  if ($LASTEXITCODE -ne 0) {
+    Write-Error "[setup][error] Fallo bibtex durante la compilacion de prueba."
+  }
+
+  Write-Host "[setup] Ejecutando pdflatex (pasada 2)..."
+  & pdflatex -interaction=nonstopmode -file-line-error $TexFile | Out-Host
+  if ($LASTEXITCODE -ne 0) {
+    Write-Error "[setup][error] Fallo pdflatex en la segunda pasada."
+  }
+
+  Write-Host "[setup] Ejecutando pdflatex (pasada 3)..."
+  & pdflatex -interaction=nonstopmode -file-line-error $TexFile | Out-Host
+  if ($LASTEXITCODE -ne 0) {
+    Write-Error "[setup][error] Fallo pdflatex en la tercera pasada."
+  }
+
+  if (-not (Test-Path "$baseName.pdf")) {
+    Write-Error "[setup][error] No se genero $baseName.pdf en la raiz del proyecto."
+  }
+
+  Copy-Item "$baseName.pdf" $pdfTarget -Force
+}
+
 function Install-MiKTeX {
   $winget = Get-Command winget.exe -ErrorAction SilentlyContinue
 
@@ -176,30 +222,30 @@ if (-not (Test-PerlCommand)) {
   Refresh-PerlPaths
 }
 
-if (-not (Test-PerlCommand)) {
-  Write-Error "[setup][error] latexmk necesita Perl, pero perl.exe no esta disponible. Cierra y abre VS Code, y vuelve a ejecutar la task."
-}
-
 Configure-MiKTeX
 Refresh-MiKTeXPaths
 Refresh-PerlPaths
 
-if (-not (Test-LaTeXCommand "latexmk")) {
-  Write-Error "[setup][error] No se encontro latexmk tras instalar MiKTeX. Abre MiKTeX Console, actualiza paquetes y vuelve a ejecutar la task."
-}
-
 Write-Host "[setup] Herramientas LaTeX detectadas:"
-& latexmk -version | Select-Object -First 1 | Out-Host
 & pdflatex --version | Select-Object -First 1 | Out-Host
 & bibtex --version | Select-Object -First 1 | Out-Host
-& perl --version | Select-Object -First 2 | Out-Host
-
-New-Item -ItemType Directory -Force -Path "PDF" | Out-Null
+if (Test-LaTeXCommand "latexmk") {
+  & latexmk -version | Select-Object -First 1 | Out-Host
+}
+else {
+  Write-Host "[setup] latexmk no esta disponible; la compilacion local de Windows usara pdflatex + bibtex."
+}
+if (Test-PerlCommand) {
+  & perl --version | Select-Object -First 2 | Out-Host
+}
+else {
+  Write-Host "[setup] Perl no esta disponible; no es necesario para la task de compilacion de Windows."
+}
 
 Write-Host "[setup] Compilando prueba inicial..."
-& latexmk -pdf -interaction=nonstopmode -file-line-error -outdir=PDF plantilla.tex | Out-Host
+Invoke-WindowsPdfBuild
 
-if ($LASTEXITCODE -ne 0 -or -not (Test-Path "PDF\plantilla.pdf")) {
+if (-not (Test-Path "PDF\plantilla.pdf")) {
   Write-Error "[setup][error] No se genero PDF\plantilla.pdf"
 }
 
