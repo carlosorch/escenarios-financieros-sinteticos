@@ -28,6 +28,7 @@ __pycache__/
 *.synctex.gz
 *.toc
 *.vrb
+*.pdf
 
 # Editor
 .DS_Store
