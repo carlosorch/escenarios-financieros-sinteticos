@@ -591,6 +591,48 @@ El flujo general se resume en la Figura~\ref{fig:pipeline-metodologico}, que org
     \label{fig:pipeline-metodologico}
 \end{figure}
 
+\section{Justificación de las decisiones metodológicas}
+
+\subsection{Uso de retornos logarítmicos}
+
+El pipeline trabaja con retornos logarítmicos y no con precios en bruto. Esta decisión evita que el modelo aprenda sobre todo la escala nominal de cada activo, que no es comparable entre compañías, y centra el análisis en las variaciones relativas que realmente intervienen en la construcción de carteras. Dos activos pueden tener precios muy distintos y, aun así, presentar comportamientos de riesgo parecidos; con los retornos esa comparación es más directa.
+
+Además, los precios financieros suelen mostrar tendencias fuertes a largo plazo, mientras que los retornos permiten estudiar mejor la variabilidad diaria, las colas de la distribución y la dependencia entre activos. Esto no significa que los retornos sean una variable sencilla ni perfectamente estable, pero sí son una representación más adecuada para entrenar modelos que deben capturar movimientos de mercado y no solo niveles acumulados de precio.
+
+También se opta por retornos logarítmicos porque facilitan el tratamiento temporal de la serie. Su interpretación es cercana a la rentabilidad porcentual diaria y permiten agregar variaciones de forma consistente en el tiempo. Para un estudio centrado en escenarios sintéticos y optimización de carteras, esta propiedad resulta más útil que trabajar directamente con precios ajustados.
+
+\subsection{División temporal y prevención de fuga de información}
+
+La división de los datos se realiza respetando el orden temporal. En este tipo de problema no sería adecuado aplicar una partición aleatoria como en otros contextos de aprendizaje automático, porque se mezclaría información futura con información pasada. Si observaciones posteriores aparecieran en entrenamiento y observaciones anteriores en test, el experimento dejaría de parecerse al uso real de un modelo financiero.
+
+Por esta razón, la metodología separa entrenamiento, validación y prueba siguiendo la secuencia cronológica. El modelo aprende con datos pasados, se ajusta o compara con una ventana posterior de validación y finalmente se evalúa sobre un tramo de test que no ha intervenido en la selección. Esta estructura es más exigente, pero también más honesta: obliga a comprobar si el comportamiento observado se mantiene cuando el modelo se enfrenta a datos no utilizados previamente.
+
+La prevención de fuga de información es especialmente importante en modelos generativos. Si la selección de semillas, hiperparámetros o configuraciones se hiciera mirando el resultado final en test, la evaluación quedaría contaminada. El rendimiento obtenido podría deberse a una elección retrospectiva y no a una mejora real del método. Por ello, el test se reserva como comprobación final y no como herramienta para decidir qué configuración conviene presentar.
+
+\subsection{Separación entre calidad generativa y utilidad financiera}
+
+Una decisión central del trabajo consiste en evaluar por separado la calidad de los escenarios sintéticos y su utilidad en carteras. Ambas cosas están relacionadas, pero no son equivalentes. Un escenario puede parecer razonable desde el punto de vista estadístico y, sin embargo, producir carteras poco útiles. También puede ocurrir lo contrario: una cartera puede obtener un resultado financiero aceptable en una ejecución concreta sin que el modelo haya capturado bien la distribución real de los retornos.
+
+Por ese motivo, la metodología combina métricas distribucionales, temporales, informacionales y financieras. Las primeras sirven para analizar si los datos generados conservan propiedades relevantes de los retornos reales. Las segundas permiten comprobar si esos escenarios tienen valor práctico al alimentar un proceso de optimización. Separar estos dos niveles reduce el riesgo de interpretar un buen Sharpe aislado como prueba suficiente de calidad generativa.
+
+Esta separación también ayuda a leer los resultados con más cuidado. El objetivo no es encontrar una métrica única que decida si un modelo es bueno o malo, sino observar si existe coherencia entre distintas señales. Si un modelo mejora una métrica financiera pero empeora mucho la dependencia entre activos o suaviza en exceso las colas, esa mejora debe tratarse con cautela. En finanzas, una evaluación demasiado estrecha puede ocultar riesgos importantes.
+
+\subsection{Baselines clásicos como punto de control}
+
+Los métodos clásicos no se incluyen solo como comparadores sencillos, sino como puntos de control necesarios. Una cartera equiponderada, una cartera de mínima varianza o una formulación de Markowitz pueden parecer menos sofisticadas que un modelo generativo, pero siguen siendo referencias fuertes en muchos contextos. Si una técnica más compleja no mejora de forma clara o no aporta información adicional, su uso queda difícil de justificar.
+
+Esta comparación cumple una función metodológica. Evita que el trabajo valore los modelos generativos de manera aislada y permite situar sus resultados frente a alternativas conocidas. En la práctica, no basta con que TimeGAN o el VAE generen escenarios visualmente plausibles; esos escenarios deben traducirse en decisiones de cartera que, al menos, puedan compararse con reglas y optimizadores tradicionales.
+
+La inclusión de variantes robustas basadas en Ledoit-Wolf responde a la misma lógica. La matriz de covarianzas es una pieza sensible en la optimización de carteras, y una estimación más estable puede cambiar el resultado sin introducir modelos generativos. Por tanto, comparar contra baselines robustos ayuda a distinguir entre una mejora atribuible a la generación sintética y una mejora que podría obtenerse simplemente con una estimación clásica mejor condicionada.
+
+\subsection{Alcance experimental del pipeline}
+
+El pipeline se diseña como un entorno experimental reproducible, no como una herramienta de inversión automática. Esta diferencia es importante. El sistema permite descargar datos, entrenar modelos, generar escenarios, calcular métricas y comparar carteras bajo un mismo protocolo, pero no incorpora todos los elementos necesarios para operar en mercado real.
+
+Quedan fuera aspectos como costes de transacción, deslizamiento, liquidez, restricciones regulatorias, fiscalidad, ejecución de órdenes o control de riesgo operativo. Incluir todos esos elementos habría desplazado el foco del trabajo hacia el diseño de una plataforma de inversión, cuando el objetivo principal es evaluar si los modelos generativos aportan información útil en un marco académico controlado.
+
+Por tanto, las decisiones metodológicas priorizan trazabilidad, comparación y claridad. El valor del pipeline está en que cada fase puede revisarse, repetirse y contrastarse con las demás. Esa estructura permite analizar los resultados sin convertir una ejecución concreta en una recomendación financiera. Para un Trabajo de Fin de Máster, esta delimitación resulta razonable: se estudia el potencial de la aproximación, pero se evita presentar el sistema como algo más maduro de lo que realmente es.
+
 \section{Criterios generales de evaluación}
 
 La evaluación se organiza alrededor de dos ideas. La primera es que la calidad de un escenario sintético no puede medirse únicamente por su aspecto visual o por una métrica aislada, sino por su capacidad para preservar propiedades relevantes de los retornos reales. La segunda es que la utilidad financiera de esos escenarios debe comprobarse de forma separada, evaluando las carteras resultantes sobre un periodo de prueba que no haya intervenido en el entrenamiento ni en la selección de configuraciones.
