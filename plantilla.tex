@@ -1291,73 +1291,39 @@ Por tanto, la aportación principal del trabajo es proporcionar un marco experim
 
 \subsection{Limitaciones}
 
-La primera limitación del trabajo está en el alcance del universo de activos. El experimento se ha construido sobre un conjunto reducido de diez valores de gran capitalización, lo que facilita el control metodológico y la interpretación de los resultados, pero también restringe la diversidad de comportamientos que el modelo debe aprender. En un universo más amplio, con activos de distinta naturaleza, sectores heterogéneos o incluso otras clases de activo, la estructura de dependencia sería más compleja y la tarea generativa probablemente más exigente.
+El alcance del universo de activos es la primera limitación clara. El experimento trabaja con diez valores de gran capitalización, una elección útil para mantener el estudio bajo control y leer los resultados sin demasiadas capas de ruido. A cambio, el modelo se enfrenta a un mercado relativamente acotado. Si se incorporasen más activos, empresas de menor capitalización, sectores menos representados u otras clases de activo, la estructura de dependencias sería más difícil de aprender y, probablemente, también más parecida a la de un problema real de inversión.
 
-También existe una limitación temporal clara. Los datos son diarios y el análisis se ha realizado sobre un único periodo histórico, de modo que los resultados deben leerse como una fotografía de esa ventana concreta. Esto impide asegurar que las conclusiones se mantendrían en otros contextos de mercado, por ejemplo en fases de menor volatilidad, en periodos de crisis o en regímenes de tipos de interés distintos. La evidencia obtenida es, por tanto, valiosa como estudio de caso, pero no como validación universal.
+La segunda limitación es temporal. Los datos son diarios y pertenecen a un único periodo histórico, por lo que los resultados deben entenderse como una lectura de esa ventana concreta. No puede asumirse que las mismas conclusiones se mantendrían en otro régimen de mercado, en una crisis distinta o en un entorno de tipos de interés diferente. La evidencia obtenida es útil como estudio de caso, pero no alcanza para defender una validez general.
 
-Otra limitación importante afecta al propio proceso de optimización. El trabajo compara los escenarios sintéticos con baselines clásicos razonables, pero no explora en profundidad el espacio completo de restricciones que suele aparecer en una cartera real. No se modelan costes de transacción, impacto de mercado, restricciones de liquidez, límites regulatorios ni políticas de rebalanceo periódico. En la práctica, estas variables pueden alterar de forma significativa la conveniencia de una cartera, por lo que su ausencia acota el significado operativo de los resultados.
+También queda limitado el proceso de optimización. El trabajo compara escenarios sintéticos con referencias clásicas razonables, pero no incorpora todo lo que condiciona una cartera en la práctica. Quedan fuera los costes de transacción, el impacto de mercado, las restricciones de liquidez, los límites regulatorios y las políticas de rebalanceo. No son detalles menores: cualquiera de estos elementos podría cambiar la conveniencia de una asignación concreta.
 
-Desde el punto de vista del modelado, también conviene recordar que ni TimeGAN ni el VAE garantizan por sí solos una reproducción completa de la dinámica financiera. Capturar distribuciones marginales, colas, dependencia cruzada y estructura temporal en un único generador sigue siendo una tarea difícil. Por eso, incluso cuando las carteras derivadas de escenarios sintéticos obtienen resultados competitivos, eso no implica que el generador haya aprendido una representación integral del mercado. El valor del pipeline está en permitir esa comparación, no en resolverla de forma definitiva.
+Desde el punto de vista del modelado, tampoco debe asumirse que TimeGAN o el VAE reproducen toda la dinámica financiera. Capturar a la vez distribuciones marginales, colas, dependencia cruzada y estructura temporal sigue siendo una tarea difícil. Por eso, aunque algunas carteras basadas en escenarios sintéticos obtengan resultados competitivos, esa mejora no prueba por sí sola que el generador haya aprendido una representación completa del mercado. Lo que demuestra el pipeline es más modesto, pero también más sólido: permite hacer esa comparación de forma trazable.
 
-Por último, el carácter experimental del trabajo impide trasladar sus conclusiones a una recomendación de inversión. El sistema sirve para analizar, comparar y diagnosticar, pero no para automatizar decisiones sin una capa adicional de validación. Esta restricción no es un defecto accidental, sino una consecuencia deliberada del diseño: el objetivo ha sido preservar la trazabilidad y evitar afirmaciones más fuertes que la evidencia disponible.
+Por último, el carácter experimental del trabajo impide convertir sus resultados en una recomendación de inversión. El sistema sirve para analizar, comparar y diagnosticar. Automatizar decisiones exigiría otra capa de validación, controles operativos y una evaluación mucho más exigente. Esta restricción no es un fallo del diseño; es precisamente lo que evita hacer afirmaciones más fuertes que la evidencia disponible.
 
 \subsection{Amenazas a la validez}
 
-Las amenazas a la validez interna se relacionan, sobre todo, con la sensibilidad de los modelos generativos a la inicialización y a los hiperparámetros. En particular, TimeGAN muestra variabilidad entre semillas, y esa variabilidad puede afectar tanto a la calidad distribucional como al comportamiento financiero de las carteras resultantes. Aunque se ha mitigado este riesgo con selección multi-semilla y evaluación temporal, no puede eliminarse por completo. En consecuencia, una configuración aparentemente buena podría deber su rendimiento a una combinación favorable de azar y periodo histórico.
+La principal amenaza a la validez interna está en la sensibilidad de los modelos generativos. TimeGAN, en particular, cambia de comportamiento según la semilla y los hiperparámetros, y esa variabilidad puede afectar tanto a la fidelidad distribucional como a las métricas financieras de las carteras resultantes. La evaluación multi-semilla reduce el problema, pero no lo elimina. Una configuración aparentemente buena puede depender todavía de una combinación favorable entre inicialización, periodo histórico y criterio de selección.
 
-También existe una amenaza ligada al criterio de selección del modelo. Si se eligiera una configuración mirando directamente el rendimiento fuera de muestra, se introduciría sesgo de selección y la comparación perdería validez. Este trabajo intenta evitar ese problema usando diagnósticos de validación independientes del test, pero la amenaza sigue siendo relevante como advertencia metodológica: en este tipo de problemas, el procedimiento de selección es parte del resultado.
+También hay una amenaza asociada a la selección del modelo. Si se escogiera una configuración mirando directamente el rendimiento en test, la comparación quedaría contaminada por sesgo de selección. En este trabajo se evita ese punto usando diagnósticos de validación independientes, pero la advertencia sigue siendo importante: en modelos generativos aplicados a finanzas, el modo de seleccionar la configuración forma parte del resultado, no es un paso accesorio.
 
-En términos de validez de constructo, la principal cuestión es si las métricas utilizadas representan realmente lo que se quiere medir. El Sharpe, la volatilidad o el drawdown son útiles para resumir el comportamiento financiero, pero no agotan el concepto de calidad de una cartera. Del mismo modo, divergencias como KL o Jensen-Shannon aportan información sobre similitud distribucional, aunque no capturan por sí solas la coherencia temporal ni el riesgo de cola en toda su complejidad. Existe, por tanto, una tensión inevitable entre medición cuantitativa y fenómeno real.
+En la validez de constructo aparece otra cuestión: las métricas no capturan todo lo que se quiere medir. Sharpe, volatilidad y drawdown resumen bien una parte del comportamiento financiero, pero no agotan la calidad de una cartera. Del mismo modo, KL y Jensen-Shannon ayudan a medir similitud distribucional, aunque no reflejan por completo la coherencia temporal ni el riesgo de cola. Hay, por tanto, una distancia inevitable entre lo que se mide y el fenómeno financiero que se intenta representar.
 
-La validez externa también está limitada por el diseño experimental. El estudio se centra en un conjunto concreto de activos, con una frecuencia diaria y bajo una ventana temporal determinada. Extender los resultados a otros mercados, horizontes o condiciones macroeconómicas requiere cautela. Un modelo que funcione razonablemente en este caso puede no comportarse igual en activos menos líquidos, en series más cortas o en periodos con cambios bruscos de régimen.
+La validez externa también queda acotada por el diseño experimental. El estudio se centra en un conjunto concreto de activos, una frecuencia diaria y una ventana temporal determinada. Extender estos resultados a otros mercados, horizontes o condiciones macroeconómicas requiere prudencia. Un modelo que funciona razonablemente aquí podría comportarse peor con activos menos líquidos, series más cortas o cambios bruscos de régimen.
 
-Por último, la validez de conclusión depende del hecho de que varias comparaciones se han hecho con diferencias relativamente moderadas entre modelos. Eso obliga a evitar sobreinterpretaciones. Cuando las distancias entre estrategias son pequeñas o la desviación entre semillas es alta, la conclusión correcta no es proclamar un ganador claro, sino reconocer que existe una zona de solapamiento donde los resultados son compatibles con varias lecturas. En ese sentido, la prudencia no es una debilidad del análisis, sino una condición de rigor.
+Por último, la validez de conclusión exige cuidado porque varias diferencias entre estrategias son moderadas. Cuando las métricas están próximas o la desviación entre semillas es alta, no tiene sentido presentar un ganador absoluto. La lectura más razonable es reconocer una zona de solapamiento: algunos resultados son compatibles con más de una interpretación. En este caso, la prudencia no debilita el análisis; lo hace más honesto.
 
 \subsection{Comparación con expectativas iniciales}
 
-Antes de realizar el experimento, la expectativa razonable era que TimeGAN ofreciera escenarios más ricos que el VAE, y que esa mayor riqueza se tradujera al menos en algunos casos en carteras competitivas frente a los baselines clásicos. Esa expectativa se ha cumplido solo parcialmente. TimeGAN sí muestra una mejor capacidad para capturar dependencias y conservar patrones multiactivo, pero no convierte esa ventaja en una superioridad estable en todas las métricas ni en todas las semillas.
+Antes del experimento, cabía esperar que TimeGAN generase escenarios más ricos que el VAE y que esa mayor riqueza se tradujera, al menos en algunas configuraciones, en carteras competitivas frente a los baselines clásicos. El resultado va en esa dirección, pero solo a medias. TimeGAN conserva mejor ciertas dependencias multiactivo, aunque esa ventaja no se convierte en una superioridad estable en todas las métricas ni en todas las semillas.
 
-También era previsible que el VAE actuara como referencia más simple y más fácil de interpretar. Esa previsión se confirma. El VAE es útil como comparador probabilístico, pero su capacidad para reproducir dinámica financiera compleja resulta más limitada que la de TimeGAN. En otras palabras, el VAE cumple una función de control metodológico, no de sustituto natural de los métodos clásicos ni de alternativa claramente superior.
+El papel del VAE sí encaja bastante bien con lo esperado. Actúa como un generador probabilístico más simple y más fácil de interpretar, pero su capacidad para reproducir una dinámica financiera compleja es más limitada. En este trabajo funciona sobre todo como referencia metodológica: ayuda a contrastar TimeGAN, no a sustituir los métodos clásicos.
 
-La comparación con las expectativas iniciales también afecta a los baselines. Antes del análisis podría esperarse que los modelos generativos superaran con claridad a la cartera equiponderada o a la de mínima varianza, precisamente por incorporar una representación más flexible de la incertidumbre. Sin embargo, los resultados muestran que los métodos clásicos siguen siendo referencias muy difíciles de batir. Eso no contradice el propósito del trabajo, pero sí obliga a rebajar cualquier expectativa de mejora automática asociada a la IA generativa.
+La comparación con los baselines obliga a rebajar una expectativa habitual en este tipo de trabajos. Podría pensarse que un modelo generativo, por representar la incertidumbre de forma más flexible, debería superar claramente a la cartera equiponderada o a mínima varianza. Sin embargo, los resultados muestran justo por qué esos métodos siguen siendo referencias exigentes: son simples, estables y difíciles de batir de forma consistente.
 
-En cierto sentido, el resultado más interesante es que el trabajo no confirma una promesa simplista, sino una hipótesis más matizada: los modelos generativos pueden aportar información complementaria, pero su utilidad depende de la calidad de la validación y del problema concreto al que se apliquen. Esa conclusión es menos espectacular que una supuesta victoria clara sobre los métodos tradicionales, pero metodológicamente es más sólida.
+El resultado más interesante, por tanto, no es una victoria clara de los modelos generativos. Es una conclusión más incómoda, pero más útil: estos modelos pueden aportar información complementaria, siempre que se validen con cuidado y se comparen contra referencias sólidas. Su valor depende del problema, de la configuración y de la disciplina experimental con la que se usen.
 
-En resumen, las expectativas iniciales se han cumplido en la parte exploratoria, pero no en la parte de superioridad sistemática. El trabajo confirma que existe espacio para usar VAE y TimeGAN como herramientas de apoyo en análisis de carteras, aunque todavía no como sustitutos consistentes de los enfoques clásicos. Esa diferencia entre lo esperado y lo observado es, precisamente, una de las aportaciones más honestas del estudio.
-
-\section{Propuesta de puesta en producción}
-
-Aunque el sistema desarrollado en este trabajo tiene un carácter experimental, resulta conveniente plantear como línea futura una evolución que lo acerque a un prototipo utilizable por otros investigadores o usuarios internos. Esta propuesta debe entenderse siempre condicionada a validaciones adicionales: la idea no es automatizar decisiones de inversión, sino convertir el pipeline en una aplicación que permita ejecutar experimentos de forma controlada, revisar datos, comparar modelos y conservar trazabilidad sobre cada ejecución.
-
-La propuesta más natural es una interfaz web que centralice las fases principales del flujo: descarga de datos, análisis exploratorio, preparación de retornos, generación de escenarios sintéticos, evaluación distribucional y comparación de carteras. De ese modo, el usuario podría seleccionar activos, definir un periodo, lanzar el experimento y consultar los resultados sin interactuar directamente con los scripts del proyecto.
-
-Funcionalmente, la aplicación podría dividirse en los módulos siguientes:
-
-\begin{itemize}
-\item Módulo de ingesta de datos: encargado de descargar precios ajustados desde Yahoo Finance mediante \texttt{yfinance}, validar que existen datos suficientes y almacenar una copia local de los datos utilizados en cada ejecución.
-
-\item Módulo de validación y EDA: responsable de calcular valores nulos, estadísticos descriptivos, retornos logarítmicos, histogramas, matriz de correlación y partición temporal. Este módulo permitiría comprobar la calidad de los datos antes de utilizarlos en los modelos.
-
-\item Módulo de optimización de carteras: encargado de ejecutar las estrategias equiponderada, mínima varianza, Markowitz, Ledoit-Wolf mínima varianza y Ledoit-Wolf Markowitz.
-
-\item Módulo de modelos generativos: destinado a entrenar o cargar modelos VAE y TimeGAN para generar escenarios sintéticos de retornos. En producción, este módulo debería ejecutarse con control de semillas, registro de configuración y almacenamiento de resultados.
-
-\item Módulo de evaluación: responsable de calcular métricas estadísticas, temporales, informacionales y financieras. Entre ellas se incluirían rentabilidad anualizada, volatilidad anualizada, ratio de Sharpe, drawdown, VaR, CVaR, divergencia KL, divergencia Jensen-Shannon, correlaciones y autocorrelaciones.
-
-\item Módulo de visualización: encargado de mostrar tablas, gráficas y comparativas de modelos dentro de la aplicación web.
-
-\end{itemize}
-
-
-La arquitectura técnica podría mantenerse deliberadamente simple: un backend en FastAPI para exponer endpoints de ejecución y consulta, y un frontend web desarrollado en React para mostrar resultados y gráficas sin tener que reconstruir la lógica científica del proyecto. Esa separación es útil porque permite reutilizar el código existente, aislar el motor experimental de la interfaz y facilitar futuras extensiones sin reescribir el pipeline.
-
-El flujo de uso sería lineal. El usuario seleccionaría el universo de activos y el intervalo temporal; el sistema descargaría los precios ajustados, validaría la consistencia de las series y generaría el análisis exploratorio; después se lanzarían los modelos generativos y los baselines; por último, se mostrarían las métricas financieras, distribucionales e informacionales junto con las carteras resultantes. En una primera versión, este proceso podría ejecutarse en local o en un servidor sencillo, sin requerir una infraestructura compleja.
-
-Si esta propuesta evolucionara a una herramienta más madura, habría tres requisitos que sí deberían incorporarse desde el inicio: registro de configuraciones y semillas, almacenamiento de resultados y artefactos, y control de versiones de datos y modelos. Sin esos elementos, la plataforma sería útil como demostrador, pero no como entorno serio de experimentación reproducible.
-
-En una fase posterior, podrían añadirse mejoras como nuevas fuentes de datos, actualización periódica, monitorización de ejecuciones, comparación entre múltiples configuraciones y exportación estructurada de resultados. También sería razonable incluir controles adicionales de seguridad y acceso si la aplicación se compartiera fuera del entorno de investigación.
-
-En síntesis, la propuesta de puesta en producción debe entenderse como una continuación natural y preliminar del trabajo: no como un sistema de inversión automático ni como una solución lista para uso operativo, sino como un prototipo web reproducible para ejecutar el pipeline, revisar resultados y comparar enfoques de forma ordenada bajo criterios controlados.
+En resumen, las expectativas se cumplen en la parte exploratoria, pero no en la idea de una superioridad sistemática. El trabajo confirma que VAE y TimeGAN pueden servir como herramientas de apoyo para estudiar carteras, aunque todavía no como sustitutos consistentes de los enfoques clásicos. Esa distancia entre lo esperado y lo observado es, precisamente, una de las lecturas más valiosas del experimento.
 
 \chapter{Conclusiones y trabajo futuro}
 
@@ -1402,7 +1368,35 @@ Otra línea de interés consiste en explorar nuevas arquitecturas generativas. L
 
 En el plano de la optimización, se podría complementar el criterio media-varianza con funciones objetivo orientadas al riesgo de cola, como la minimización del CVaR, que aprovecharían mejor la información sobre eventos extremos contenida en los escenarios generados. Igualmente, integrar los escenarios sintéticos en marcos como Black-Litterman, empleando las distribuciones aprendidas como vistas probabilísticas, ofrecería una conexión más directa entre modelado generativo y construcción de carteras.
 
-Por último, aproximar el trabajo a un entorno más realista exigiría incluir costes de transacción, impacto de mercado, restricciones operativas, esquemas de rebalanceo periódico y consideraciones regulatorias. Estas extensiones encajarían con la evolución del prototipo hacia la herramienta web descrita durante el trabajo, que podría servir como plataforma para ejecutar nuevas configuraciones, comparar modelos y mantener la trazabilidad de cada experimento.
+Por último, aproximar el trabajo a un entorno más realista exigiría incluir costes de transacción, impacto de mercado, restricciones operativas, esquemas de rebalanceo periódico y consideraciones regulatorias. Sin estos elementos, cualquier lectura operativa del sistema seguiría siendo limitada, aunque los resultados experimentales fueran favorables.
+
+\subsection{Evolución hacia una herramienta web reproducible}
+
+Una continuación natural del trabajo sería convertir el pipeline en una herramienta web de apoyo a la experimentación. No se trataría de construir un sistema automático de inversión, ni de presentar los modelos como listos para producción financiera. La idea sería bastante más acotada: ofrecer una forma ordenada de ejecutar experimentos, revisar datos, comparar configuraciones y conservar la trazabilidad de cada prueba.
+
+La aplicación podría centralizar las fases que ahora se ejecutan mediante scripts: descarga de precios ajustados, análisis exploratorio, preparación de retornos, generación de escenarios sintéticos, evaluación distribucional y comparación de carteras. Así, un usuario podría seleccionar activos, definir un periodo de análisis, lanzar el experimento y consultar los resultados sin tener que modificar directamente el código del proyecto.
+
+Funcionalmente, bastaría con dividir la herramienta en seis bloques principales:
+
+\begin{itemize}
+\item Módulo de ingesta de datos, encargado de descargar precios ajustados desde Yahoo Finance mediante \texttt{yfinance}, comprobar que las series tienen datos suficientes y guardar una copia de los datos usados en cada ejecución.
+
+\item Módulo de validación y EDA, orientado a revisar valores nulos, estadísticos descriptivos, retornos logarítmicos, histogramas, matriz de correlación y partición temporal antes de entrenar los modelos.
+
+\item Módulo de optimización de carteras, responsable de ejecutar las estrategias equiponderada, mínima varianza, Markowitz, Ledoit-Wolf mínima varianza y Ledoit-Wolf Markowitz.
+
+\item Módulo de modelos generativos, destinado a entrenar o cargar VAE y TimeGAN para generar escenarios sintéticos de retornos, siempre con registro de semillas y configuración.
+
+\item Módulo de evaluación, encargado de calcular métricas financieras, estadísticas, temporales e informacionales, como rentabilidad anualizada, volatilidad, ratio de Sharpe, drawdown, VaR, CVaR, divergencia KL, divergencia Jensen-Shannon, correlaciones y autocorrelaciones.
+
+\item Módulo de visualización, centrado en mostrar tablas, gráficas y comparativas de modelos dentro de la propia aplicación.
+\end{itemize}
+
+La arquitectura no tendría por qué ser compleja. Un backend en FastAPI sería suficiente para exponer endpoints de ejecución y consulta, mientras que un frontend en React permitiría mostrar resultados y gráficas sin mezclar la interfaz con la lógica científica del pipeline. Esta separación facilitaría reutilizar el código existente y, al mismo tiempo, mantendría el experimento relativamente fácil de auditar.
+
+En una primera versión, el flujo podría ser lineal: selección de activos e intervalo temporal, descarga y validación de precios, generación del análisis exploratorio, ejecución de modelos y baselines, y presentación final de métricas y carteras. Podría ejecutarse en local o en un servidor sencillo. Lo importante no sería la infraestructura, sino que cada ejecución quedara documentada.
+
+Si la herramienta creciera, habría tres requisitos que convendría incorporar desde el principio: registro de configuraciones y semillas, almacenamiento de resultados y artefactos, y control de versiones de datos y modelos. Sin esa base, la aplicación serviría como demostrador, pero no como entorno serio de experimentación reproducible. Más adelante podrían añadirse nuevas fuentes de datos, actualización periódica, monitorización de ejecuciones, comparación entre configuraciones, exportación estructurada de resultados y controles de acceso si se compartiera fuera del entorno de investigación.
 
 En definitiva, las líneas de trabajo futuro apuntan en una misma dirección: ampliar la evidencia disponible y someter el enfoque generativo a condiciones más exigentes antes de afirmar que puede competir con garantías frente a métodos clásicos robustos.
 
