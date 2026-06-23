@@ -1267,22 +1267,11 @@ Por esa razón, esta parte del trabajo debe leerse como una validación parcial 
 
 \subsection{Síntesis descriptiva de resultados}
 
-En conjunto, los resultados muestran que el pipeline desarrollado permite comparar carteras clásicas, variantes robustas y carteras derivadas de escenarios sintéticos bajo un mismo protocolo, lo cual resulta relevante porque todas las estrategias se evalúan sobre el mismo conjunto de prueba y mediante las mismas métricas financieras, sin alterar las condiciones de valuación de unas y otras.
+En conjunto, los resultados muestran que el pipeline permite comparar carteras clásicas, variantes robustas y carteras derivadas de escenarios sintéticos bajo un mismo protocolo. Todas las estrategias se evalúan sobre el mismo conjunto de prueba y con las mismas métricas financieras, lo que facilita una comparación homogénea entre rentabilidad, volatilidad, ratio de Sharpe, drawdown y riesgo de cola.
 
-El trabajo no se limita a comprobar si un modelo especifico obtiene una rentabilidad elevada, sino que se basa en analizar de forma simultánea a volatilidad, el ratio de Sharpe, el drawdown máximo y las medidas de riesgo de cola, ofreciendo una imagen más completa del comportamiento de cada estrategia.
+Las referencias clásicas siguen siendo difíciles de superar de forma consistente. La cartera equiponderada ofrece una base sencilla y estable, mientras que mínima varianza reduce volatilidad y drawdown a cambio de una rentabilidad más contenida. Markowitz alcanza mayor rentabilidad anualizada, pero con una volatilidad mucho más alta, por lo que su rendimiento ajustado al riesgo queda penalizado. Las variantes Ledoit-Wolf aportan una mejora moderada, sobre todo en mínima varianza, aunque no cambian de forma sustancial la lectura general.
 
-Las referencias clásicas siguen siendo sólidas. 
-La cartera equiponderada ofrece una referencia sencilla y estable que resulta difícil de superar de forma consistente, mientras que la cartera de mínima varianza logra reducir tanto la volatilidad como el drawdown a costa de una rentabilidad bruta más contenida. 
-
-El modelo de Markowitz alcanza rentabilidades anualizadas superiores pero para ello asume una volatilidad mayor que  hace que se penalice su rendimiento ajustado al riesgo y se confirme que una mayor rentabilidad bruta no implica una mejor solución de cartera cuando se consideran métricas de riesgo de forma explícita.
-
-Las variantes robustas basadas en Ledoit-Wolf aportan una mejora moderada donde la regularización de la matriz de covarianzas permite obtener una estimación del riesgo conjunto algo más estable. Sin embargo, el impacto observado no es lo suficientemente pronunciado como para transformar el comportamiento general de las carteras clásicas.
-
-En cuanto a TimeGAN, los resultados indican que el modelo puede generar escenarios útiles para construir carteras competitivas en determinadas configuraciones, pero la variabilidad entre semillas impide interpretar estos resultados como una mejora estable, ya que la evaluación multi-semilla revela que el rendimiento depende en buena medida de la inicialización y de la dinámica de entrenamiento, de modo que una única ejecución no sería suficiente para sostener una conclusión firme.
-
-El VAE ocupa un papel complementario dentro de la comparación, ofreciendo una referencia generativa más sencilla que TimeGAN. Aunque algunas carteras derivadas del VAE presentan un comportamiento razonable en términos de riesgo, el modelo no consigue superar con claridad a los baselines clásicos.
-
-Esta síntesis debe entenderse como descriptiva, no concluyente. La valoración metodológica de estas evidencias se desarrolla en la sección siguiente, donde se discute hasta qué punto los modelos generativos pueden considerarse herramientas de apoyo para la optimización de carteras y cuáles son las limitaciones que impiden interpretarlos como sustitutos directos de los enfoques tradicionales.
+En los modelos generativos, TimeGAN produce carteras competitivas en algunas configuraciones, pero la variabilidad entre semillas impide interpretarlo como una mejora robusta. El VAE actúa como referencia generativa más simple y obtiene algunos resultados razonables en términos de riesgo, aunque tampoco supera con claridad a los baselines clásicos. Por tanto, los resultados apoyan una lectura prudente: los modelos generativos pueden complementar el análisis de carteras, pero no sustituyen todavía a los enfoques clásicos dentro del protocolo evaluado.
 
 \section{Discusión}
 
