@@ -1225,9 +1225,22 @@ Por esa razón, esta parte del trabajo debe leerse como una validación parcial 
 
 \subsection{Síntesis descriptiva de resultados}
 
-En conjunto, los resultados muestran que el pipeline permite comparar carteras clásicas, variantes robustas y carteras derivadas de escenarios sintéticos bajo un mismo protocolo. Las referencias clásicas siguen siendo sólidas. TimeGAN alcanza resultados competitivos en algunas configuraciones, y el VAE aporta una referencia generativa complementaria, aunque sin superar de forma robusta a los baselines clásicos. La parte distribucional todavía deja margen claro de mejora, especialmente en la preservación de dependencias entre activos.
+En conjunto, los resultados muestran que el pipeline desarrollado permite comparar carteras clásicas, variantes robustas y carteras derivadas de escenarios sintéticos bajo un mismo protocolo, lo cual resulta relevante porque todas las estrategias se evalúan sobre el mismo conjunto de prueba y mediante las mismas métricas financieras, sin alterar las condiciones de valuación de unas y otras.
 
-Esta síntesis debe entenderse como descriptiva, no concluyente. La valoración metodológica de estas evidencias se desarrolla en la sección siguiente.
+El trabajo no se limita a comprobar si un modelo especifico obtiene una rentabilidad elevada, sino que se basa en analizar de forma simultánea a volatilidad, el ratio de Sharpe, el drawdown máximo y las medidas de riesgo de cola, ofreciendo una imagen más completa del comportamiento de cada estrategia.
+
+Las referencias clásicas siguen siendo sólidas. 
+La cartera equiponderada ofrece una referencia sencilla y estable que resulta difícil de superar de forma consistente, mientras que la cartera de mínima varianza logra reducir tanto la volatilidad como el drawdown a costa de una rentabilidad bruta más contenida. 
+
+El modelo de Markowitz alcanza rentabilidades anualizadas superiores pero para ello asume una volatilidad mayor que  hace que se penalice su rendimiento ajustado al riesgo y se confirme que una mayor rentabilidad bruta no implica una mejor solución de cartera cuando se consideran métricas de riesgo de forma explícita.
+
+Las variantes robustas basadas en Ledoit-Wolf aportan una mejora moderada donde la regularización de la matriz de covarianzas permite obtener una estimación del riesgo conjunto algo más estable. Sin embargo, el impacto observado no es lo suficientemente pronunciado como para transformar el comportamiento general de las carteras clásicas.
+
+En cuanto a TimeGAN, los resultados indican que el modelo puede generar escenarios útiles para construir carteras competitivas en determinadas configuraciones, pero la variabilidad entre semillas impide interpretar estos resultados como una mejora estable, ya que la evaluación multi-semilla revela que el rendimiento depende en buena medida de la inicialización y de la dinámica de entrenamiento, de modo que una única ejecución no sería suficiente para sostener una conclusión firme.
+
+El VAE ocupa un papel complementario dentro de la comparación, ofreciendo una referencia generativa más sencilla que TimeGAN. Aunque algunas carteras derivadas del VAE presentan un comportamiento razonable en términos de riesgo, el modelo no consigue superar con claridad a los baselines clásicos.
+
+Esta síntesis debe entenderse como descriptiva, no concluyente. La valoración metodológica de estas evidencias se desarrolla en la sección siguiente, donde se discute hasta qué punto los modelos generativos pueden considerarse herramientas de apoyo para la optimización de carteras y cuáles son las limitaciones que impiden interpretarlos como sustitutos directos de los enfoques tradicionales.
 
 \section{Discusión}
 
@@ -1330,6 +1343,22 @@ En términos financieros, las carteras construidas a partir de escenarios sinté
 Otro resultado relevante es que la calibración de media y volatilidad debe interpretarse como una herramienta diagnóstica y no como una mejora universal del modelo. Aunque esa calibración reduce el error en localización y escala por construcción, no resuelve por sí sola las discrepancias en dependencia, correlación o estructura de colas. Por tanto, el mérito del enfoque no reside únicamente en ajustar los primeros momentos de la distribución, sino en evaluar si se conserva una representación suficientemente rica del comportamiento conjunto de los activos.
 
 En conjunto, el trabajo muestra que, dentro del protocolo experimental planteado, la combinación de modelado generativo y métricas informacionales permite estudiar escenarios financieros sintéticos con mayor detalle que los enfoques basados solo en estadísticos puntuales. Aun así, la utilidad práctica depende de la configuración concreta, de la semilla de entrenamiento y de la forma en que se integren los escenarios dentro de la optimización. La conclusión general es, por tanto, prudente: los modelos generativos son una herramienta prometedora para el análisis de carteras, pero su uso requiere validación rigurosa y comparación sistemática con referencias clásicas robustas.
+
+\subsection{Cumplimiento de los objetivos específicos planteados}
+
+A partir de los resultados obtenidos, puede afirmarse que el trabajo ha permitido cumplir de forma razonada los objetivos específicos definidos al inicio del proyecto. 
+
+En relación con el primero de ellos, se ha llevado a cabo un análisis del problema de optimización de carteras y de sus principales limitaciones, especialmente las asociadas a la dependencia de estimaciones históricas, a la sensibilidad de la matriz de covarianzas y a la dificultad de representar adecuadamente distribuciones financieras con colas pesadas, volatilidad variable y dependencias entre activos. Además, la revisión del marco teórico y del estado del arte ha permitido situar el trabajo dentro de una línea de investigación activa, en la que los modelos generativos y las métricas informacionales aparecen como herramientas complementarias.
+
+Respecto al segundo objetivo, el trabajo ha explorado el uso de TimeGAN y de Autoencoders Variacionales como modelos generativos aplicados a retornos financieros, utilizándolos para aprender representaciones a partir de datos reales y generar escenarios sintéticos de mercado. TimeGAN ha mostrado un mayor interés dentro del experimento, mientras que el VAE ha servido como referencia generativa probabilística más sencilla.
+
+El tercer objetivo, centrado en la obtención y preparación de los datos financieros, se ha alcanzado mediante la construcción de un flujo de trabajo completo que abarca desde la descarga de precios ajustados hasta la transformación a retornos logarítmicos, la alineación temporal de activos, la normalización y la división cronológica en entrenamiento, validación y prueba.
+
+En relación con el cuarto objetivo, se han desarrollado e integrado modelos basados en VAE y TimeGAN para generar escenarios sintéticos de retornos, incorporando métricas estadísticas, temporales e informacionales para evaluar su calidad de forma más completa. El uso de divergencias como Kullback-Leibler y Jensen-Shannon ha permitido analizar la distancia entre distribuciones reales y generadas desde una perspectiva más amplia que la ofrecida por las métricas financieras tradicionales.
+
+El quinto objetivo se ha abordado mediante la comparación del pipeline propuesto frente a métodos clásicos de optimización de carteras incluyendo también variantes robustas basadas en Ledoit-Wolf. Los resultados muestran que los modelos generativos pueden producir carteras competitivas en determinadas configuraciones, especialmente en el caso de TimeGAN, pero no demuestran una superioridad estable frente a los enfoques clásicos.
+
+Como podemos observar, además del objetivo general del proyecto, todos los objetivos específicos han sido cubiertos, por lo que el trabajo permite cerrar el estudio de forma coherente con su planteamiento inicial.
 
 \section{Líneas de trabajo futuro}
 El trabajo desarrollado sugiere varias líneas de continuación que permitirían reforzar la evidencia disponible y ampliar el alcance del enfoque propuesto. Estas líneas no deben entenderse como correcciones a un planteamiento incompleto, sino como extensiones naturales de un protocolo que se ha mantenido acotado para favorecer la reproducibilidad y la interpretación controlada de los resultados.
