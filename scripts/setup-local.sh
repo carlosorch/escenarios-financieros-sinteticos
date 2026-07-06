@@ -84,10 +84,10 @@ bibtex --version | head -n 1
 mkdir -p PDF
 
 echo "[setup] Compilando prueba inicial..."
-latexmk -pdf -interaction=nonstopmode -file-line-error -outdir=PDF plantilla.tex >/dev/null
+latexmk -pdf -interaction=nonstopmode -file-line-error -outdir=PDF memoria.tex >/dev/null
 
-if [[ ! -f PDF/plantilla.pdf ]]; then
-  echo "[setup][error] No se genero PDF/plantilla.pdf"
+if [[ ! -f PDF/memoria.pdf ]]; then
+  echo "[setup][error] No se genero PDF/memoria.pdf"
   exit 1
 fi
 

@@ -37,7 +37,7 @@ if (-not (Get-Command bibtex -ErrorAction SilentlyContinue)) {
 
 New-Item -ItemType Directory -Force -Path "PDF" | Out-Null
 
-$texFile = "plantilla.tex"
+$texFile = "memoria.tex"
 $baseName = [System.IO.Path]::GetFileNameWithoutExtension($texFile)
 $pdfTarget = Join-Path "PDF" "$baseName.pdf"
 

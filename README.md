@@ -42,7 +42,7 @@ La evaluación separa dos preguntas:
 
 ```text
 .
-├── plantilla.tex                 # Memoria principal en LaTeX
+├── memoria.tex                   # Memoria principal en LaTeX
 ├── bibliografia.bib              # Bibliografía APA
 ├── src/tfm_pipeline/             # Pipeline experimental Python
 │   ├── config.py                 # Configuración del experimento
@@ -146,7 +146,7 @@ El criterio de selección de TimeGAN se basa en diagnósticos de validación. La
 
 ## Compilación de la memoria
 
-La memoria principal está en `plantilla.tex`.
+La memoria principal está en `memoria.tex`.
 
 Compilación local:
 
@@ -166,7 +166,7 @@ También puede compilarse desde VS Code con la tarea **Compile thesis PDF**. El 
 
 - `docs/flujo_codigo.md`: guía de instalación y ejecución del pipeline.
 - `docs/metricas_experimento.md`: protocolo de métricas usado en el experimento.
-- `plantilla.tex`: memoria completa del TFM.
+- `memoria.tex`: memoria completa del TFM.
 
 ## Reproducibilidad
 

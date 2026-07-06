@@ -106,13 +106,13 @@ jobs:
           latexmk -version
           pdflatex --version
           bibtex --version
-          test -f PDF/plantilla.pdf
+          test -f PDF/memoria.pdf
 
       - name: Upload generated PDF
         uses: actions/upload-artifact@v4
         with:
           name: thesis-pdf-ubuntu-latest
-          path: PDF/plantilla.pdf
+          path: PDF/memoria.pdf
 
   fresh-install-macos:
     name: macos-latest
@@ -138,13 +138,13 @@ jobs:
           latexmk -version
           pdflatex --version
           bibtex --version
-          test -f PDF/plantilla.pdf
+          test -f PDF/memoria.pdf
 
       - name: Upload generated PDF
         uses: actions/upload-artifact@v4
         with:
           name: thesis-pdf-macos-latest
-          path: PDF/plantilla.pdf
+          path: PDF/memoria.pdf
 
   fresh-install-windows:
     name: windows-latest
@@ -183,12 +183,12 @@ jobs:
           pdflatex --version
           bibtex --version
           perl --version
-          if (-not (Test-Path "PDF\plantilla.pdf")) {
-            throw "PDF\plantilla.pdf was not generated."
+          if (-not (Test-Path "PDF\memoria.pdf")) {
+            throw "PDF\memoria.pdf was not generated."
           }
 
       - name: Upload generated PDF
         uses: actions/upload-artifact@v4
         with:
           name: thesis-pdf-windows-latest
-          path: PDF/plantilla.pdf
+          path: PDF/memoria.pdf

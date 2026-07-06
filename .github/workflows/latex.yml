@@ -15,10 +15,10 @@ jobs:
         run: |
           mkdir -p PDF
           docker run --rm -v "$PWD":/work -w /work sanjibsen/weblatex:latest \
-            latexmk -pdf -interaction=nonstopmode -file-line-error -outdir=PDF plantilla.tex
+            latexmk -pdf -interaction=nonstopmode -file-line-error -outdir=PDF memoria.tex
 
       - name: Upload PDF artifact
         uses: actions/upload-artifact@v4
         with:
           name: tesis-pdf
-          path: PDF/plantilla.pdf
+          path: PDF/memoria.pdf

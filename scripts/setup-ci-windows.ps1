@@ -100,10 +100,10 @@ if (-not (Test-Command "latexmk")) {
 New-Item -ItemType Directory -Force -Path "PDF" | Out-Null
 
 Write-Host "[setup-ci] Compiling initial PDF..."
-latexmk -pdf -interaction=nonstopmode -file-line-error -outdir=PDF plantilla.tex
+latexmk -pdf -interaction=nonstopmode -file-line-error -outdir=PDF memoria.tex
 
-if ($LASTEXITCODE -ne 0 -or -not (Test-Path "PDF\plantilla.pdf")) {
-  Write-Error "[setup-ci][error] PDF\plantilla.pdf was not generated."
+if ($LASTEXITCODE -ne 0 -or -not (Test-Path "PDF\memoria.pdf")) {
+  Write-Error "[setup-ci][error] PDF\memoria.pdf was not generated."
 }
 
 Persist-ToolPathsForGitHubActions

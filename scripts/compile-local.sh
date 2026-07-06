@@ -7,4 +7,4 @@ if [[ "${OSTYPE:-}" == msys* || "${OSTYPE:-}" == cygwin* ]]; then
 fi
 
 mkdir -p PDF
-latexmk -pdf -interaction=nonstopmode -file-line-error -outdir=PDF plantilla.tex
+latexmk -pdf -interaction=nonstopmode -file-line-error -outdir=PDF memoria.tex

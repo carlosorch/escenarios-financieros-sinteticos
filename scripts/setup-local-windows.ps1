@@ -245,8 +245,8 @@ else {
 Write-Host "[setup] Compilando prueba inicial..."
 Invoke-WindowsPdfBuild
 
-if (-not (Test-Path "PDF\plantilla.pdf")) {
-  Write-Error "[setup][error] No se genero PDF\plantilla.pdf"
+if (-not (Test-Path "PDF\memoria.pdf")) {
+  Write-Error "[setup][error] No se genero PDF\memoria.pdf"
 }
 
 Write-Host "[setup] Todo listo. Puedes compilar desde VS Code con:"
