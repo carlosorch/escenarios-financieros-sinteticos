@@ -142,7 +142,7 @@ El documento se organiza de forma progresiva para separar con claridad el marco 
 
 En primer lugar, se introduce el problema de la optimización de carteras y se justifica la relevancia de estudiar técnicas capaces de representar mejor la incertidumbre de los retornos financieros. A continuación, se presenta un capítulo diferenciado en dos partes: un marco teórico, donde se revisan los conceptos necesarios para comprender el trabajo, y un estado del arte, centrado en antecedentes y estudios previos relacionados con el problema abordado.
 
-Después se presentan los objetivos del trabajo y se define el planteamiento metodológico general. El Capítulo 4 establece el enfoque metodológico, el diseño del pipeline, los criterios generales de evaluación y la lógica de separación entre entrenamiento, validación y prueba. A continuación, el Capítulo 5 desarrolla de forma operativa la contribución: describe el experimento realizado, los datos utilizados, la preparación de la información, los modelos comparados, las métricas aplicadas y los resultados obtenidos. Finalmente, el Capítulo 6 discute el significado de esos resultados, sus limitaciones y las posibles líneas de trabajo futuro.
+Después se presentan, en un mismo capítulo, los objetivos del trabajo y el planteamiento metodológico general: enfoque adoptado, diseño del pipeline, criterios generales de evaluación y lógica de separación entre entrenamiento, validación y prueba. A continuación, el capítulo de desarrollo específico de la contribución describe el experimento realizado, los datos utilizados, la preparación de la información, los modelos comparados, las métricas aplicadas y los resultados obtenidos. Finalmente, el capítulo de conclusiones discute el significado de esos resultados, sus limitaciones y las posibles líneas de trabajo futuro.
 
 Esta organización permite mantener una distinción clara entre lo que se ha medido y lo que puede concluirse a partir de dichas mediciones. En particular, la interpretación de los resultados se reserva para la discusión final, evitando presentar como conclusiones generales lo que pueda depender de una configuración concreta, de una semilla de entrenamiento o de un periodo histórico determinado.
 
@@ -521,7 +521,7 @@ También se observa que la teoría de la información aporta herramientas útile
 
 A partir de esta revisión, el presente trabajo se sitúa en la intersección entre modelado generativo, evaluación informacional y optimización de carteras. Su contribución no consiste en proponer una sustitución directa de los métodos clásicos, sino en desarrollar un protocolo reproducible para evaluar si los escenarios generados por VAE y TimeGAN conservan propiedades relevantes de los retornos reales y si dichas representaciones pueden resultar útiles en la construcción de carteras.
 
-\chapter{Objetivos concretos}
+\chapter{Objetivos y metodología}
 \section{Objetivo general}
 
 El objetivo general de este proyecto es desarrollar y evaluar un pipeline experimental reproducible basado en técnicas de modelado generativo y métricas de teoría de la información, con el fin de generar escenarios sintéticos de retornos financieros, validar su fidelidad estadística e informacional y analizar su utilidad en procesos de optimización de carteras frente a enfoques tradicionales.
@@ -542,17 +542,17 @@ A continuación, se presentan los objetivos específicos que guiarán el desarro
 \item O5: {\bf Evaluar y comparar} el comportamiento del pipeline propuesto frente a métodos tradicionales de optimización de carteras, analizando su capacidad para representar la incertidumbre, preservar dependencias entre activos y apoyar la construcción de carteras evaluadas fuera de muestra.
 \end{itemize}
 
-\chapter{Metodología}
+\section{Metodología}
 
-\section{Enfoque metodológico}
+\subsection{Enfoque metodológico}
 
 La metodología del trabajo se define como aplicada, experimental y comparativa. Se parte de un problema financiero conocido, la optimización de carteras, y se estudia si los modelos generativos pueden aportar escenarios sintéticos útiles para analizarlo bajo condiciones controladas. Por tanto, el trabajo no se orienta a desarrollar una estrategia de inversión lista para su uso real, sino a construir un procedimiento reproducible que permita comparar resultados y valorar sus limitaciones.
 
 El planteamiento combina técnicas de ciencia de datos, aprendizaje profundo y evaluación financiera. En primer lugar, se trabaja con datos históricos de mercado; después, se preparan retornos y ventanas temporales; posteriormente, se entrenan modelos generativos y se construyen carteras a partir de información empírica o sintética. Finalmente, todas las alternativas se comparan mediante métricas comunes y sobre datos reales fuera de muestra.
 
-Este capítulo recoge el marco metodológico general, el diseño del pipeline, los criterios de evaluación y las decisiones de reproducibilidad. La descripción concreta de los datos utilizados, los modelos ejecutados y los resultados observados se desarrolla en el Capítulo 5, para separar el método de su aplicación experimental.
+Este apartado recoge el marco metodológico general, el diseño del pipeline, los criterios de evaluación y las decisiones de reproducibilidad. La descripción concreta de los datos utilizados, los modelos ejecutados y los resultados observados se desarrolla en el capítulo de desarrollo específico de la contribución, para separar el método de su aplicación experimental.
 
-\section{Marco de trabajo adoptado}
+\subsection{Marco de trabajo adoptado}
 
 Como guía general se toma CRISP-DM, por tratarse de un marco ampliamente utilizado en proyectos de ciencia de datos basados en comprensión del problema, preparación de datos, modelado, evaluación y revisión de resultados. En este TFM no se aplica como una metodología empresarial cerrada, sino como una forma ordenada de estructurar un experimento cuantitativo reproducible. Sus fases se adaptan al contexto financiero y experimental de la siguiente forma:
 
@@ -578,7 +578,7 @@ Despliegue & Construcción de un prototipo experimental reproducible para análi
 \caption{Adaptación de CRISP-DM al proyecto}\label{tab:crispdm-adaptacion}
 \end{table}
 
-\section{Diseño técnico del pipeline}
+\subsection{Diseño técnico del pipeline}
 
 La solución se implementa como un pipeline modular en Python. Esta decisión facilita separar las responsabilidades del experimento: un módulo se encarga de la descarga y preparación de datos, otros implementan los modelos generativos, otros calculan métricas y otros ejecutan las comparaciones financieras. Esta separación resulta importante porque permite repetir partes concretas del experimento sin rehacer todo el proceso y reduce el riesgo de mezclar la generación de datos sintéticos con la evaluación final.
 
@@ -591,9 +591,9 @@ El flujo general se resume en la Figura~\ref{fig:pipeline-metodologico}, que org
     \label{fig:pipeline-metodologico}
 \end{figure}
 
-\section{Justificación de las decisiones metodológicas}
+\subsection{Justificación de las decisiones metodológicas}
 
-\subsection{Uso de retornos logarítmicos}
+\subsubsection{Uso de retornos logarítmicos}
 
 Aunque los datos originales son precios ajustados, el experimento no modela directamente esos precios. Se transforman en retornos logarítmicos porque, para este problema, el nivel absoluto de una acción aporta poca información comparable. Un precio de NVDA y uno de JPM no significan lo mismo: cada activo tiene su propia escala, su propia historia y sus propios ajustes corporativos.
 
@@ -601,7 +601,7 @@ En cambio, los retornos permiten trabajar con una pregunta más útil para carte
 
 Esto no convierte el problema en algo sencillo. Los retornos financieros siguen siendo ruidosos, presentan colas pesadas y cambian de comportamiento según el periodo de mercado. Precisamente por eso son adecuados para este estudio. Eliminan la escala nominal del precio, pero conservan las dificultades que interesa evaluar en un modelo generativo.
 
-\subsection{División temporal y prevención de fuga de información}
+\subsubsection{División temporal y prevención de fuga de información}
 
 La separación entre entrenamiento, validación y prueba se hace siguiendo el orden de las fechas. En finanzas, esto es importante. Una partición aleatoria podría parecer más cómoda desde el punto de vista técnico, pero introduciría un problema serio: el modelo podría aprender con información posterior a la que luego se usa para evaluar.
 
@@ -609,7 +609,7 @@ El experimento intenta evitar esa fuga de información. Primero se entrena con u
 
 La precaución es especialmente necesaria con TimeGAN. Al depender de la inicialización, una semilla concreta puede dar un resultado mejor que otra sin que eso signifique que el método sea estable. Por ese motivo, el test no se utiliza para ir probando hasta encontrar la ejecución más favorable. Se usa al final, cuando las decisiones principales ya están fijadas.
 
-\subsection{Separación entre calidad generativa y utilidad financiera}
+\subsubsection{Separación entre calidad generativa y utilidad financiera}
 
 En este trabajo se evalúan dos cosas distintas. La primera es si los datos sintéticos se parecen a los datos reales. La segunda es si esos datos sintéticos ayudan a construir carteras. Pueden parecer la misma pregunta, pero no lo son.
 
@@ -617,7 +617,7 @@ Un modelo puede generar retornos con medias y volatilidades parecidas a las real
 
 Por eso no se usa una sola métrica para decidir. Las métricas estadísticas e informacionales sirven para revisar la calidad de los escenarios. Las métricas financieras muestran qué ocurre cuando esos escenarios se llevan al problema de cartera. La conclusión debe salir de mirar ambas partes a la vez, no de escoger el número que mejor encaje.
 
-\subsection{Baselines clásicos como punto de control}
+\subsubsection{Baselines clásicos como punto de control}
 
 Los métodos clásicos se mantienen como comparación porque siguen siendo referencias fuertes. La cartera equiponderada, por ejemplo, es simple, pero no por ello irrelevante. Si un modelo generativo necesita mucha más complejidad y no mejora de forma clara a una regla sencilla, esa complejidad pierde fuerza.
 
@@ -625,7 +625,7 @@ Lo mismo ocurre con mínima varianza y Markowitz. No son modelos nuevos, pero re
 
 También se incluye Ledoit-Wolf porque la estimación de la covarianza puede cambiar mucho el resultado. Antes de decir que una mejora viene del modelo generativo, conviene comprobar si una técnica clásica de regularización ya consigue parte de esa mejora. Esa comparación hace que la lectura de los resultados sea más prudente.
 
-\subsection{Alcance experimental del pipeline}
+\subsubsection{Alcance experimental del pipeline}
 
 El pipeline no se plantea como una herramienta de inversión automática. Su función es ordenar el experimento: descargar datos, preparar retornos, entrenar modelos, generar escenarios, calcular métricas y comparar carteras. Para el objetivo del TFM, ese alcance es suficiente.
 
@@ -633,13 +633,13 @@ Quedan fuera aspectos que serían necesarios en un entorno real, como costes de 
 
 La idea, por tanto, es mantener el sistema acotado y revisable. Cada fase del pipeline puede comprobarse por separado y los resultados pueden reproducirse con la misma configuración. Esa trazabilidad es más importante para este trabajo que añadir funcionalidades operativas que no se van a validar en profundidad.
 
-\section{Criterios generales de evaluación}
+\subsection{Criterios generales de evaluación}
 
 La evaluación se organiza alrededor de dos ideas. La primera es que la calidad de un escenario sintético no puede medirse únicamente por su aspecto visual o por una métrica aislada, sino por su capacidad para preservar propiedades relevantes de los retornos reales. La segunda es que la utilidad financiera de esos escenarios debe comprobarse de forma separada, evaluando las carteras resultantes sobre un periodo de prueba que no haya intervenido en el entrenamiento ni en la selección de configuraciones.
 
 Con este enfoque se pretende evitar una interpretación excesivamente optimista de los modelos generativos. El trabajo compara VAE y TimeGAN con baselines clásicos, mantiene una división temporal fija y reserva el conjunto de test para la evaluación final. De esta forma, la metodología busca que las conclusiones dependan del protocolo experimental completo y no de una ejecución concreta o de una selección posterior del mejor resultado.
 
-\section{Herramientas y entorno de desarrollo}
+\subsection{Herramientas y entorno de desarrollo}
 
 El desarrollo se apoya en Python 3 y en bibliotecas habituales dentro de la ciencia de datos y las finanzas cuantitativas. \texttt{Pandas} y \texttt{NumPy} se utilizan para la manipulación de series temporales y el cálculo numérico \cite{Harris2020,McKinney2010}. \texttt{yfinance} permite descargar los datos financieros utilizados en el estudio. \texttt{PyTorch} se emplea para implementar y entrenar los modelos VAE y TimeGAN, ya que ofrece control sobre la arquitectura, la función de pérdida y el dispositivo de entrenamiento \cite{Paszke2019}. De forma complementaria, bibliotecas como \texttt{SciPy}, \texttt{statsmodels}, \texttt{matplotlib} y \texttt{seaborn} permiten calcular estadísticos, analizar dependencias, comparar distribuciones y visualizar patrones relevantes en los datos reales y sintéticos \cite{Virtanen2020,Seabold2010}.
 
@@ -649,7 +649,7 @@ También se utilizan pruebas automatizadas con \texttt{pytest} para validar func
 
 En cuanto al hardware, el código contempla ejecución con CUDA en entornos con GPU NVIDIA, MPS en equipos Apple Silicon y CPU como alternativa general. Esta selección automática de dispositivo no cambia el diseño del experimento, pero sí mejora su portabilidad y facilita que el pipeline pueda ejecutarse en distintos equipos sin modificar manualmente el código principal.
 
-\section{Protocolo experimental y reproducibilidad}
+\subsection{Protocolo experimental y reproducibilidad}
 
 El protocolo experimental se define antes de la interpretación de resultados. En primer lugar se descargan los precios históricos y se preparan los retornos. Después se realiza la división temporal en entrenamiento, validación y prueba. A continuación se entrenan o evalúan los baselines clásicos, se entrena el VAE sobre los datos de entrenamiento y se generan escenarios sintéticos. El mismo procedimiento se aplica a TimeGAN, incorporando evaluación multi-semilla para analizar la sensibilidad del modelo.
 
@@ -1402,7 +1402,7 @@ En definitiva, las líneas de trabajo futuro apuntan en una misma dirección: am
 
 \section*{Disponibilidad del código}
 
-El código fuente del proyecto está disponible en el repositorio público de GitHub: \url{https://github.com/carlosorch/synthetic-financial-scenarios}.
+El código fuente del proyecto está disponible en el repositorio público de GitHub: \url{https://github.com/carlosorch/escenarios-financieros-sinteticos}.
 
 %\begin{thebibliography}{a}
 %\bibitem{etiqueta} \textsc{Autores},
