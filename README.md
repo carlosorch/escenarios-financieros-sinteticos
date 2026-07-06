@@ -1,134 +1,154 @@
-# TFM - Flujo local con VS Code y LaTeX
+# Synthetic Financial Scenarios
 
-Este repositorio esta preparado para trabajar la tesis en local con VS Code, LaTeX instalado en el ordenador y GitHub como control de versiones.
+Repositorio asociado al Trabajo de Fin de Máster **"Generación de escenarios sintéticos de retornos financieros mediante VAE y TimeGAN para optimización de carteras"**.
 
-## Que queda configurado
+El proyecto implementa un pipeline reproducible en Python para descargar precios financieros, preparar retornos logarítmicos, generar escenarios sintéticos con modelos generativos y evaluar su utilidad en optimización de carteras.
 
-- Compilacion local con `latexmk`, `pdflatex` y `bibtex`.
-- Setup automatico desde VS Code para instalar/verificar dependencias LaTeX.
-- Tarea de compilacion local a PDF.
-- LaTeX Workshop configurado para usar `latexmk_local` como receta recomendada.
-- Docker queda solo como fallback opcional, no como flujo principal.
-- Workflow manual de GitHub Actions para generar el PDF cuando se necesite.
-- Workflow de tests Python para validar el pipeline experimental cuando cambia el codigo.
+## Objetivo
 
-## Inicio rapido
+Evaluar si escenarios sintéticos generados mediante **VAE** y **TimeGAN** pueden preservar propiedades estadísticas, temporales e informacionales de retornos financieros reales y servir como apoyo para construir carteras comparables con métodos clásicos.
 
-1. Abrir el repo en VS Code.
-2. Ejecutar `Terminal` -> `Run Task` -> `Setup local thesis environment`.
-3. Cuando termine, ejecutar `Terminal` -> `Run Task` -> `Compile thesis PDF`.
-4. Abrir `PDF/plantilla.pdf`.
+El repositorio incluye:
 
-En Windows, el setup instala MiKTeX y Strawberry Perl con `winget` si no estan instalados. Puede pedir permisos de administrador.
+- código del pipeline experimental;
+- modelos VAE y TimeGAN en PyTorch;
+- baselines financieros clásicos;
+- métricas distribucionales, temporales, informacionales y financieras;
+- pruebas unitarias;
+- memoria LaTeX del TFM y scripts de compilación.
 
-Para ejecutar el pipeline Python de experimentos, usar la guia `docs/flujo_codigo.md`.
+## Diseño experimental
 
-## Requisitos base
+| Elemento | Valor |
+| --- | --- |
+| Fuente de datos | Yahoo Finance mediante `yfinance` |
+| Activos | AAPL, MSFT, GOOGL, AMZN, META, NVDA, JPM, XOM, JNJ y PG |
+| Frecuencia | Diaria |
+| Variable modelada | Retornos logarítmicos |
+| Periodo completo | 2015-01-01 a 2026-05-12 |
+| Entrenamiento | 2015-01-01 a 2022-12-31 |
+| Validación | 2023-01-01 a 2024-06-30 |
+| Prueba | 2024-07-01 a 2026-05-12 |
+| Ventana temporal | 30 días |
+| Modelos generativos | VAE y TimeGAN |
+| Baselines | Equiponderada, mínima varianza, Markowitz y Ledoit-Wolf |
 
-Cada persona del equipo debe tener:
+La evaluación separa dos preguntas:
 
-- `Git`
-- `VS Code`
-- Cuenta de GitHub con acceso al repo
+1. **Fidelidad generativa**: si los escenarios sintéticos conservan propiedades de los retornos reales.
+2. **Utilidad financiera**: si las carteras construidas con esos escenarios se comportan razonablemente sobre datos reales fuera de muestra.
 
-El setup del proyecto se encarga de LaTeX:
+## Estructura del repositorio
 
-- Windows: instala/verifica MiKTeX y Strawberry Perl, necesario para ejecutar `latexmk`.
-- Linux: instala paquetes TeX Live usando `apt`, `dnf` o `pacman` si estan disponibles.
-- macOS: instala `mactex-no-gui` usando Homebrew si esta disponible.
-
-## Instalacion base por sistema
-
-### Windows
-
-Opcion recomendada: usar `winget` en PowerShell.
-
-```powershell
-winget install --id Git.Git -e
-winget install --id Microsoft.VisualStudioCode -e
+```text
+.
+├── plantilla.tex                 # Memoria principal en LaTeX
+├── bibliografia.bib              # Bibliografía APA
+├── src/tfm_pipeline/             # Pipeline experimental Python
+│   ├── config.py                 # Configuración del experimento
+│   ├── data.py                   # Descarga y preparación de retornos
+│   ├── evaluation.py             # Métricas financieras
+│   ├── synthetic_evaluation.py   # Métricas de escenarios sintéticos
+│   ├── optimization.py           # Optimización de carteras
+│   ├── model_selection.py        # Selección por validación
+│   ├── models/                   # VAE y TimeGAN
+│   └── run_*.py                  # Puntos de entrada del pipeline
+├── tests/unit/                   # Pruebas unitarias
+├── docs/                         # Guías de ejecución y métricas
+├── scripts/                      # Compilación LaTeX y generación de figuras
+├── media/                        # Figuras usadas en la memoria
+└── results/                      # Resultados generados localmente
 ```
 
-Si `winget` no esta disponible, usar los instaladores oficiales:
+## Instalación
 
-- Git: `https://git-scm.com/downloads`
-- VS Code: `https://code.visualstudio.com/Download`
+Requisitos:
 
-No hace falta instalar Docker para trabajar en local.
+- Python 3.10 o superior;
+- Git;
+- conexión a internet para descargar precios desde Yahoo Finance.
 
-### Linux Ubuntu/Debian
+Clonar el repositorio:
 
 ```bash
-sudo apt update
-sudo apt install -y git
-sudo snap install code --classic
+git clone https://github.com/carlosorch/synthetic-financial-scenarios.git
+cd synthetic-financial-scenarios
 ```
 
-### macOS
-
-Con Homebrew:
+Instalación recomendada con `uv`:
 
 ```bash
-brew install git
-brew install --cask visual-studio-code
+uv sync --extra dev
 ```
 
-Si no tienes Homebrew:
+Alternativa con `pip`:
 
 ```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+python3 -m pip install --upgrade pip
+python3 -m pip install -e ".[dev]"
 ```
 
-## Clonar y abrir el repositorio
+En equipos Linux con GPU NVIDIA puede usarse el fichero CUDA:
 
 ```bash
-git clone git@github.com:carlosorch/tfm.git
-cd tfm
-code .
+python3 -m pip install -r requirements-cuda.txt
+python3 -m pip install -e ".[dev]"
 ```
 
-Si alguien no tiene SSH configurado en GitHub:
+## Comprobación rápida
 
 ```bash
-git clone https://github.com/carlosorch/tfm.git
-cd tfm
-code .
+uv run python -c "import tfm_pipeline; print('tfm_pipeline OK')"
+uv run pytest
 ```
 
-Al abrir el repo, VS Code deberia sugerir instalar extensiones recomendadas. Instalar como minimo:
-
-- `LaTeX Workshop`
-- `Live Share` si vais a compartir una sesion
-- `Grammarly` solo si a esa persona le resulta util
-
-## Setup local de LaTeX
-
-En VS Code:
-
-1. Ir a `Terminal` -> `Run Task`.
-2. Elegir `Setup local thesis environment`.
-3. Esperar a que instale/verifique LaTeX.
-4. Confirmar que se genera `PDF/plantilla.pdf`.
-
-Por terminal:
+Con `pip`, sustituir `uv run` por `python3 -m` cuando proceda:
 
 ```bash
-./scripts/setup-local.sh
+python3 -m pytest
 ```
 
-En Windows tambien se puede ejecutar:
+## Ejecución del pipeline
 
-```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\setup-local-windows.ps1
+Flujo completo:
+
+```bash
+uv run python -m tfm_pipeline.run_baselines
+uv run python -m tfm_pipeline.run_vae
+uv run python -m tfm_pipeline.run_timegan
+uv run python -m tfm_pipeline.run_timegan_multiseed
+uv run python -m tfm_pipeline.report_timegan_multiseed
+uv run python -m tfm_pipeline.compare_results
+uv run python scripts/generate-result-figures.py
 ```
 
-## Compilar el PDF
+Para una comprobación corta, ejecutar solo los tests y los baselines:
 
-En VS Code:
+```bash
+uv run pytest
+uv run python -m tfm_pipeline.run_baselines
+```
 
-1. Ir a `Terminal` -> `Run Task`.
-2. Elegir `Compile thesis PDF`.
+Las salidas se generan en `results/`. Esta carpeta no se versiona porque contiene artefactos reproducibles.
 
-Por terminal:
+## Resultados generados
+
+| Ruta | Contenido |
+| --- | --- |
+| `results/baselines/` | Métricas y pesos de carteras clásicas |
+| `results/vae/` | Escenarios y métricas del VAE |
+| `results/timegan/` | Escenarios y métricas de TimeGAN |
+| `results/timegan_multiseed/` | Evaluación multi-semilla, ranking y selección por validación |
+| `results/combined_portfolio_metrics.csv` | Comparación agregada de carteras |
+| `media/result_*.png` | Figuras regeneradas para la memoria |
+
+El criterio de selección de TimeGAN se basa en diagnósticos de validación. Las métricas financieras de test se reservan para la evaluación final fuera de muestra.
+
+## Compilación de la memoria
+
+La memoria principal está en `plantilla.tex`.
+
+Compilación local:
 
 ```bash
 ./scripts/compile-local.sh
@@ -140,191 +160,32 @@ En Windows:
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\compile-local-windows.ps1
 ```
 
-Salida esperada:
+También puede compilarse desde VS Code con la tarea **Compile thesis PDF**. El PDF generado se guarda en `PDF/plantilla.pdf`.
 
-- `PDF/plantilla.pdf`
+## Documentación útil
 
-## Compilar con LaTeX Workshop
+- `docs/flujo_codigo.md`: guía de instalación y ejecución del pipeline.
+- `docs/metricas_experimento.md`: protocolo de métricas usado en el experimento.
+- `plantilla.tex`: memoria completa del TFM.
 
-La receta recomendada es:
+## Reproducibilidad
 
-```text
-latexmk_local (recommended)
-```
+El pipeline registra metadatos de ejecución como revisión de Git, rama activa, versión de Python, plataforma, paquetes instalados y disponibilidad de CUDA/MPS. Esto facilita reconstruir el entorno experimental y explicar diferencias entre ejecuciones.
 
-Para compilar desde LaTeX Workshop:
+Los modelos generativos son estocásticos; por ello, TimeGAN incluye una evaluación multi-semilla y una selección basada exclusivamente en validación.
 
-- abrir `plantilla.tex`
-- ejecutar `LaTeX Workshop: Build LaTeX project`
-- o usar el boton de build de la extension
+## Limitaciones
 
-La autocompilacion al guardar esta desactivada en `.vscode/settings.json` para evitar builds constantes. Si el equipo la quiere activar, cambiar:
+Este repositorio tiene finalidad académica. No constituye asesoramiento financiero ni un sistema de trading. Los resultados deben interpretarse como evidencia experimental dentro del protocolo definido, no como garantía de rendimiento futuro.
 
-```json
-"latex-workshop.latex.autoBuild.run": "onSave"
-```
+## Referencias principales
 
-## Archivos principales
+- Yoon, J., Jarrett, D., & van der Schaar, M. (2019). *Time-series Generative Adversarial Networks*. NeurIPS.
+- Kingma, D. P., & Welling, M. (2014). *Auto-Encoding Variational Bayes*. ICLR.
+- Markowitz, H. (1952). *Portfolio Selection*. The Journal of Finance.
 
-- Documento principal: `plantilla.tex`
-- Bibliografia: `bibliografia.bib`
-- Imagenes: `media/`
-- PDF generado: `PDF/plantilla.pdf`
+La bibliografía completa está en `bibliografia.bib` y en la memoria LaTeX.
 
-## Flujo diario recomendado
+## Licencia
 
-Antes de empezar:
-
-```bash
-git pull
-```
-
-Despues de editar y compilar:
-
-```bash
-git status
-git add .
-git commit -m "Describe brevemente el cambio"
-git push
-```
-
-Si dos personas editan a la vez:
-
-- antes de empezar: `git pull`
-- al terminar: `git add`, `git commit`, `git push`
-- si Git avisa de conflicto: hacer otro `git pull` y resolverlo antes de seguir
-
-## Compilacion remota manual en GitHub
-
-Usar esto solo si quereis generar un PDF desde GitHub sin depender del ordenador local.
-
-Pasos:
-
-1. Entrar en el repo en GitHub.
-2. Abrir la pestana `Actions`.
-3. Entrar en `Build Thesis PDF`.
-4. Pulsar `Run workflow`.
-5. Esperar a que termine.
-6. Descargar el artefacto `tesis-pdf`.
-
-## Prueba de instalacion desde cero
-
-El repositorio incluye una prueba aislada para comprobar si una persona con un equipo limpio podria instalar las dependencias y compilar el PDF.
-
-La prueba se ejecuta en GitHub Actions sobre maquinas nuevas de:
-
-- Linux: `ubuntu-latest`
-- macOS: `macos-latest`
-- Windows: `windows-latest`
-
-Workflow:
-
-```text
-Fresh Install Test
-```
-
-Esta prueba no se ejecuta cuando solo cambian archivos del documento, bibliografia o imagenes. Por ejemplo, cambios en `plantilla.tex`, `bibliografia.bib`, `media/` o `logo_unir.pdf` no lanzan esta prueba porque no modifican la instalacion del entorno.
-
-Se ejecuta automaticamente solo cuando cambian archivos de configuracion del entorno:
-
-- `.github/workflows/fresh-install-test.yml`
-- `.vscode/extensions.json`
-- `.vscode/settings.json`
-- `.vscode/tasks.json`
-- `scripts/**`
-
-Ademas, cada sistema operativo se prueba solo cuando el cambio le afecta:
-
-- cambios en `scripts/setup-local.sh` o `scripts/compile-local.sh`: prueban Linux y macOS
-- cambios en scripts Windows `.ps1`: prueban Windows
-- cambios en la configuracion compartida de VS Code o en el propio workflow: prueban Linux, macOS y Windows
-- ejecucion manual con `Run workflow`: prueba Linux, macOS y Windows
-
-Los archivos personales de VS Code no deberian subirse. El repositorio solo conserva la configuracion compartida necesaria para que todos tengan las mismas tareas, recetas de LaTeX Workshop y extensiones recomendadas.
-
-Que valida:
-
-- instalacion/verificacion de LaTeX en Linux y macOS usando `scripts/setup-local.sh`
-- instalacion/verificacion de LaTeX en Windows usando `scripts/setup-ci-windows.ps1`
-- disponibilidad de `latexmk`, `pdflatex` y `bibtex`
-- disponibilidad de `perl` en Windows, necesario para `latexmk`
-- generacion correcta de `PDF/plantilla.pdf`
-
-En Windows, la prueba de GitHub Actions usa un script separado porque el setup normal para usuarios puede requerir permisos de administrador mediante `winget`. El flujo para usuarios sigue siendo:
-
-```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\setup-local-windows.ps1
-```
-
-Interpretacion del resultado:
-
-- si Linux y macOS pasan, el script normal de usuario ha funcionado en una maquina limpia
-- si Windows pasa, el proyecto compila en Windows con MiKTeX, Strawberry Perl y los mismos comandos LaTeX
-- en Windows, un usuario real todavia debe aceptar permisos de administrador si `winget` instala MiKTeX o Strawberry Perl
-- al terminar el setup local, los scripts muestran las versiones detectadas de `latexmk`, `pdflatex`, `bibtex` y, en Windows, `perl`
-
-Para ejecutar la prueba desde GitHub:
-
-1. Entrar en el repo en GitHub.
-2. Abrir la pestana `Actions`.
-3. Entrar en `Fresh Install Test`.
-4. Pulsar `Run workflow`.
-5. Revisar los tres jobs: Linux, macOS y Windows.
-6. Descargar el artefacto `thesis-pdf-*` si se quiere revisar el PDF generado por cada sistema.
-
-## Docker como fallback
-
-Docker ya no es el flujo principal. Si alguien lo tiene instalado y quiere usarlo, sigue disponible:
-
-```bash
-docker run --rm -v "$PWD":/work -w /work sanjibsen/weblatex:latest \
-  latexmk -pdf -interaction=nonstopmode -file-line-error -outdir=PDF plantilla.tex
-```
-
-En VS Code tambien existe la task:
-
-```text
-Compile thesis PDF (Docker fallback)
-```
-
-## Problemas tipicos
-
-Si VS Code no encuentra `latexmk` justo despues de instalar MiKTeX:
-
-- cerrar VS Code
-- abrir VS Code otra vez
-- ejecutar `Setup local thesis environment`
-
-Si `latexmk` dice que falta `perl`:
-
-- ejecutar `Setup local thesis environment`
-- aceptar la instalacion de Strawberry Perl si Windows pide permisos
-- cerrar y abrir VS Code si la terminal antigua no detecta el nuevo `PATH`
-
-Si MiKTeX avisa `So far, you have not checked for MiKTeX updates`, el PDF puede estar compilando correctamente; para quitar el aviso, abrir `MiKTeX Console` y pulsar `Check for updates`.
-
-Si quieres recompilar limpio:
-
-```bash
-rm -rf PDF
-mkdir PDF
-./scripts/compile-local.sh
-```
-
-En Windows:
-
-```powershell
-Remove-Item -Recurse -Force .\PDF
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\compile-local-windows.ps1
-```
-
-## Codespaces
-
-Codespaces queda disponible como opcion secundaria. El flujo recomendado para este proyecto es trabajar en local con LaTeX instalado en el ordenador.
-
-## Colaboracion entre miembros del TFM
-
-- Cambios pequenos: commit directo a `main` si el equipo lo acuerda.
-- Cambios grandes: rama + pull request + revision.
-- Historial completo y reversible con Git.
-- GitHub Actions consume cuota de la cuenta propietaria del repositorio.
+Este proyecto se distribuye bajo licencia MIT. Ver el archivo `LICENSE`.
