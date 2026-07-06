@@ -1,4 +1,4 @@
-# Synthetic Financial Scenarios
+# Escenarios financieros sintéticos
 
 Repositorio asociado al Trabajo de Fin de Máster **"Generación de escenarios sintéticos de retornos financieros mediante VAE y TimeGAN para optimización de carteras"**.
 
